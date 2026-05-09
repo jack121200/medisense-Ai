@@ -1,0 +1,31 @@
+{
+  "n_samples_clean": 416,
+  "n_features": 20,
+  "features": [
+    "WBC",
+    "LYMp",
+    "MIDp",
+    "NEUTp",
+    "LYMn",
+    "MIDn",
+    "NEUTn",
+    "RBC",
+    "HGB",
+    "HCT",
+    "MCV",
+    "MCH",
+    "MCHC",
+    "RDWSD",
+    "RDWCV",
+    "PLT",
+    "MPV",
+    "PDW",
+    "PCT",
+    "PLCR"
+  ],
+  "contamination": 0.05,
+  "kmeans_k": 3,
+  "n_anomalies": 21,
+  "dataset": "cbc information.xlsx",
+  "note": "Isolation Forest + KMeans on CBC blood parameters"
+}

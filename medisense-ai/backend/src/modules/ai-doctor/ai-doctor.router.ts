@@ -1,0 +1,72 @@
+import { Router } from 'express';
+import { aiDoctorController } from './ai-doctor.controller';
+import { authenticate, authorize } from '../../middleware/auth.middleware';
+
+const router = Router();
+
+/**
+ * POST /api/v1/ai-doctor/start-call
+ * Patient starts a new AI Doctor voice call.
+ * Returns vapiCallId + publicKey to the frontend SDK.
+ */
+router.post(
+    '/start-call',
+    authenticate,
+    authorize('PATIENT'),
+    aiDoctorController.startCall
+);
+
+/**
+ * GET /api/v1/ai-doctor/patient-context
+ * Real-time patient data endpoint — called by Vapi tool call mid-conversation.
+ * Requires valid JWT in Authorization header (passed by Vapi tool server config).
+ */
+router.get(
+    '/patient-context',
+    authenticate,
+    authorize('PATIENT'),
+    aiDoctorController.getPatientContext
+);
+
+/**
+ * POST /api/v1/ai-doctor/webhook
+ * Vapi webhook — receives end-of-call report (transcript + summary).
+ * No authenticated user — Vapi server sends this, NOT the patient.
+ * Must be publicly accessible (no authenticate middleware).
+ */
+router.post('/webhook', aiDoctorController.handleWebhook);
+
+/**
+ * POST /api/v1/ai-doctor/save-call
+ * Frontend calls this after the call ends to persist the call record + trigger Groq suggestions.
+ */
+router.post(
+    '/save-call',
+    authenticate,
+    authorize('PATIENT'),
+    aiDoctorController.saveCall
+);
+
+/**
+ * GET /api/v1/ai-doctor/calls?page=1&limit=10
+ * Get paginated call history for the logged-in patient.
+ */
+router.get(
+    '/calls',
+    authenticate,
+    authorize('PATIENT'),
+    aiDoctorController.getCalls
+);
+
+/**
+ * GET /api/v1/ai-doctor/calls/:id
+ * Get single call with full transcript (patient-owned only).
+ */
+router.get(
+    '/calls/:id',
+    authenticate,
+    authorize('PATIENT'),
+    aiDoctorController.getCallById
+);
+
+export default router;

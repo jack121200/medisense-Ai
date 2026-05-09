@@ -1,0 +1,715 @@
+// ═══════════════════════════════════════════════════
+// PRISMA SCHEMA — MediSense AI
+// ═══════════════════════════════════════════════════
+
+generator client {
+  provider      = "prisma-client-js"
+  binaryTargets = ["native", "linux-musl-openssl-3.0.x"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ─────────────────────────────────────────
+// USER & AUTH
+// ─────────────────────────────────────────
+
+model User {
+  id               String         @id @default(cuid())
+  email            String         @unique
+  passwordHash     String
+  firstName        String
+  lastName         String
+  role             UserRole       @default(DOCTOR)
+  department       String?
+  avatar           String?
+  isActive         Boolean        @default(true)
+  lastLoginAt      DateTime?
+  // Doctor-specific fields
+  specialization   String?        // e.g. "Cardiologist", "Orthopedic"
+  consultationFee  Float?         // in INR
+  licenseNumber    String?
+  // Relations
+  refreshTokens    RefreshToken[]
+  auditLogs        AuditLog[]
+  notifications    Notification[]
+  linkedPatient    Patient?       @relation("UserPatientLink")
+  createdAt        DateTime       @default(now())
+  updatedAt        DateTime       @updatedAt
+
+  @@map("users")
+}
+
+model RefreshToken {
+  id        String   @id @default(cuid())
+  token     String   @unique
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  @@map("refresh_tokens")
+}
+
+enum UserRole {
+  SUPER_ADMIN
+  ADMIN
+  DOCTOR
+  NURSE
+  ANALYST
+  RECEPTIONIST
+  LAB_TECHNICIAN
+  PATIENT
+}
+
+// ─────────────────────────────────────────
+// PATIENT CORE
+// ─────────────────────────────────────────
+
+model Patient {
+  id                    String               @id @default(cuid())
+  patientCode           String               @unique
+  firstName             String
+  lastName              String
+  dateOfBirth           DateTime
+  gender                Gender
+  bloodGroup            BloodGroup?
+  email                 String?
+  phone                 String?
+  address               String?
+  city                  String?
+  emergencyContactName  String?
+  emergencyContactPhone String?
+  emergencyContactRel   String?              // Relationship: Mother, Father, Spouse etc.
+  photo                 String?
+
+  // Medical Profile
+  bmi                   Float?
+  height                Float?               // in cm
+  weight                Float?               // in kg
+  smokingStatus         SmokingStatus        @default(NEVER)
+  alcoholUse            AlcoholUse           @default(NEVER)
+  physicalActivity      ActivityLevel        @default(MODERATE)
+  allergies             String?              // comma-separated
+  medicalHistory        String?              // free text
+  currentMedications    String?              // free text
+
+  // Comorbidities
+  hasDiabetes           Boolean              @default(false)
+  hasHypertension       Boolean              @default(false)
+  hasHeartDisease       Boolean              @default(false)
+  hasCKD                Boolean              @default(false)
+  hasAsthma             Boolean              @default(false)
+  hasCOPD               Boolean              @default(false)
+  hasObesity            Boolean              @default(false)
+  hasCancer             Boolean              @default(false)
+
+  // Risk
+  currentRiskLevel      RiskLevel            @default(LOW)
+  riskScore             Float                @default(0)
+  isActive              Boolean              @default(true)
+  isSeeded              Boolean              @default(false)
+
+  // Self-registration link
+  userId                String?              @unique
+  user                  User?                @relation("UserPatientLink", fields: [userId], references: [id])
+
+  // Relations
+  admissions            Admission[]
+  vitalsReadings        VitalsReading[]
+  mlPredictions         MLPrediction[]
+  careRecommendations   CareRecommendation[]
+  labReports            LabReport[]
+  alerts                Alert[]
+  consultations         Consultation[]
+  prescriptions         Prescription[]
+  labTestRequests       LabTestRequest[]
+  invoices              Invoice[]
+  appointmentRequests   AppointmentRequest[]
+  aiDoctorCalls         AiDoctorCall[]
+
+  createdAt             DateTime             @default(now())
+  updatedAt             DateTime             @updatedAt
+
+  @@map("patients")
+  @@index([currentRiskLevel])
+  @@index([patientCode])
+  @@index([userId])
+}
+
+// ─────────────────────────────────────────
+// ADMISSION
+// ─────────────────────────────────────────
+
+model Admission {
+  id                      String            @id @default(cuid())
+  admissionNumber         String            @unique
+  patientId               String
+  patient                 Patient           @relation(fields: [patientId], references: [id])
+  admittedAt              DateTime          @default(now())
+  dischargedAt            DateTime?
+  lengthOfStay            Int?
+  wardType                WardType
+  bedNumber               String?
+  icuAdmitted             Boolean           @default(false)
+  admissionReason         String
+  diagnosis               String?
+  treatmentOutcome        TreatmentOutcome?
+  readmitted              Boolean           @default(false)
+  readmissionWithin30Days Boolean           @default(false)
+  attendingDoctorId       String?
+  dischargeNotes          String?
+  clinicalData            ClinicalSnapshot?
+
+  createdAt               DateTime          @default(now())
+  updatedAt               DateTime          @updatedAt
+
+  @@map("admissions")
+  @@index([patientId])
+  @@index([admittedAt])
+}
+
+model ClinicalSnapshot {
+  id                      String    @id @default(cuid())
+  admissionId             String    @unique
+  admission               Admission @relation(fields: [admissionId], references: [id])
+
+  bloodSugarFasting       Float?
+  bloodSugarPostMeal      Float?
+  hba1c                   Float?
+  cholesterolTotal        Float?
+  cholesterolLDL          Float?
+  cholesterolHDL          Float?
+  triglycerides           Float?
+  heartRateAvg            Float?
+  bloodPressureSystolic   Float?
+  bloodPressureDiastolic  Float?
+  oxygenSaturation        Float?
+  temperature             Float?
+  hemoglobin              Float?
+  whiteBloodCellCount     Float?
+  creatinine              Float?
+  gfr                     Float?
+
+  createdAt               DateTime  @default(now())
+
+  @@map("clinical_snapshots")
+}
+
+// ─────────────────────────────────────────
+// VITALS (TimescaleDB hypertable)
+// ─────────────────────────────────────────
+
+model VitalsReading {
+  id               String       @id @default(cuid())
+  patientId        String
+  patient          Patient      @relation(fields: [patientId], references: [id])
+  recordedAt       DateTime     @default(now())
+
+  heartRate        Float
+  oxygenSaturation Float
+  systolicBP       Float
+  diastolicBP      Float
+  temperature      Float
+  respiratoryRate  Float?
+  glucoseLevel     Float?
+
+  isAnomaly        Boolean      @default(false)
+  anomalyType      String?
+  alertTriggered   Boolean      @default(false)
+  source           VitalsSource @default(MANUAL)
+
+  @@map("vitals_readings")
+  @@index([patientId, recordedAt])
+}
+
+// ─────────────────────────────────────────
+// ML PREDICTIONS
+// ─────────────────────────────────────────
+
+model MLPrediction {
+  id                    String    @id @default(cuid())
+  patientId             String
+  patient               Patient   @relation(fields: [patientId], references: [id])
+  modelVersion          String
+
+  predictedRiskLevel    RiskLevel
+  riskProbabilityHigh   Float
+  riskProbabilityMedium Float
+  riskProbabilityLow    Float
+  riskConfidence        Float
+
+  readmissionRisk       Boolean
+  readmissionProbability Float
+
+  predictedLengthOfStay Float
+
+  clusterLabel          Int
+  clusterName           String
+
+  shapValues            Json
+  topRiskFactors        Json
+
+  createdAt             DateTime  @default(now())
+
+  @@map("ml_predictions")
+  @@index([patientId])
+}
+
+// ─────────────────────────────────────────
+// CARE RECOMMENDATIONS
+// ─────────────────────────────────────────
+
+model CareRecommendation {
+  id             String               @id @default(cuid())
+  patientId      String
+  patient        Patient              @relation(fields: [patientId], references: [id])
+  generatedAt    DateTime             @default(now())
+  validUntil     DateTime
+  isAcknowledged Boolean              @default(false)
+  acknowledgedBy String?
+  acknowledgedAt DateTime?
+  items          RecommendationItem[]
+
+  @@map("care_recommendations")
+}
+
+model RecommendationItem {
+  id               String                 @id @default(cuid())
+  recommendationId String
+  recommendation   CareRecommendation     @relation(fields: [recommendationId], references: [id])
+  category         RecommendationCategory
+  priority         Priority
+  title            String
+  description      String
+  actionableSteps  Json
+  followUpInDays   Int?
+  specialistType   String?
+
+  @@map("recommendation_items")
+}
+
+// ─────────────────────────────────────────
+// CONSULTATION (Doctor-Patient session)
+// ─────────────────────────────────────────
+
+model Consultation {
+  id              String            @id @default(cuid())
+  patientId       String
+  patient         Patient           @relation(fields: [patientId], references: [id])
+  doctorId        String
+  appointmentId   String?           @unique
+  symptoms        String[]          // list of symptom strings
+  notes           String?
+  diagnosis       String?
+  aiDiseasePred   Json?             // Disease prediction from ML
+  status          ConsultationStatus @default(IN_PROGRESS)
+  prescription    Prescription?
+  labTestRequests LabTestRequest[]
+  invoice         Invoice?
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+
+  @@map("consultations")
+  @@index([patientId])
+  @@index([doctorId])
+}
+
+model Prescription {
+  id             String             @id @default(cuid())
+  consultationId String             @unique
+  consultation   Consultation       @relation(fields: [consultationId], references: [id])
+  patientId      String
+  patient        Patient            @relation(fields: [patientId], references: [id])
+  doctorId       String
+  notes          String?
+  items          PrescriptionItem[]
+  createdAt      DateTime           @default(now())
+
+  @@map("prescriptions")
+  @@index([patientId])
+}
+
+model PrescriptionItem {
+  id             String       @id @default(cuid())
+  prescriptionId String
+  prescription   Prescription @relation(fields: [prescriptionId], references: [id], onDelete: Cascade)
+  medicineName   String
+  dosage         String       // e.g. "500mg"
+  frequency      String       // e.g. "3 times daily"
+  duration       String?      // e.g. "5 days"
+  instructions   String?
+
+  @@map("prescription_items")
+}
+
+// ─────────────────────────────────────────
+// LAB TEST WORKFLOW
+// ─────────────────────────────────────────
+
+model LabTestRequest {
+  id             String            @id @default(cuid())
+  testId         String            @unique  // e.g. TEST-2045
+  patientId      String
+  patient        Patient           @relation(fields: [patientId], references: [id])
+  consultationId String?
+  consultation   Consultation?     @relation(fields: [consultationId], references: [id])
+  orderedByDocId String
+  testType       LabTestType
+  status         LabTestStatus     @default(PENDING)
+  priority       String?           @default("NORMAL")
+  notes          String?
+  result         LabTestResult?
+  createdAt      DateTime          @default(now())
+  updatedAt      DateTime          @updatedAt
+
+  @@map("lab_test_requests")
+  @@index([patientId])
+  @@index([status])
+}
+
+model LabTestResult {
+  id            String         @id @default(cuid())
+  requestId     String         @unique
+  request       LabTestRequest @relation(fields: [requestId], references: [id])
+  hemoglobin    Float?
+  wbc           Float?
+  platelets     Float?
+  rbc           Float?
+  glucose       Float?
+  cholesterol   Float?
+  creatinine    Float?
+  rawValues     Json?          // any additional key-value results
+  fileUrl       String?        // uploaded PDF
+  aiAnalysis    Json?          // AI flagged abnormals
+  uploadedAt    DateTime       @default(now())
+
+  @@map("lab_test_results")
+}
+
+// ─────────────────────────────────────────
+// BILLING
+// ─────────────────────────────────────────
+
+model Invoice {
+  id             String        @id @default(cuid())
+  invoiceNumber  String        @unique  // e.g. INV-2024-00001
+  patientId      String
+  patient        Patient       @relation(fields: [patientId], references: [id])
+  consultationId String?       @unique
+  consultation   Consultation? @relation(fields: [consultationId], references: [id])
+  items          InvoiceItem[]
+  subtotal       Float
+  tax            Float         @default(0)
+  totalAmount    Float
+  isPaid         Boolean       @default(false)
+  paymentMethod  String?       // CASH | UPI | CARD
+  paidAt         DateTime?
+  createdAt      DateTime      @default(now())
+
+  @@map("invoices")
+  @@index([patientId])
+  @@index([isPaid])
+}
+
+model InvoiceItem {
+  id          String  @id @default(cuid())
+  invoiceId   String
+  invoice     Invoice @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
+  description String  // e.g. "Consultation Fee", "Blood Test"
+  amount      Float
+
+  @@map("invoice_items")
+}
+
+// ─────────────────────────────────────────
+// APPOINTMENT REQUESTS (New workflow)
+// ─────────────────────────────────────────
+
+model AppointmentRequest {
+  id               String                @id @default(cuid())
+  patientId        String
+  patient          Patient               @relation(fields: [patientId], references: [id])
+  doctorId         String                // User.id of doctor
+  requestedDate    DateTime
+  timeSlot         AppointmentTimeSlot
+  reason           String?
+  status           AppointmentReqStatus  @default(PENDING)
+  // Counter-offer fields (filled by receptionist on rejection)
+  counterDate      DateTime?
+  counterSlot      AppointmentTimeSlot?
+  receptionistNote String?
+  // Filled when approved → creates actual appointment ref
+  approvedAt       DateTime?
+  rejectedAt       DateTime?
+  createdAt        DateTime              @default(now())
+  updatedAt        DateTime              @updatedAt
+
+  @@map("appointment_requests")
+  @@index([patientId])
+  @@index([doctorId])
+  @@index([status])
+}
+
+// ─────────────────────────────────────────
+// NOTIFICATIONS
+// ─────────────────────────────────────────
+
+model Notification {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  title     String
+  message   String
+  type      String   @default("INFO")   // INFO | SUCCESS | WARNING | ACTION_REQUIRED
+  isRead    Boolean  @default(false)
+  metadata  Json?                       // e.g. { appointmentRequestId, labTestId }
+  createdAt DateTime @default(now())
+
+  @@map("notifications")
+  @@index([userId, isRead])
+}
+
+// ─────────────────────────────────────────
+// ALERTS
+// ─────────────────────────────────────────
+
+model Alert {
+  id          String        @id @default(cuid())
+  patientId   String
+  patient     Patient       @relation(fields: [patientId], references: [id])
+  type        AlertType
+  severity    AlertSeverity
+  message     String
+  details     Json
+  isRead      Boolean       @default(false)
+  isResolved  Boolean       @default(false)
+  resolvedBy  String?
+  resolvedAt  DateTime?
+  createdAt   DateTime      @default(now())
+
+  @@map("alerts")
+  @@index([patientId, createdAt])
+  @@index([isRead, isResolved])
+}
+
+// ─────────────────────────────────────────
+// LAB REPORTS
+// ─────────────────────────────────────────
+
+model LabReport {
+  id         String   @id @default(cuid())
+  patientId  String
+  patient    Patient  @relation(fields: [patientId], references: [id])
+  reportDate DateTime
+  reportType String
+  fileUrl    String?
+  results    Json
+  notes      String?
+  orderedBy  String?
+  createdAt  DateTime @default(now())
+
+  @@map("lab_reports")
+}
+
+// ─────────────────────────────────────────
+// AUDIT LOG
+// ─────────────────────────────────────────
+
+model AuditLog {
+  id         String   @id @default(cuid())
+  userId     String
+  user       User     @relation(fields: [userId], references: [id])
+  action     String
+  resource   String
+  resourceId String?
+  details    Json?
+  ipAddress  String?
+  userAgent  String?
+  createdAt  DateTime @default(now())
+
+  @@map("audit_logs")
+  @@index([userId, createdAt])
+}
+
+// ─────────────────────────────────────────
+// ENUMS
+// ─────────────────────────────────────────
+
+enum Gender {
+  MALE
+  FEMALE
+  OTHER
+}
+
+enum BloodGroup {
+  A_POS
+  A_NEG
+  B_POS
+  B_NEG
+  AB_POS
+  AB_NEG
+  O_POS
+  O_NEG
+}
+
+enum SmokingStatus {
+  NEVER
+  FORMER
+  CURRENT
+}
+
+enum AlcoholUse {
+  NEVER
+  OCCASIONAL
+  REGULAR
+  HEAVY
+}
+
+enum ActivityLevel {
+  SEDENTARY
+  LOW
+  MODERATE
+  HIGH
+}
+
+enum RiskLevel {
+  LOW
+  MEDIUM
+  HIGH
+  CRITICAL
+}
+
+enum WardType {
+  GENERAL
+  ICU
+  CARDIAC
+  ORTHOPEDIC
+  ONCOLOGY
+  NEUROLOGY
+  PEDIATRIC
+  MATERNITY
+}
+
+enum TreatmentOutcome {
+  RECOVERED
+  STABLE
+  DETERIORATED
+  TRANSFERRED
+  DECEASED
+}
+
+enum VitalsSource {
+  MANUAL
+  DEVICE
+  WEARABLE
+  SIMULATED
+}
+
+enum AlertType {
+  VITALS_ANOMALY
+  RISK_ESCALATION
+  READMISSION_RISK
+  MEDICATION_DUE
+  FOLLOW_UP
+  SYSTEM
+}
+
+enum AlertSeverity {
+  INFO
+  WARNING
+  CRITICAL
+  EMERGENCY
+}
+
+enum RecommendationCategory {
+  MEDICATION
+  LIFESTYLE
+  DIET
+  FOLLOW_UP
+  SPECIALIST
+  DIAGNOSTIC
+  PREVENTIVE
+}
+
+enum Priority {
+  LOW
+  MEDIUM
+  HIGH
+  URGENT
+}
+
+enum ConsultationStatus {
+  IN_PROGRESS
+  COMPLETED
+  CANCELLED
+}
+
+enum LabTestType {
+  BLOOD_TEST
+  URINE_TEST
+  XRAY
+  ECG
+  CT_SCAN
+  MRI
+  ULTRASOUND
+  STOOL_TEST
+  CULTURE
+  BIOPSY
+}
+
+enum LabTestStatus {
+  PENDING
+  ACCEPTED
+  SAMPLE_COLLECTED
+  COMPLETED
+  CANCELLED
+}
+
+enum AppointmentTimeSlot {
+  MORNING    // 9AM - 12PM
+  NOON       // 12PM - 3PM
+  NIGHT      // 6PM - 9PM
+  LATE_NIGHT // 9PM - 12AM
+}
+
+enum AppointmentReqStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  COUNTER_OFFERED
+  PATIENT_ACCEPTED
+  PATIENT_DECLINED
+  COMPLETED
+}
+
+// ─────────────────────────────────────────
+// AI DOCTOR CALLS
+// ─────────────────────────────────────────
+
+model AiDoctorCall {
+  id                String        @id @default(cuid())
+  patientId         String
+  patient           Patient       @relation(fields: [patientId], references: [id])
+  vapiCallId        String        @unique
+  durationSecs      Int?          // total call duration in seconds
+  transcript        Json?         // array of {role, message, time} objects
+  summary           String?       @db.Text // AI-generated 3-5 line summary
+  preCallData       Json?         // { reason, reportText, additionalNotes }
+  doctorSuggestions Json?         // { summary, possible_conditions, recommended_actions, red_flags, follow_up }
+  status            AiCallStatus  @default(COMPLETED)
+  startedAt         DateTime      @default(now())
+  endedAt           DateTime?
+
+  @@map("ai_doctor_calls")
+  @@index([patientId, startedAt])
+}
+
+enum AiCallStatus {
+  IN_PROGRESS
+  COMPLETED
+  FAILED
+  NO_ANSWER
+}
