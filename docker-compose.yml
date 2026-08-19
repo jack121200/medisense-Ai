@@ -1,0 +1,232 @@
+version: '3.9'
+
+services:
+  # ──────────────────────────────────────────
+  # NGINX — Reverse Proxy
+  # ──────────────────────────────────────────
+  nginx:
+    image: nginx:alpine
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      - frontend
+      - backend
+    networks:
+      - medisense-net
+    restart: unless-stopped
+
+  # ──────────────────────────────────────────
+  # FRONTEND — React + Vite
+  # ──────────────────────────────────────────
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    ports:
+      - "3000:80"
+    environment:
+      - VITE_API_URL=http://localhost:5000
+      - VITE_WS_URL=http://localhost:5000
+      - VITE_VAPI_PUBLIC_KEY=${VAPI_PUBLIC_KEY}
+    depends_on:
+      - backend
+    networks:
+      - medisense-net
+    restart: unless-stopped
+
+  # ──────────────────────────────────────────
+  # BACKEND — Node.js + Express
+  # ──────────────────────────────────────────
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    ports:
+      - "5000:5000"
+    environment:
+      - NODE_ENV=production
+      - PORT=5000
+      - DATABASE_URL=postgresql://medisense:medisense_password@postgres:5432/medisense_db
+      - REDIS_URL=redis://:redis_password@redis:6379
+      - ML_SERVICE_URL=http://ml-service:8000
+      - KAFKA_BROKER=kafka:9092
+      - KAFKA_VITALS_TOPIC=patient-vitals
+      - KAFKA_ALERTS_TOPIC=medical-alerts
+      - ELASTICSEARCH_URL=http://elasticsearch:9200
+      - MINIO_ENDPOINT=minio
+      - MINIO_PORT=9000
+      - MINIO_ACCESS_KEY=minioadmin
+      - MINIO_SECRET_KEY=minioadmin123
+      - MINIO_BUCKET=medisense-files
+      - JWT_ACCESS_SECRET=medisense-super-secret-access-key-min-32-chars-2024
+      - JWT_REFRESH_SECRET=medisense-super-secret-refresh-key-min-32-chars-2024
+      - JWT_ACCESS_EXPIRY=15m
+      - JWT_REFRESH_EXPIRY=7d
+      - FRONTEND_URL=http://localhost
+      - VAPI_API_KEY=${VAPI_API_KEY}
+      - VAPI_PUBLIC_KEY=${VAPI_PUBLIC_KEY}
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      ml-service:
+        condition: service_started
+    networks:
+      - medisense-net
+    restart: unless-stopped
+    volumes:
+      - ./backend/logs:/app/logs
+
+  # ──────────────────────────────────────────
+  # ML SERVICE — Python FastAPI
+  # ──────────────────────────────────────────
+  ml-service:
+    build:
+      context: ./ml-service
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    environment:
+      - DATABASE_URL=postgresql://medisense:medisense_password@postgres:5432/medisense_db
+      - REDIS_URL=redis://:redis_password@redis:6379
+      - KAFKA_BROKER=kafka:9092
+      - MODEL_PATH=/app/models
+      - HEART_CSV=/app/data/HeartDiseaseTrain-Test.csv
+    volumes:
+      - ./ml-service/app/models:/app/models
+      - ./HeartDiseaseTrain-Test.csv:/app/data/HeartDiseaseTrain-Test.csv:ro
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - medisense-net
+    restart: unless-stopped
+
+  # ──────────────────────────────────────────
+  # POSTGRESQL + TIMESCALEDB
+  # ──────────────────────────────────────────
+  postgres:
+    image: timescale/timescaledb:latest-pg15
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_DB=medisense_db
+      - POSTGRES_USER=medisense
+      - POSTGRES_PASSWORD=medisense_password
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U medisense -d medisense_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - medisense-net
+    restart: unless-stopped
+
+  # ──────────────────────────────────────────
+  # REDIS
+  # ──────────────────────────────────────────
+  redis:
+    image: redis:7-alpine
+    # No host port binding — only accessible internally via Docker network
+    # (backend and ml-service connect via redis://redis:6379 internally)
+    command: redis-server --requirepass redis_password
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "-a", "redis_password", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - medisense-net
+    restart: unless-stopped
+
+  # ──────────────────────────────────────────
+  # ZOOKEEPER (for Kafka)
+  # ──────────────────────────────────────────
+  zookeeper:
+    image: confluentinc/cp-zookeeper:7.5.0
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+    volumes:
+      - zookeeper_data:/var/lib/zookeeper/data
+    networks:
+      - medisense-net
+    restart: unless-stopped
+
+  # ──────────────────────────────────────────
+  # APACHE KAFKA
+  # ──────────────────────────────────────────
+  kafka:
+    image: confluentinc/cp-kafka:7.5.0
+    ports:
+      - "9092:9092"
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092,PLAINTEXT_HOST://localhost:29092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
+    depends_on:
+      - zookeeper
+    volumes:
+      - kafka_data:/var/lib/kafka/data
+    networks:
+      - medisense-net
+    restart: unless-stopped
+
+  # ──────────────────────────────────────────
+  # ELASTICSEARCH
+  # ──────────────────────────────────────────
+  elasticsearch:
+    image: elasticsearch:8.11.0
+    ports:
+      - "9200:9200"
+    environment:
+      - discovery.type=single-node
+      - xpack.security.enabled=false
+      - ES_JAVA_OPTS=-Xms512m -Xmx512m
+    volumes:
+      - elasticsearch_data:/usr/share/elasticsearch/data
+    networks:
+      - medisense-net
+    restart: unless-stopped
+
+  # ──────────────────────────────────────────
+  # MINIO (S3-compatible storage)
+  # ──────────────────────────────────────────
+  minio:
+    image: minio/minio:latest
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    command: server /data --console-address ":9001"
+    environment:
+      - MINIO_ROOT_USER=minioadmin
+      - MINIO_ROOT_PASSWORD=minioadmin123
+    volumes:
+      - minio_data:/data
+    networks:
+      - medisense-net
+    restart: unless-stopped
+
+networks:
+  medisense-net:
+    driver: bridge
+
+volumes:
+  postgres_data:
+  redis_data:
+  kafka_data:
+  zookeeper_data:
+  elasticsearch_data:
+  minio_data:

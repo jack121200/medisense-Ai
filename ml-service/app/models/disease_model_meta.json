@@ -1,0 +1,7 @@
+{
+  "accuracy": 0.0,
+  "n_estimators": 200,
+  "n_symptoms": 134,
+  "n_diseases": 42,
+  "algorithm": "RandomForestClassifier"
+}
