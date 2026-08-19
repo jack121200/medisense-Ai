@@ -3,6 +3,7 @@ import { authenticate } from '../../middleware/auth.middleware';
 import { requireRole, requireOwnership } from '../../middleware/rbac.middleware';
 import { billingService } from './billing.service';
 import { sendSuccess } from '../../utils/apiResponse';
+import { writeAuditLog } from '../../lib/auditLog';
 
 const router = Router();
 router.use(authenticate);
@@ -30,9 +31,13 @@ router.get('/:id', requireOwnership('billing', { allowRoles: [...STAFF] }), asyn
 });
 
 // Mark as paid
-router.patch('/:id/pay', requireRole(...STAFF), async (req, res, next) => {
+router.patch('/:id/pay', requireRole(...STAFF), async (req: any, res, next) => {
     try {
         const data = await billingService.markPaid(req.params.id, req.body.paymentMethod);
+        await writeAuditLog({
+            userId: req.user.id, action: 'INVOICE_PAID', resource: 'Invoice', resourceId: req.params.id,
+            details: { paymentMethod: req.body.paymentMethod }, req,
+        });
         sendSuccess(res, data, 'Payment recorded');
     } catch (e) { next(e); }
 });

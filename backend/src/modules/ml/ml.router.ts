@@ -2,6 +2,7 @@ import { Router } from 'express';
 import { mlController } from './ml.controller';
 import { authenticate } from '../../middleware/auth.middleware';
 import { requireOwnership } from '../../middleware/rbac.middleware';
+import { uploadPdfMemory } from '../../middleware/upload.middleware';
 
 const router = Router();
 
@@ -96,5 +97,13 @@ router.get('/predictions/:patientId', requireOwnership('patient'), mlController.
  * Returns SHAP values for a specific saved prediction
  */
 router.get('/shap/:predictionId', requireOwnership('mlPrediction'), mlController.getSHAP);
+
+/**
+ * POST /api/v1/ml/pdf-extract/:kind
+ * Proxies a PDF/DOCX upload to ml-service (heart|cbc|symptoms|lipid|text).
+ * Replaces the frontend's old direct call to localhost:8000, which broke
+ * once ml-service stopped being host-exposed (Phase 1.8).
+ */
+router.post('/pdf-extract/:kind', uploadPdfMemory.single('file'), mlController.pdfExtract);
 
 export default router;

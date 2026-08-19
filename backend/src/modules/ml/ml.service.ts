@@ -8,6 +8,12 @@ import { emitRiskEscalation } from '../../config/socket';
 const mlClient = axios.create({
     baseURL: env.ML_SERVICE_URL,
     timeout: 30000,
+    // ml-service now rejects every request without this shared secret
+    // (see ml-service/app/main.py internal_auth_middleware) — it's no
+    // longer host-exposed, but this stops it trusting "reachable ==
+    // allowed" for anything else that can still reach it on the internal
+    // Docker network.
+    headers: { 'X-Internal-Service-Key': env.ML_SERVICE_INTERNAL_KEY },
 });
 
 export const mlService = {
@@ -225,5 +231,30 @@ export const mlService = {
         const prediction = await prisma.mLPrediction.findUnique({ where: { id: predictionId } });
         if (!prediction) throw new AppError('Prediction not found', 404, 'NOT_FOUND');
         return prediction.shapValues;
+    },
+
+    /**
+     * Proxies a PDF/DOCX upload to ml-service's OCR-style extraction
+     * endpoints. Previously the frontend called ml-service directly on
+     * localhost:8000; now that ml-service isn't host-exposed and requires
+     * the internal service key (Phase 1.8), this is the only path in.
+     * Uses global fetch/FormData (Node 20) instead of axios so we don't
+     * need to add the `form-data` package just for this.
+     */
+    async proxyPdfExtract(kind: 'heart' | 'cbc' | 'symptoms' | 'lipid' | 'text', file: Express.Multer.File) {
+        const formData = new FormData();
+        formData.append('file', new Blob([file.buffer], { type: file.mimetype }), file.originalname);
+
+        const res = await fetch(`${env.ML_SERVICE_URL}/api/pdf/extract-${kind}`, {
+            method: 'POST',
+            headers: { 'X-Internal-Service-Key': env.ML_SERVICE_INTERNAL_KEY },
+            body: formData as any,
+        });
+
+        const data = await res.json();
+        if (!res.ok) {
+            throw new AppError((data as any)?.detail || 'PDF extraction failed', res.status, 'PDF_EXTRACT_FAILED');
+        }
+        return data;
     },
 };

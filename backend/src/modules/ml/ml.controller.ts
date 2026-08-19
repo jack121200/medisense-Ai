@@ -228,4 +228,27 @@ export const mlController = {
             res.status(status).json({ success: false, message: err?.message });
         }
     },
+
+    /**
+     * POST /api/v1/ml/pdf-extract/:kind  (kind: heart|cbc|symptoms|lipid|text)
+     * Proxies a PDF/DOCX upload to ml-service's extraction endpoints.
+     */
+    pdfExtract: async (req: Request, res: Response) => {
+        try {
+            const kind = req.params.kind as 'heart' | 'cbc' | 'symptoms' | 'lipid' | 'text';
+            if (!['heart', 'cbc', 'symptoms', 'lipid', 'text'].includes(kind)) {
+                res.status(400).json({ success: false, message: 'Invalid extraction kind' });
+                return;
+            }
+            if (!req.file) {
+                res.status(400).json({ success: false, message: 'file is required' });
+                return;
+            }
+            const result = await mlService.proxyPdfExtract(kind, req.file);
+            res.json(result);
+        } catch (err: any) {
+            const status = err?.statusCode || 503;
+            res.status(status).json({ success: false, message: err?.message || 'PDF extraction unavailable' });
+        }
+    },
 };

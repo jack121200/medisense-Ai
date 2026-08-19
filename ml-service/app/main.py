@@ -11,7 +11,9 @@ from __future__ import annotations
 
 import time
 import threading
+import hmac
 from contextlib import asynccontextmanager
+from pathlib import Path
 from typing import Any, Dict
 
 from fastapi import FastAPI, Request
@@ -87,12 +89,29 @@ app = FastAPI(
 )
 
 # ── Middleware ────────────────────────────────────────────────────────────────
+# Previously allow_origins=["*"] with allow_credentials=True — an invalid
+# combination browsers reject anyway, and unnecessary now: this service is
+# no longer host-exposed (docker-compose.yml), so the only real caller is
+# the backend, never a browser directly.
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"], allow_credentials=True,
+    allow_origins=[settings.ALLOWED_ORIGIN], allow_credentials=True,
     allow_methods=["*"], allow_headers=["*"],
 )
 app.add_middleware(GZipMiddleware, minimum_size=1000)
+
+# Routes that don't require the internal service key — health/docs need to
+# be reachable for container healthchecks and local debugging without a key.
+_PUBLIC_PATHS = {"/api/health", "/api/docs", "/api/redoc", "/openapi.json"}
+
+
+@app.middleware("http")
+async def internal_auth_middleware(request: Request, call_next):
+    if request.url.path not in _PUBLIC_PATHS:
+        provided = request.headers.get("x-internal-service-key", "")
+        if not hmac.compare_digest(provided, settings.INTERNAL_API_KEY):
+            return JSONResponse(status_code=401, content={"detail": "Missing or invalid internal service key"})
+    return await call_next(request)
 
 
 @app.middleware("http")

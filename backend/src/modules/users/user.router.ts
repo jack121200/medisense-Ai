@@ -8,6 +8,7 @@ import { AppError, sendSuccess, sendCreated } from '../../utils/apiResponse';
 import bcrypt from 'bcryptjs';
 import { AuthRequest } from '../../middleware/auth.middleware';
 import { Response } from 'express';
+import { writeAuditLog } from '../../lib/auditLog';
 
 const router = Router();
 router.use(authenticate, requireAdmin);
@@ -35,6 +36,7 @@ router.post('/', asyncHandler(async (req: AuthRequest, res: Response) => {
         data: { email, passwordHash, firstName, lastName, role: role || 'DOCTOR', department },
         select: { id: true, email: true, firstName: true, lastName: true, role: true },
     });
+    await writeAuditLog({ userId: req.user!.id, action: 'USER_CREATE', resource: 'User', resourceId: user.id, details: { role: user.role }, req });
     sendCreated(res, generatedPassword ? { ...user, generatedPassword } : user);
 }));
 
@@ -44,11 +46,13 @@ router.patch('/:id', asyncHandler(async (req: AuthRequest, res: Response) => {
         data: req.body,
         select: { id: true, email: true, firstName: true, lastName: true, role: true, isActive: true },
     });
+    await writeAuditLog({ userId: req.user!.id, action: 'USER_UPDATE', resource: 'User', resourceId: user.id, details: req.body, req });
     sendSuccess(res, user, 'User updated');
 }));
 
 router.delete('/:id', asyncHandler(async (req: AuthRequest, res: Response) => {
     await prisma.user.update({ where: { id: req.params.id }, data: { isActive: false } });
+    await writeAuditLog({ userId: req.user!.id, action: 'USER_DEACTIVATE', resource: 'User', resourceId: req.params.id, req });
     sendSuccess(res, null, 'User deactivated');
 }));
 

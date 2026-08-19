@@ -1,5 +1,4 @@
 import api from './axiosInstance';
-import axios from 'axios';
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -75,11 +74,15 @@ export const aiDoctorApi = {
     getCallById: (id: string) =>
         api.get<{ success: boolean; data: AiDoctorCallDetail }>(`/ai-doctor/calls/${id}`),
 
-    /** Extract raw text from a PDF for the pre-call form upload */
+    /**
+     * Extract raw text from a PDF for the pre-call form upload.
+     * Goes through the backend proxy (POST /ml/pdf-extract/text) — ml-service
+     * is no longer reachable directly from the browser (see Phase 1.8).
+     */
     extractPdfText: async (file: File): Promise<{ text: string; pages: number }> => {
         const fd = new FormData();
         fd.append('file', file);
-        const res = await axios.post('http://localhost:8000/api/pdf/extract-text', fd);
+        const res = await api.post('/ml/pdf-extract/text', fd);
         return res.data;
     },
 };

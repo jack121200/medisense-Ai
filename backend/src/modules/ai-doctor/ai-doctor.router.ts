@@ -2,6 +2,8 @@ import { Router } from 'express';
 import { aiDoctorController } from './ai-doctor.controller';
 import { authenticate } from '../../middleware/auth.middleware';
 import { requireRole } from '../../middleware/rbac.middleware';
+import { verifyVapiWebhook } from '../../middleware/vapiWebhook.middleware';
+import { aiDoctorCallLimiter } from '../../middleware/rateLimiter.middleware';
 
 const router = Router();
 
@@ -14,6 +16,7 @@ router.post(
     '/start-call',
     authenticate,
     requireRole('PATIENT'),
+    aiDoctorCallLimiter,
     aiDoctorController.startCall
 );
 
@@ -32,10 +35,11 @@ router.get(
 /**
  * POST /api/v1/ai-doctor/webhook
  * Vapi webhook — receives end-of-call report (transcript + summary).
- * No authenticated user — Vapi server sends this, NOT the patient.
- * Must be publicly accessible (no authenticate middleware).
+ * No authenticated user — Vapi server sends this, NOT the patient — but
+ * verifyVapiWebhook confirms the request actually came from Vapi via a
+ * shared-secret header before any handler code runs.
  */
-router.post('/webhook', aiDoctorController.handleWebhook);
+router.post('/webhook', verifyVapiWebhook, aiDoctorController.handleWebhook);
 
 /**
  * POST /api/v1/ai-doctor/save-call

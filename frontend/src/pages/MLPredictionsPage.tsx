@@ -3,7 +3,7 @@ import { Brain, Heart, Droplets, Upload, FileText, AlertTriangle, CheckCircle, I
 import { mlApi } from '../api/ml.api';
 import { useAuthStore } from '../store/authStore';
 import toast from 'react-hot-toast';
-import axios from 'axios';
+import apiClient from '../api/axiosInstance';
 import LipidProfileTab from '../components/ml/LipidProfileTab';
 
 // ── Colour tokens ──────────────────────────────────────────────────────────────
@@ -92,7 +92,7 @@ function HeartRiskTab() {
         try {
             const fd = new FormData();
             fd.append('file', file);
-            const res = await axios.post('http://localhost:8000/api/pdf/extract-heart', fd);
+            const res = await apiClient.post('/ml/pdf-extract/heart', fd);
             const extracted = res.data.extracted || {};
             setForm(prev => ({ ...prev, ...extracted }));
             toast.success(`Extracted ${res.data.fields_found} fields. Review & correct before predicting.`);
@@ -258,7 +258,7 @@ function CBCTab() {
         try {
             const fd = new FormData();
             fd.append('file', file);
-            const res = await axios.post('http://localhost:8000/api/pdf/extract-cbc', fd);
+            const res = await apiClient.post('/ml/pdf-extract/cbc', fd);
             const extracted = res.data.extracted || {};
             // Convert all extracted values to string for the form
             const stringified: Record<string, string> = {};
@@ -457,7 +457,7 @@ function SymptomTab() {
         try {
             const fd = new FormData();
             fd.append('file', file);
-            const res = await axios.post('http://localhost:8000/api/pdf/extract-symptoms', fd);
+            const res = await apiClient.post('/ml/pdf-extract/symptoms', fd);
             const csv = res.data.symptoms_csv || '';
             if (csv) {
                 setSymptoms(prev => prev ? prev + ', ' + csv : csv);
