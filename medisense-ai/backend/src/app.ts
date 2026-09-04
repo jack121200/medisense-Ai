@@ -1,6 +1,7 @@
 import 'dotenv/config';
 import express from 'express';
 import http from 'http';
+import path from 'path';
 import cors from 'cors';
 import helmet from 'helmet';
 import compression from 'compression';
@@ -76,6 +77,11 @@ app.use('/api/docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec, {
     customSiteTitle: 'MediSense AI API',
     customCss: '.swagger-ui .topbar { background: #0A0E1A; }',
 }));
+
+// Lab report PDFs are intentionally NOT served as static files — a static
+// mount here would make them fetchable by anyone who learns/guesses a
+// filename, unauthenticated. They're served exclusively through the
+// ownership-checked GET /api/v1/lab/:id/reports/file route instead.
 
 // ─── Health check ───────────────────────────────────
 app.get('/health', (_req, res) => {

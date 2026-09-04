@@ -273,7 +273,7 @@ export default function VitalsMonitorPage() {
                     background: 'var(--surface-1)', border: '1px solid rgba(255,45,85,0.20)',
                     borderRadius: 18, padding: '22px 24px', marginTop: 24,
                 }}>
-                    <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 2, background: 'var(--risk-critical)', borderRadius: '18px 18px 0 0', opacity: 0.6, position: 'relative' as any }} />
+                    <div style={{ position: 'relative', top: 0, left: 0, right: 0, height: 2, background: 'var(--risk-critical)', borderRadius: '18px 18px 0 0', opacity: 0.6 }} />
                     <h3 style={{ fontSize: 14.5, fontWeight: 700, marginBottom: 14, display: 'flex', alignItems: 'center', gap: 8, color: 'var(--risk-critical)' }}>
                         <AlertTriangle size={16} /> Recent Vitals Anomaly Alerts
                     </h3>

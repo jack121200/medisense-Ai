@@ -2,10 +2,11 @@ import { Router } from 'express';
 import { authController } from './auth.controller';
 import { authenticate } from '../../middleware/auth.middleware';
 import { validate } from '../../middleware/validate.middleware';
-import { authRateLimiter } from '../../middleware/rateLimiter.middleware';
+import { authRateLimiter, loginRateLimiter, registrationRateLimiter } from '../../middleware/rateLimiter.middleware';
 import {
     registerSchema, loginSchema, refreshSchema,
     updateProfileSchema, changePasswordSchema,
+    forgotPasswordSchema, resetPasswordSchema,
 } from './auth.schema';
 
 const router = Router();
@@ -31,16 +32,21 @@ const router = Router();
  *               lastName: { type: string }
  *               role: { type: string, enum: [ADMIN, DOCTOR, NURSE, ANALYST] }
  */
-// Patient self-registration — public (no auth, no rate limiter)
-router.post('/patient-register', authController.registerPatient);
+// Patient self-registration — public, now rate-limited (previously had none at all)
+router.post('/patient-register', registrationRateLimiter, authController.registerPatient);
 
-router.post('/register', validate(registerSchema), authController.register);
+router.post('/register', authRateLimiter, validate(registerSchema), authController.register);
 
-router.post('/login', authRateLimiter, validate(loginSchema), authController.login);
-router.post('/refresh', validate(refreshSchema), authController.refresh);
-router.post('/logout', validate(refreshSchema), authController.logout);
+// Login has its own strict limiter (see rateLimiter.middleware.ts) — the
+// general authRateLimiter was far too permissive for the brute-force target.
+router.post('/login', loginRateLimiter, validate(loginSchema), authController.login);
+router.post('/refresh', authRateLimiter, validate(refreshSchema), authController.refresh);
+router.post('/logout', authRateLimiter, validate(refreshSchema), authController.logout);
 router.get('/me', authenticate, authController.getMe);
 router.patch('/me', authenticate, validate(updateProfileSchema), authController.updateProfile);
 router.patch('/me/password', authenticate, validate(changePasswordSchema), authController.changePassword);
+
+router.post('/forgot-password', authRateLimiter, validate(forgotPasswordSchema), authController.forgotPassword);
+router.post('/reset-password', authRateLimiter, validate(resetPasswordSchema), authController.resetPassword);
 
 export default router;

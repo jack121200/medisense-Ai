@@ -57,7 +57,36 @@ export const mlApi = {
         is_smoker: number;
     }) => api.post('/ml/lipid-analyze', data),
 
+    // ── Bayesian Clinical Decision & Uncertainty Engine ────────────────────────
+    /** Run Bayesian Inference (Posterior Prob, Epistemic Uncertainty & Value of Information VOI) */
+    runBayesianInference: (data: {
+        age: number;
+        resting_blood_pressure: number;
+        cholestoral: number;
+        fasting_blood_sugar: number;
+        chest_pain_present?: boolean;
+        ecg_abnormal?: boolean;
+        known_tests_completed?: string[];
+    }) => api.post('/ml/bayesian-infer', data),
+
+    // ── Mamdani Fuzzy Logic Dosing & Triage ────────────────────────────────────
+    /** Run Mamdani FIS Drug Dosing & Triage Controller */
+    runFuzzyDosing: (data: {
+        systolic_bp: number;
+        serum_creatinine: number;
+        age: number;
+        drug_name: string;
+    }) => api.post('/ml/fuzzy-dose', data),
+
+    // ── Deep LSTM Autoencoder & Waveform Monitor ───────────────────────────────
+    /** Run Deep LSTM Autoencoder Waveform Signal Analyzer */
+    runDeepAnomalyStream: (data: {
+        signal_waveform?: number[];
+        sample_rate_hz?: number;
+        trigger_anomaly?: boolean;
+    }) => api.post('/ml/deep-stream', data),
+
     // ── Model Status ───────────────────────────────────────────────────────────
-    /** Check if all 3 ML models are trained and ready */
+    /** Check if all ML models are trained and ready */
     modelStatus: () => api.get('/ml/model-status'),
 };

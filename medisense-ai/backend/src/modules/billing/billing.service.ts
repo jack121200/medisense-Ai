@@ -1,5 +1,6 @@
 import { prisma } from '../../config/database';
 import { AppError } from '../../utils/apiResponse';
+import { emitInvoiceCreated } from '../../config/socket';
 
 export const billingService = {
 
@@ -37,11 +38,25 @@ export const billingService = {
         if (!inv) throw new AppError('Invoice not found', 404, 'NOT_FOUND');
         if (inv.isPaid) throw new AppError('Invoice already marked as paid', 400, 'ALREADY_PAID');
 
-        return prisma.invoice.update({
+        const updated = await prisma.invoice.update({
             where: { id },
             data: { isPaid: true, paymentMethod, paidAt: new Date() },
-            include: { items: true, patient: { select: { id: true, firstName: true, lastName: true } } },
+            include: { items: true, patient: { select: { id: true, firstName: true, lastName: true, userId: true } } },
         });
+
+        // Real-time: notify patient their bill is marked paid
+        if (updated.patient?.userId) {
+            emitInvoiceCreated(updated.patient.userId, {
+                invoiceId: updated.id,
+                invoiceNumber: updated.invoiceNumber,
+                status: 'PAID',
+                paymentMethod,
+                totalAmount: updated.totalAmount,
+                patientName: `${updated.patient.firstName} ${updated.patient.lastName}`,
+            });
+        }
+
+        return updated;
     },
 
     async getRevenueToday() {

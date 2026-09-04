@@ -8,7 +8,8 @@ import {
     Upload, AlertTriangle, CheckCircle2, ChevronDown, ChevronUp, X, Clock
 } from 'lucide-react';
 import { patientApi } from '../api/patient.api';
-import { mlApi, vitalsApi, reportApi } from '../api/index';
+import { vitalsApi, reportApi } from '../api/index';
+import api from '../api/axiosInstance';
 import { useVitalsStore } from '../store/vitalsStore';
 import { useSocket } from '../hooks/useSocket';
 import { format } from 'date-fns';
@@ -64,13 +65,18 @@ const SAMPLE_LAB = `Hemoglobin: 8.2 g/dL\nWBC: 14.5 K/µL\nGlucose: 240 mg/dL\nC
 
 interface SavedReport { id: string; date: string; text: string; findings: LabFinding[]; }
 
+import { useAuthStore } from '../store/authStore';
+
+// ... (inside PatientDetailPage)
 export default function PatientDetailPage() {
+    const { user } = useAuthStore();
+    const isReceptionist = user?.role === 'RECEPTIONIST';
     const { id } = useParams<{ id: string }>();
     const navigate = useNavigate();
     const [patient, setPatient] = useState<any>(null);
     const [prediction, setPrediction] = useState<any>(null);
-    const [loading, setLoading] = useState(true);
     const [predicting, setPredicting] = useState(false);
+    const [loading, setLoading] = useState(true);
     const [activeTab, setActiveTab] = useState<'overview' | 'ml' | 'vitals' | 'reports'>('overview');
 
     // Reports tab state
@@ -108,17 +114,39 @@ export default function PatientDetailPage() {
         return () => { leavePatientRoom(id); };
     }, [id]);
 
+    const openAITools = () => navigate('/ai-tools');
+
     const runPrediction = async () => {
-        if (!id) return;
+        if (!id || !patient) return;
         setPredicting(true);
         try {
-            const { data } = await mlApi.predictAll(id);
-            setPrediction(data.data);
-            toast.success('ML prediction complete!');
-            const r = await patientApi.getById(id);
-            setPatient(r.data.data);
-        } catch { toast.error('Prediction failed — ML service may not be ready'); }
-        finally { setPredicting(false); }
+            const patientAge = Math.floor((Date.now() - new Date(patient.dateOfBirth).getTime()) / (365.25 * 24 * 3600000));
+            const latestV = latestVitals[id];
+            const payload = {
+                patientId: id,
+                age: patientAge,
+                sex: patient.gender === 'MALE' ? 'Male' : 'Female',
+                chest_pain_type: 'Asymptomatic',
+                resting_blood_pressure: latestV?.systolicBP || 120,
+                cholestoral: 200,
+                fasting_blood_sugar: patient.hasDiabetes ? 'Greater than 120 mg/dl' : 'Lower than 120 mg/dl',
+                rest_ecg: 'Normal',
+                Max_heart_rate: latestV?.heartRate || 150,
+                exercise_induced_angina: patient.hasHeartDisease ? 'Yes' : 'No',
+                oldpeak: 0,
+                slope: 'Flat',
+                vessels_colored_by_flourosopy: 'Zero',
+                thalassemia: 'Normal',
+            };
+            await api.post('/ml/predict-risk', payload);
+            const savedRes = await api.get(`/ml/predictions/${id}`);
+            setPrediction(savedRes.data.data?.[0] || null);
+            toast.success('AI prediction complete');
+        } catch {
+            toast.error('Failed to run prediction');
+        } finally {
+            setPredicting(false);
+        }
     };
 
     const downloadReport = async () => {
@@ -193,9 +221,11 @@ export default function PatientDetailPage() {
                     >
                         <Calendar size={15} /> Book Appointment
                     </button>
-                    <button onClick={runPrediction} disabled={predicting} className="btn-primary">
-                        {predicting ? <><RefreshCw size={15} style={{ animation: 'spin 0.8s linear infinite' }} /> Running...</> : <><Brain size={15} /> Run ML Prediction</>}
-                    </button>
+                    {!isReceptionist && (
+                        <button onClick={runPrediction} disabled={predicting} className="btn-primary">
+                            {predicting ? <><RefreshCw size={15} style={{ animation: 'spin 0.8s linear infinite' }} /> Running...</> : <><Brain size={15} /> Run ML Prediction</>}
+                        </button>
+                    )}
                     <button onClick={downloadReport} className="btn-ghost"><Download size={15} /> Report</button>
                 </div>
             </div>
@@ -246,17 +276,19 @@ export default function PatientDetailPage() {
                         {comorbidities.length === 0 && <span style={{ fontSize: 12, color: 'var(--text-muted)' }}>No comorbidities on record</span>}
                     </div>
                 </div>
-                <div style={{ textAlign: 'center', flexShrink: 0 }}>
-                    <div className="font-mono" style={{
-                        fontSize: 40, fontWeight: 700,
-                        color: patient.riskScore > 70 ? 'var(--risk-critical)' : patient.riskScore > 50 ? 'var(--risk-high)' : 'var(--risk-low)',
-                    }}>
-                        {patient.riskScore?.toFixed(1)}
+                {!isReceptionist && (
+                    <div style={{ textAlign: 'center', flexShrink: 0 }}>
+                        <div className="font-mono" style={{
+                            fontSize: 40, fontWeight: 700,
+                            color: patient.riskScore > 70 ? 'var(--risk-critical)' : patient.riskScore > 50 ? 'var(--risk-high)' : 'var(--risk-low)',
+                        }}>
+                            {patient.riskScore?.toFixed(1)}
+                        </div>
+                        <div style={{ fontSize: 11, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
+                            🤖 AI Risk Score
+                        </div>
                     </div>
-                    <div style={{ fontSize: 11, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
-                        🤖 AI Risk Score
-                    </div>
-                </div>
+                )}
             </div>
 
             {/* Tab bar */}
@@ -265,12 +297,20 @@ export default function PatientDetailPage() {
                 background: 'var(--surface-1)', border: '1px solid var(--surface-border)',
                 borderRadius: 12, padding: 4,
             }}>
-                {([
-                    ['overview', '📊 Overview'],
-                    ['ml', '🤖 ML Models'],
-                    ['vitals', '⚡ Vitals Chart'],
-                    ['reports', '🧪 Lab Reports'],
-                ] as const).map(([tab, label]) => (
+                {(
+                    isReceptionist
+                        ? [
+                            ['overview', '📊 Overview'],
+                            ['vitals', '⚡ Vitals Chart'],
+                            ['reports', '🧪 Lab Reports'],
+                        ]
+                        : [
+                            ['overview', '📊 Overview'],
+                            ['ml', '🤖 ML Models'],
+                            ['vitals', '⚡ Vitals Chart'],
+                            ['reports', '🧪 Lab Reports'],
+                        ]
+                ).map(([tab, label]) => (
                     <button key={tab} onClick={() => setActiveTab(tab as any)} style={{
                         flex: 1, padding: '8px 14px', borderRadius: 9, fontSize: 13, fontWeight: 700,
                         border: 'none', cursor: 'pointer', transition: 'all 0.15s',

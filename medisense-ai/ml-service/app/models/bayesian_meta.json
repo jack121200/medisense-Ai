@@ -1,0 +1,115 @@
+{
+  "node_count": 7,
+  "edges": [
+    [
+      "Age_Risk",
+      "Hypertension"
+    ],
+    [
+      "Age_Risk",
+      "Coronary_Disease"
+    ],
+    [
+      "Hypertension",
+      "Coronary_Disease"
+    ],
+    [
+      "Hypercholesterolemia",
+      "Coronary_Disease"
+    ],
+    [
+      "Hyperglycemia",
+      "Coronary_Disease"
+    ],
+    [
+      "Coronary_Disease",
+      "Chest_Pain"
+    ],
+    [
+      "Coronary_Disease",
+      "ECG_St_T"
+    ]
+  ],
+  "dag_topology": {
+    "nodes": [
+      {
+        "id": "Age_Risk",
+        "label": "Age > 55",
+        "type": "demographic"
+      },
+      {
+        "id": "Hypertension",
+        "label": "Hypertension (BP>130)",
+        "type": "risk_factor"
+      },
+      {
+        "id": "Hypercholesterolemia",
+        "label": "High Cholesterol (>240)",
+        "type": "risk_factor"
+      },
+      {
+        "id": "Hyperglycemia",
+        "label": "High Fasting Sugar",
+        "type": "risk_factor"
+      },
+      {
+        "id": "Chest_Pain",
+        "label": "Anginal Chest Pain",
+        "type": "symptom"
+      },
+      {
+        "id": "ECG_St_T",
+        "label": "ECG ST-T Abnormality",
+        "type": "finding"
+      },
+      {
+        "id": "Coronary_Disease",
+        "label": "Coronary Artery Disease",
+        "type": "target"
+      }
+    ],
+    "edges": [
+      {
+        "source": "Age_Risk",
+        "target": "Hypertension"
+      },
+      {
+        "source": "Age_Risk",
+        "target": "Coronary_Disease"
+      },
+      {
+        "source": "Hypertension",
+        "target": "Coronary_Disease"
+      },
+      {
+        "source": "Hypercholesterolemia",
+        "target": "Coronary_Disease"
+      },
+      {
+        "source": "Hyperglycemia",
+        "target": "Coronary_Disease"
+      },
+      {
+        "source": "Coronary_Disease",
+        "target": "Chest_Pain"
+      },
+      {
+        "source": "Coronary_Disease",
+        "target": "ECG_St_T"
+      }
+    ]
+  },
+  "estimator": "BayesianEstimator (BDeu prior, equivalent_sample_size=10)",
+  "n_train": 1025,
+  "node_marginals": {
+    "Age_Risk": 0.5063,
+    "Hypertension": 0.4341,
+    "Hypercholesterolemia": 0.4907,
+    "Hyperglycemia": 0.1493,
+    "Chest_Pain": 0.5151,
+    "ECG_St_T": 0.5005,
+    "Coronary_Disease": 0.5132
+  },
+  "dataset": "HeartDiseaseTrain-Test.csv",
+  "note": "Replaces the previous hardcoded likelihood-ratio constants \u2014 every CPD here is fit from data via pgmpy, not hand-picked."
+}

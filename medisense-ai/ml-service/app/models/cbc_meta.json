@@ -26,6 +26,16 @@
   "contamination": 0.05,
   "kmeans_k": 3,
   "n_anomalies": 21,
+  "cluster_label_map": {
+    "1": "Normal Pattern",
+    "0": "Mild Concern",
+    "2": "Abnormal Pattern"
+  },
+  "cluster_severity_scores": {
+    "0": 0.7328,
+    "1": 0.5407,
+    "2": 5.907
+  },
   "dataset": "cbc information.xlsx",
-  "note": "Isolation Forest + KMeans on CBC blood parameters"
+  "note": "Isolation Forest + KMeans on CBC blood parameters. cluster_label_map is recomputed by centroid severity every training run \u2014 never assume cluster ID N means the same thing across retrains."
 }

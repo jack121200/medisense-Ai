@@ -63,7 +63,6 @@ export default function RegisterPage() {
     const [form, setForm] = useState({
         firstName: '', lastName: '', email: '', password: '', confirmPassword: '',
         dateOfBirth: '', gender: '', phone: '', address: '', city: '',
-        specialization: '', licenseNumber: '', consultationFee: '',
         // Medical history (patient only)
         bloodGroup: '', allergies: '', medicalHistory: '', currentMedications: '',
         smokingStatus: 'Never', alcoholUse: 'Never',
@@ -132,11 +131,7 @@ export default function RegisterPage() {
                     role: selectedRole,
                     dateOfBirth: form.dateOfBirth, gender: form.gender.toUpperCase(),
                     phone: form.phone,
-                    ...(isDoctor ? {
-                        specialization: form.specialization,
-                        licenseNumber: form.licenseNumber,
-                        consultationFee: form.consultationFee ? parseFloat(form.consultationFee) : undefined,
-                    } : {}),
+                    // Doctors are always Cardiologist — specialization is set server-side
                 });
             }
             navigate('/login?registered=1');

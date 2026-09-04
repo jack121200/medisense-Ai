@@ -1,6 +1,7 @@
 import { Router, Request, Response, NextFunction } from 'express';
 import { patientController } from './patient.controller';
 import { authenticate } from '../../middleware/auth.middleware';
+import { requireRole, requireOwnership } from '../../middleware/rbac.middleware';
 import { prisma } from '../../config/database';
 import { sendSuccess } from '../../utils/apiResponse';
 import { appointmentRequestService } from '../appointments/appointmentRequest.service';
@@ -8,6 +9,12 @@ import { appointmentRequestService } from '../appointments/appointmentRequest.se
 const router = Router();
 
 router.use(authenticate);
+
+// Roles that manage patient records (create/edit/delete/list-all).
+// RECEPTIONIST can register/list patients but not edit clinical fields;
+// LAB_TECHNICIAN/ANALYST only need read access via requireOwnership below.
+const STAFF_MANAGE = ['SUPER_ADMIN', 'ADMIN', 'DOCTOR', 'NURSE', 'RECEPTIONIST'] as const;
+const STAFF_READ_ANY = ['SUPER_ADMIN', 'ADMIN', 'DOCTOR', 'NURSE', 'RECEPTIONIST', 'LAB_TECHNICIAN', 'ANALYST'] as const;
 
 // ─── Patient Self-Service Routes (for Patient Portal) ──────────────────────────
 // Mounted at /api/v1/patient/* (singular) — return data for the logged-in patient.
@@ -69,15 +76,15 @@ router.get('/my-prescriptions', async (req: Request, res: Response, next: NextFu
 // These are mounted at BOTH /api/v1/patients/* and /api/v1/patient/*
 // The self-service routes above take priority (defined first).
 
-router.get('/high-risk', patientController.getHighRisk);
-router.get('/', patientController.list);
-router.post('/', patientController.create);
-router.get('/:id', patientController.getById);
-router.patch('/:id', patientController.update);
-router.delete('/:id', patientController.softDelete);
-router.get('/:id/admissions', patientController.getAdmissions);
-router.post('/:id/admissions', patientController.createAdmission);
-router.get('/:id/vitals', patientController.getVitals);
-router.get('/:id/timeline', patientController.getTimeline);
+router.get('/high-risk', requireRole(...STAFF_READ_ANY), patientController.getHighRisk);
+router.get('/', requireRole(...STAFF_READ_ANY), patientController.list);
+router.post('/', requireRole(...STAFF_MANAGE), patientController.create);
+router.get('/:id', requireOwnership('patient', { allowRoles: [...STAFF_READ_ANY] }), patientController.getById);
+router.patch('/:id', requireRole(...STAFF_MANAGE), patientController.update);
+router.delete('/:id', requireRole(...STAFF_MANAGE), patientController.softDelete);
+router.get('/:id/admissions', requireOwnership('patient', { allowRoles: [...STAFF_READ_ANY] }), patientController.getAdmissions);
+router.post('/:id/admissions', requireRole(...STAFF_MANAGE), patientController.createAdmission);
+router.get('/:id/vitals', requireOwnership('patient', { allowRoles: [...STAFF_READ_ANY] }), patientController.getVitals);
+router.get('/:id/timeline', requireOwnership('patient', { allowRoles: [...STAFF_READ_ANY] }), patientController.getTimeline);
 
 export default router;

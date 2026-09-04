@@ -1,6 +1,8 @@
 import { prisma } from '../../config/database';
 import { AppError } from '../../utils/apiResponse';
 import { Prisma } from '@prisma/client';
+import { emitPrescriptionCreated, emitInvoiceCreated, emitConsultationCompleted } from '../../config/socket';
+import { notificationService } from '../notifications/notification.service';
 
 export const consultationService = {
 
@@ -110,9 +112,10 @@ export const consultationService = {
     }) {
         // Upsert prescription
         const existing = await prisma.prescription.findUnique({ where: { consultationId } });
+        let prescription;
         if (existing) {
             await prisma.prescriptionItem.deleteMany({ where: { prescriptionId: existing.id } });
-            return prisma.prescription.update({
+            prescription = await prisma.prescription.update({
                 where: { consultationId },
                 data: {
                     notes: data.notes,
@@ -120,17 +123,41 @@ export const consultationService = {
                 },
                 include: { items: true },
             });
+        } else {
+            prescription = await prisma.prescription.create({
+                data: {
+                    consultationId,
+                    patientId: data.patientId,
+                    doctorId: data.doctorId,
+                    notes: data.notes,
+                    items: { create: data.items },
+                },
+                include: { items: true },
+            });
         }
-        return prisma.prescription.create({
-            data: {
-                consultationId,
-                patientId: data.patientId,
-                doctorId: data.doctorId,
-                notes: data.notes,
-                items: { create: data.items },
-            },
-            include: { items: true },
+
+        // Real-time: push prescription to patient dashboard immediately
+        const patient = await prisma.patient.findUnique({
+            where: { id: data.patientId },
+            select: { userId: true, firstName: true, lastName: true },
         });
+        if (patient?.userId) {
+            emitPrescriptionCreated(patient.userId, {
+                prescriptionId: prescription.id,
+                consultationId,
+                itemCount: data.items.length,
+                patientName: `${patient.firstName} ${patient.lastName}`,
+            });
+            await notificationService.create(
+                patient.userId,
+                '💊 New Prescription Ready',
+                `Your doctor has written a prescription with ${data.items.length} medication(s). Check your portal.`,
+                'SUCCESS',
+                { prescriptionId: prescription.id, consultationId },
+            );
+        }
+
+        return prescription;
     },
 
     async closeAndBill(consultationId: string, patientId: string) {
@@ -171,6 +198,32 @@ export const consultationService = {
 
         // Mark consultation completed
         await prisma.consultation.update({ where: { id: consultationId }, data: { status: 'COMPLETED' } });
+
+        // Real-time: push invoice + consultation complete to patient dashboard
+        const patient = await prisma.patient.findUnique({
+            where: { id: patientId },
+            select: { userId: true, firstName: true, lastName: true },
+        });
+        if (patient?.userId) {
+            emitInvoiceCreated(patient.userId, {
+                invoiceId: invoice.id,
+                invoiceNumber: invoice.invoiceNumber,
+                totalAmount: invoice.totalAmount,
+                patientName: `${patient.firstName} ${patient.lastName}`,
+            });
+            emitConsultationCompleted(patient.userId, {
+                consultationId,
+                patientName: `${patient.firstName} ${patient.lastName}`,
+            });
+            await notificationService.create(
+                patient.userId,
+                '🧾 Invoice Generated',
+                `Your consultation bill of ₹${subtotal.toLocaleString('en-IN')} is ready. Invoice #${invoiceNumber}.`,
+                'INFO',
+                { invoiceId: invoice.id, invoiceNumber },
+            );
+        }
+
         return invoice;
     },
 };

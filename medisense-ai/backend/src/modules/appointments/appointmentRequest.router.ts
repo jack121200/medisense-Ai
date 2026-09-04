@@ -1,12 +1,13 @@
 import { Router, Request, Response, NextFunction } from 'express';
-import { authenticate, authorize } from '../../middleware/auth.middleware';
+import { authenticate } from '../../middleware/auth.middleware';
+import { requireRole } from '../../middleware/rbac.middleware';
 import { appointmentRequestService } from './appointmentRequest.service';
 import { sendSuccess } from '../../utils/apiResponse';
 
 const router = Router();
 
 // POST /api/v1/appointment-requests — patient creates request
-router.post('/', authenticate, authorize('PATIENT'), async (req: Request, res: Response, next: NextFunction) => {
+router.post('/', authenticate, requireRole('PATIENT'), async (req: Request, res: Response, next: NextFunction) => {
     try {
         const result = await appointmentRequestService.create({
             patientUserId: (req as any).user.id,
@@ -41,7 +42,7 @@ router.get('/', authenticate, async (req: Request, res: Response, next: NextFunc
 });
 
 // PATCH /api/v1/appointment-requests/:id/approve — receptionist approves
-router.patch('/:id/approve', authenticate, authorize('RECEPTIONIST', 'ADMIN'), async (req: Request, res: Response, next: NextFunction) => {
+router.patch('/:id/approve', authenticate, requireRole('RECEPTIONIST', 'ADMIN'), async (req: Request, res: Response, next: NextFunction) => {
     try {
         const result = await appointmentRequestService.approve(req.params.id);
         sendSuccess(res, result);
@@ -49,7 +50,7 @@ router.patch('/:id/approve', authenticate, authorize('RECEPTIONIST', 'ADMIN'), a
 });
 
 // PATCH /api/v1/appointment-requests/:id/reject — receptionist rejects with counter-offer
-router.patch('/:id/reject', authenticate, authorize('RECEPTIONIST', 'ADMIN'), async (req: Request, res: Response, next: NextFunction) => {
+router.patch('/:id/reject', authenticate, requireRole('RECEPTIONIST', 'ADMIN'), async (req: Request, res: Response, next: NextFunction) => {
     try {
         const { counterDate, counterSlot, note } = req.body;
         const result = await appointmentRequestService.reject(req.params.id, counterDate, counterSlot, note);
@@ -58,7 +59,7 @@ router.patch('/:id/reject', authenticate, authorize('RECEPTIONIST', 'ADMIN'), as
 });
 
 // PATCH /api/v1/appointment-requests/:id/respond — patient accepts or declines counter-offer
-router.patch('/:id/respond', authenticate, authorize('PATIENT'), async (req: Request, res: Response, next: NextFunction) => {
+router.patch('/:id/respond', authenticate, requireRole('PATIENT'), async (req: Request, res: Response, next: NextFunction) => {
     try {
         const result = await appointmentRequestService.patientRespond(
             req.params.id,

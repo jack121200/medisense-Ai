@@ -108,7 +108,7 @@ export default function AnalyticsPage() {
                     {tab === 'stats' && stats?.descriptive && (
                         <div>
                             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(230px, 1fr))', gap: 14 }}>
-                                {Object.entries(stats.descriptive).slice(0, 12).map(([col, s]: any) => (
+                                {Object.entries(stats?.descriptive || {}).slice(0, 12).map(([col, s]: any) => (
                                     <div key={col} style={{
                                         background: 'var(--surface-1)', border: '1px solid var(--surface-border)',
                                         borderRadius: 14, padding: '16px 18px',

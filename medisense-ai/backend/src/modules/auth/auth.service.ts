@@ -1,15 +1,50 @@
 import bcrypt from 'bcryptjs';
+import crypto from 'crypto';
 import jwt, { SignOptions } from 'jsonwebtoken';
 import { v4 as uuidv4 } from 'uuid';
 import { prisma } from '../../config/database';
 import { env } from '../../config/env';
+import { redis } from '../../config/redis';
 import { AppError } from '../../utils/apiResponse';
 import { logger } from '../../config/logger';
+import { sendPasswordResetEmail } from '../../utils/mailer';
 
 interface TokenPair {
     accessToken: string;
     refreshToken: string;
 }
+
+// Redis-backed account lockout — layered underneath loginRateLimiter (which
+// is per-IP+email) so an attacker spraying login attempts from many IPs
+// against one account still gets locked out.
+const LOCKOUT_THRESHOLD = 8;
+const LOCKOUT_WINDOW_SECONDS = 15 * 60;
+const failedLoginKey = (email: string) => `login-fail:${email.toLowerCase()}`;
+
+async function assertNotLockedOut(email: string): Promise<void> {
+    const count = await redis.get(failedLoginKey(email));
+    if (count && parseInt(count, 10) >= LOCKOUT_THRESHOLD) {
+        throw new AppError('Too many failed login attempts. Please try again in 15 minutes.', 429, 'ACCOUNT_LOCKED');
+    }
+}
+
+async function recordFailedLogin(email: string): Promise<void> {
+    const key = failedLoginKey(email);
+    const count = await redis.incr(key);
+    if (count === 1) await redis.expire(key, LOCKOUT_WINDOW_SECONDS);
+}
+
+async function clearFailedLogins(email: string): Promise<void> {
+    await redis.del(failedLoginKey(email));
+}
+
+// Password reset tokens live in Redis, not Postgres — they're inherently
+// short-lived/single-use, so a TTL'd cache entry is a better fit than a
+// migration-requiring table. Only the SHA-256 hash of the token is stored,
+// same principle as never storing plaintext passwords.
+const RESET_TOKEN_TTL_SECONDS = 30 * 60;
+const resetTokenKey = (hash: string) => `pwreset:${hash}`;
+const hashToken = (token: string) => crypto.createHash('sha256').update(token).digest('hex');
 
 function generateTokens(userId: string, email: string, role: string): TokenPair {
     const accessOpts: SignOptions = { expiresIn: (env.JWT_ACCESS_EXPIRY as SignOptions['expiresIn']) ?? '15m' };
@@ -110,27 +145,40 @@ export const authService = {
         if (existing) throw new AppError('Email already registered', 409, 'EMAIL_EXISTS');
 
         const passwordHash = await bcrypt.hash(data.password, 12);
+        const resolvedRole = (data.role as any) || 'DOCTOR';
         const user = await prisma.user.create({
             data: {
                 email: data.email,
                 passwordHash,
                 firstName: data.firstName,
                 lastName: data.lastName,
-                role: (data.role as any) || 'DOCTOR',
+                role: resolvedRole,
                 department: data.department,
+                // All doctors are Cardiologists — set automatically, never from client input
+                specialization: resolvedRole === 'DOCTOR' ? 'Cardiologist' : undefined,
             },
-            select: { id: true, email: true, firstName: true, lastName: true, role: true, createdAt: true },
+            select: { id: true, email: true, firstName: true, lastName: true, role: true, specialization: true, createdAt: true },
         });
         logger.info(`New staff registered: ${user.email}`);
         return user;
     },
 
     async login(email: string, password: string) {
+        await assertNotLockedOut(email);
+
         const user = await prisma.user.findUnique({ where: { email, isActive: true } });
-        if (!user) throw new AppError('Invalid email or password', 401, 'INVALID_CREDENTIALS');
+        if (!user) {
+            await recordFailedLogin(email);
+            throw new AppError('Invalid email or password', 401, 'INVALID_CREDENTIALS');
+        }
 
         const isValid = await bcrypt.compare(password, user.passwordHash);
-        if (!isValid) throw new AppError('Invalid email or password', 401, 'INVALID_CREDENTIALS');
+        if (!isValid) {
+            await recordFailedLogin(email);
+            throw new AppError('Invalid email or password', 401, 'INVALID_CREDENTIALS');
+        }
+
+        await clearFailedLogins(email);
 
         const tokens = generateTokens(user.id, user.email, user.role);
         const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
@@ -155,6 +203,13 @@ export const authService = {
         });
         if (!stored || stored.expiresAt < new Date()) {
             throw new AppError('Invalid or expired refresh token', 401, 'TOKEN_INVALID');
+        }
+
+        // A deactivated user must not be able to keep refreshing access
+        // tokens for the remaining life of an already-issued refresh token.
+        if (!stored.user.isActive) {
+            await prisma.refreshToken.delete({ where: { id: stored.id } });
+            throw new AppError('Account is deactivated', 401, 'ACCOUNT_INACTIVE');
         }
 
         try {
@@ -207,5 +262,40 @@ export const authService = {
         await prisma.user.update({ where: { id: userId }, data: { passwordHash } });
         // Revoke all refresh tokens
         await prisma.refreshToken.deleteMany({ where: { userId } });
+    },
+
+    /**
+     * Always responds the same way whether or not the email exists, so this
+     * endpoint can't be used to enumerate registered accounts. If the user
+     * exists, a single-use token (TTL'd in Redis, only its hash stored) is
+     * emailed/logged.
+     */
+    async forgotPassword(email: string): Promise<void> {
+        const user = await prisma.user.findUnique({ where: { email, isActive: true } });
+        if (!user) return; // don't reveal whether the account exists
+
+        const token = crypto.randomBytes(32).toString('base64url');
+        await redis.setex(resetTokenKey(hashToken(token)), RESET_TOKEN_TTL_SECONDS, user.id);
+
+        await sendPasswordResetEmail(user.email, token);
+        logger.info(`Password reset requested for ${user.email}`);
+    },
+
+    async resetPassword(token: string, newPassword: string): Promise<string> {
+        const key = resetTokenKey(hashToken(token));
+        const userId = await redis.get(key);
+        if (!userId) throw new AppError('Invalid or expired reset token', 400, 'TOKEN_INVALID');
+
+        // Single-use — delete immediately so the same token can't be replayed.
+        await redis.del(key);
+
+        const passwordHash = await bcrypt.hash(newPassword, 12);
+        await prisma.user.update({ where: { id: userId }, data: { passwordHash } });
+        // A password reset should invalidate every existing session.
+        await prisma.refreshToken.deleteMany({ where: { userId } });
+        await clearFailedLogins((await prisma.user.findUnique({ where: { id: userId }, select: { email: true } }))?.email ?? '');
+
+        logger.info(`Password reset completed for user ${userId}`);
+        return userId;
     },
 };

@@ -1,8 +1,26 @@
 """
 Lipid Profile Analysis API Routes — MediSense AI
 ==================================================
-POST /api/lipid/analyze       — Analyze lipid values via Random Forest model
-GET  /api/lipid/model-status  — Check whether lipid model is ready
+POST /api/lipid/analyze       — Analyze lipid values via a documented,
+                                 guideline-based rule engine
+GET  /api/lipid/model-status  — Always ready (no trained model to wait on)
+
+This route previously wrapped 4 RandomForestClassifiers (risk_category,
+has_dyslipidemia, has_metabolic_syndrome, statin_intensity) trained on
+data/lipid_ml_dataset.csv. That dataset's labels turned out to be
+deterministic rule-engine outputs computed from the exact same lipid
+values used as the models' inputs (the same logic implemented directly in
+_classify_panel below) — the "ML" was learning to reproduce a rule engine
+that already existed in this file, not predicting anything from real
+clinical outcomes. A search for a real dataset linking lipid panels to
+diagnosed dyslipidemia/metabolic-syndrome/statin-therapy outcomes did not
+turn up a usable public one, so rather than keep presenting a rule engine
+as machine learning, this route is now an honest, fully rule-based
+clinical classifier — same NLA-2014 panel logic as before, extended with
+documented ATP III / ACC-AHA-derived rules for the four fields the old
+"models" used to produce. See _rule_based_targets() below for exactly
+which guideline each rule comes from and where an input this schema
+doesn't collect (waist circumference, systolic BP value) is approximated.
 """
 from __future__ import annotations
 
@@ -10,25 +28,10 @@ import math
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
-import numpy as np
-import os
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter
 from pydantic import BaseModel, Field
 
 router = APIRouter()
-
-MODELS_DIR = Path(os.getenv("MODEL_PATH", str(Path(__file__).parent.parent.parent / "models")))
-_cache: Dict[str, Any] = {}
-
-
-def _load_lipid_model():
-    if "lipid_model" not in _cache:
-        path = MODELS_DIR / "lipid_model.pkl"
-        import joblib
-        if not path.exists():
-            return None
-        _cache["lipid_model"] = joblib.load(path)
-    return _cache["lipid_model"]
 
 
 # ── NLA-2014 Reference Ranges ─────────────────────────────────────────────────
@@ -98,6 +101,93 @@ def _classify_panel(
             "value": non_hdl, "status": classify_non_hdl(non_hdl),
             "reference": "< 130 mg/dL (Optimal)", "unit": "mg/dL"
         },
+    }
+
+
+def _rule_based_targets(
+    tc: float, ldl: float, hdl: float, tg: float, age: int, gender: str, bmi: float,
+    is_diabetic: int, is_hypertensive: int, is_smoker: int,
+) -> Dict[str, Any]:
+    """
+    Replaces the old 4 RandomForest outputs with documented guideline rules.
+
+    has_dyslipidemia — ATP III composite definition: any single lipid
+      parameter at or beyond a "high" cutoff (TC>=240, LDL>=160, TG>=200,
+      or low HDL for sex).
+
+    risk_category — a simple additive point score over the same panel
+      categories plus conventional risk factors (diabetes/hypertension/
+      smoking). This is a transparent composite screening score, NOT a
+      validated event-risk calculator like ASCVD/Framingham/QRISK, which
+      need inputs (systolic BP value, race, treatment status, etc.) this
+      schema doesn't collect — it should not be presented to a clinician
+      as equivalent to one.
+
+    has_metabolic_syndrome — NCEP ATP III requires >=3 of 5 criteria.
+      Two of the five (waist circumference, fasting glucose, blood
+      pressure value) aren't in this request schema; BMI>30 is used as an
+      approximation for central obesity, and the is_diabetic/is_hypertensive
+      flags stand in for the glucose/BP criteria. This is a documented
+      approximation, not the literal ATP III measurement set.
+
+    statin_intensity — a simplified reading of the ACC/AHA 2018 statin
+      benefit groups (LDL>=190 -> high-intensity; diabetic 40-75 with
+      elevated risk -> moderate; etc.), not a substitute for calculating
+      a real 10-year ASCVD risk score.
+    """
+    hdl_low = (gender.upper() == "M" and hdl < 40) or (gender.upper() != "M" and hdl < 50)
+
+    has_dyslipidemia = tc >= 240 or ldl >= 160 or tg >= 200 or hdl_low
+
+    score = 0
+    if ldl >= 190: score += 3
+    elif ldl >= 160: score += 2
+    elif ldl >= 130: score += 1
+    if tc >= 240: score += 1
+    if tg >= 200: score += 1
+    if hdl_low: score += 1
+    score += int(bool(is_diabetic)) + int(bool(is_hypertensive)) + int(bool(is_smoker))
+
+    if score >= 5:
+        risk_category = "HIGH"
+    elif score >= 2:
+        risk_category = "MEDIUM"
+    else:
+        risk_category = "LOW"
+
+    metsyn_criteria = sum([
+        bmi > 30,                # proxy for elevated waist circumference
+        tg >= 150,
+        hdl_low,
+        bool(is_hypertensive),   # proxy for elevated BP criterion
+        bool(is_diabetic),       # proxy for elevated fasting glucose criterion
+    ])
+    has_metabolic_syndrome = metsyn_criteria >= 3
+
+    if ldl >= 190:
+        statin_intensity = "HIGH"
+    elif bool(is_diabetic) and 40 <= age <= 75:
+        statin_intensity = "MODERATE"
+    elif risk_category == "HIGH":
+        statin_intensity = "HIGH" if ldl >= 160 else "MODERATE"
+    elif risk_category == "MEDIUM" and (has_dyslipidemia or bool(is_smoker)):
+        statin_intensity = "LOW"
+    else:
+        statin_intensity = "NONE"
+
+    # A rough class-probability-shaped output so the response contract stays
+    # the same shape as before (frontend/backend expect a dict of {class: prob})
+    # — derived from the same score, not a real model's predict_proba.
+    risk_probability = {"LOW": 0.0, "MEDIUM": 0.0, "HIGH": 0.0}
+    risk_probability[risk_category] = 1.0
+
+    return {
+        "risk_category": risk_category,
+        "risk_probability": risk_probability,
+        "has_dyslipidemia": has_dyslipidemia,
+        "has_metabolic_syndrome": has_metabolic_syndrome,
+        "statin_intensity": statin_intensity,
+        "method": "rule-based (ATP III / ACC-AHA 2018 derived thresholds) — not a trained model",
     }
 
 
@@ -201,55 +291,38 @@ class LipidRequest(BaseModel):
 
 
 # ── Endpoint ────────────────────────────────────────────────────────────────────
-@router.post("/analyze", summary="Analyze Lipid Profile using Random Forest model")
+@router.post("/analyze", summary="Analyze Lipid Profile via guideline-based rule engine")
 def analyze_lipid(req: LipidRequest):
     """
     Input  : Lipid panel values + patient demographics
     Output : Risk category, dyslipidemia detection, statin recommendation,
              NLA-2014 panel classification, clinical ratios, and recommendations
+
+    All outputs are computed by documented clinical-guideline thresholds
+    (see _rule_based_targets and _classify_panel) — this endpoint does not
+    use a trained model. See the module docstring for why.
     """
     # ── Auto-compute derived fields ───────────────────────────────────────────
     vldl    = req.vldl    if req.vldl    is not None else round(req.triglycerides / 5.0, 1)
     non_hdl = req.non_hdl if req.non_hdl is not None else round(req.total_cholesterol - req.hdl, 1)
-    bmi     = req.bmi or 25.0  # default neutral BMI for model if not provided
+    bmi     = req.bmi or 25.0  # neutral default when not provided
 
-    # ── Feature engineering ───────────────────────────────────────────────────
+    # ── Derived ratios (clinically standard, shown to the user as-is) ────────
     tc_hdl_ratio      = round(req.total_cholesterol / req.hdl, 2) if req.hdl > 0 else 0
     ldl_hdl_ratio     = round(req.ldl / req.hdl, 2)               if req.hdl > 0 else 0
     tg_hdl_ratio      = round(req.triglycerides / req.hdl, 2)     if req.hdl > 0 else 0
     atherogenic_index = round(math.log10(req.triglycerides / req.hdl), 3) if req.hdl > 0 and req.triglycerides > 0 else 0.0
 
-    feature_names = [
-        'total_cholesterol', 'ldl', 'hdl', 'vldl', 'triglycerides', 'non_hdl',
-        'age', 'bmi', 'is_diabetic', 'is_hypertensive', 'is_smoker',
-        'tc_hdl_ratio', 'ldl_hdl_ratio', 'tg_hdl_ratio', 'atherogenic_index'
-    ]
-    X = np.array([[
-        req.total_cholesterol, req.ldl, req.hdl, vldl, req.triglycerides, non_hdl,
-        req.age, bmi, req.is_diabetic, req.is_hypertensive, req.is_smoker,
-        tc_hdl_ratio, ldl_hdl_ratio, tg_hdl_ratio, atherogenic_index,
-    ]], dtype=float)
-
-    # ── ML predictions ────────────────────────────────────────────────────────
-    models = _load_lipid_model()
-    if models is None:
-        raise HTTPException(503, detail="Lipid model not found. Run train/train_lipid_model.py first.")
-
-    risk_model      = models["risk_category"]
-    dyslip_model    = models["has_dyslipidemia"]
-    metab_model     = models["has_metabolic_syndrome"]
-    statin_model    = models["statin_intensity"]
-
-    # Ensure correct feature order if model saved names
-    risk_cat       = str(risk_model.predict(X)[0])
-    risk_proba_arr = risk_model.predict_proba(X)[0]
-    risk_classes   = risk_model.classes_
-    risk_proba     = {str(c): round(float(p), 3) for c, p in zip(risk_classes, risk_proba_arr)}
-
-    has_dyslipidemia      = bool(int(dyslip_model.predict(X)[0]) == 1)
-    has_metabolic_syndrome = bool(int(metab_model.predict(X)[0]) == 1)
-    statin_intensity      = str(statin_model.predict(X)[0])
-    needs_statin          = statin_intensity != "NONE"
+    # ── Rule-based classification (replaces the old circular ML models) ──────
+    targets = _rule_based_targets(
+        req.total_cholesterol, req.ldl, req.hdl, req.triglycerides,
+        req.age, req.gender, bmi, req.is_diabetic, req.is_hypertensive, req.is_smoker,
+    )
+    risk_cat = targets["risk_category"]
+    has_dyslipidemia = targets["has_dyslipidemia"]
+    has_metabolic_syndrome = targets["has_metabolic_syndrome"]
+    statin_intensity = targets["statin_intensity"]
+    needs_statin = statin_intensity != "NONE"
 
     # ── Panel analysis ────────────────────────────────────────────────────────
     panel = _classify_panel(
@@ -261,7 +334,7 @@ def analyze_lipid(req: LipidRequest):
         "success": True,
         "data": {
             "risk_category":    risk_cat,
-            "risk_probability": risk_proba,
+            "risk_probability": targets["risk_probability"],
             "has_dyslipidemia":        has_dyslipidemia,
             "has_metabolic_syndrome":  has_metabolic_syndrome,
             "statin_recommendation": {
@@ -285,19 +358,18 @@ def analyze_lipid(req: LipidRequest):
                 req.total_cholesterol, req.ldl, req.hdl, req.triglycerides, req.gender
             ),
             "nla_category": _nla_category(req.ldl),
+            "method": targets["method"],
         }
     }
 
 
-@router.get("/model-status", summary="Check Lipid model readiness")
+@router.get("/model-status", summary="Lipid analyzer readiness (rule-based — always ready)")
 def lipid_model_status():
-    model_path = MODELS_DIR / "lipid_model.pkl"
-    ready = model_path.exists()
     return {
         "success": True,
         "data": {
-            "model_ready": ready,
-            "model_file":  "lipid_model.pkl",
+            "model_ready": True,
+            "method": "rule-based (ATP III / ACC-AHA 2018 derived thresholds), no trained model file",
             "targets": ["risk_category", "has_dyslipidemia", "has_metabolic_syndrome", "statin_intensity"],
         }
     }

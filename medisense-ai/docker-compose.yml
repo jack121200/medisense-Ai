@@ -48,25 +48,28 @@ services:
     environment:
       - NODE_ENV=production
       - PORT=5000
-      - DATABASE_URL=postgresql://medisense:medisense_password@postgres:5432/medisense_db
-      - REDIS_URL=redis://:redis_password@redis:6379
+      - DATABASE_URL=postgresql://medisense:${POSTGRES_PASSWORD}@postgres:5432/medisense_db
+      - REDIS_URL=redis://:${REDIS_PASSWORD}@redis:6379
       - ML_SERVICE_URL=http://ml-service:8000
+      - ML_SERVICE_INTERNAL_KEY=${ML_SERVICE_INTERNAL_KEY}
       - KAFKA_BROKER=kafka:9092
       - KAFKA_VITALS_TOPIC=patient-vitals
       - KAFKA_ALERTS_TOPIC=medical-alerts
       - ELASTICSEARCH_URL=http://elasticsearch:9200
       - MINIO_ENDPOINT=minio
       - MINIO_PORT=9000
-      - MINIO_ACCESS_KEY=minioadmin
-      - MINIO_SECRET_KEY=minioadmin123
+      - MINIO_ACCESS_KEY=${MINIO_ACCESS_KEY}
+      - MINIO_SECRET_KEY=${MINIO_SECRET_KEY}
       - MINIO_BUCKET=medisense-files
-      - JWT_ACCESS_SECRET=medisense-super-secret-access-key-min-32-chars-2024
-      - JWT_REFRESH_SECRET=medisense-super-secret-refresh-key-min-32-chars-2024
+      - JWT_ACCESS_SECRET=${JWT_ACCESS_SECRET}
+      - JWT_REFRESH_SECRET=${JWT_REFRESH_SECRET}
       - JWT_ACCESS_EXPIRY=15m
       - JWT_REFRESH_EXPIRY=7d
       - FRONTEND_URL=http://localhost
       - VAPI_API_KEY=${VAPI_API_KEY}
       - VAPI_PUBLIC_KEY=${VAPI_PUBLIC_KEY}
+      - VAPI_WEBHOOK_SECRET=${VAPI_WEBHOOK_SECRET}
+      - GROQ_API_KEY=${GROQ_API_KEY}
     depends_on:
       postgres:
         condition: service_healthy
@@ -87,14 +90,19 @@ services:
     build:
       context: ./ml-service
       dockerfile: Dockerfile
-    ports:
-      - "8000:8000"
+    # No host port binding — ml-service is internal-only. It previously
+    # published 8000:8000 directly, which let anyone who could reach the
+    # host bypass the backend's JWT auth entirely and call every
+    # prediction/upload endpoint. The backend reaches it at
+    # http://ml-service:8000 over the internal Docker network only.
     environment:
-      - DATABASE_URL=postgresql://medisense:medisense_password@postgres:5432/medisense_db
-      - REDIS_URL=redis://:redis_password@redis:6379
+      - DATABASE_URL=postgresql://medisense:${POSTGRES_PASSWORD}@postgres:5432/medisense_db
+      - REDIS_URL=redis://:${REDIS_PASSWORD}@redis:6379
       - KAFKA_BROKER=kafka:9092
       - MODEL_PATH=/app/models
       - HEART_CSV=/app/data/HeartDiseaseTrain-Test.csv
+      - INTERNAL_API_KEY=${ML_SERVICE_INTERNAL_KEY}
+      - ALLOWED_ORIGIN=http://backend:5000
     volumes:
       - ./ml-service/app/models:/app/models
       - ./HeartDiseaseTrain-Test.csv:/app/data/HeartDiseaseTrain-Test.csv:ro
@@ -114,10 +122,12 @@ services:
     image: timescale/timescaledb:latest-pg15
     ports:
       - "5432:5432"
+    # NOTE: host-exposing the DB port is addressed in Phase 5 (network
+    # segmentation) — left as-is here to keep this pass scoped to secrets.
     environment:
       - POSTGRES_DB=medisense_db
       - POSTGRES_USER=medisense
-      - POSTGRES_PASSWORD=medisense_password
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
@@ -136,11 +146,11 @@ services:
     image: redis:7-alpine
     # No host port binding — only accessible internally via Docker network
     # (backend and ml-service connect via redis://redis:6379 internally)
-    command: redis-server --requirepass redis_password
+    command: redis-server --requirepass ${REDIS_PASSWORD}
     volumes:
       - redis_data:/data
     healthcheck:
-      test: ["CMD", "redis-cli", "-a", "redis_password", "ping"]
+      test: ["CMD", "redis-cli", "-a", "${REDIS_PASSWORD}", "ping"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -211,8 +221,8 @@ services:
       - "9001:9001"
     command: server /data --console-address ":9001"
     environment:
-      - MINIO_ROOT_USER=minioadmin
-      - MINIO_ROOT_PASSWORD=minioadmin123
+      - MINIO_ROOT_USER=${MINIO_ACCESS_KEY}
+      - MINIO_ROOT_PASSWORD=${MINIO_SECRET_KEY}
     volumes:
       - minio_data:/data
     networks:

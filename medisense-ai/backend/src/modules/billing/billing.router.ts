@@ -1,13 +1,19 @@
 import { Router } from 'express';
 import { authenticate } from '../../middleware/auth.middleware';
+import { requireRole, requireOwnership } from '../../middleware/rbac.middleware';
 import { billingService } from './billing.service';
 import { sendSuccess } from '../../utils/apiResponse';
+import { writeAuditLog } from '../../lib/auditLog';
 
 const router = Router();
 router.use(authenticate);
 
-// List invoices  
-router.get('/', async (req, res, next) => {
+// Billing is a staff worklist; patients use /patient/my-bills for their own
+// invoices, so nothing here needs to allow the PATIENT role.
+const STAFF = ['SUPER_ADMIN', 'ADMIN', 'DOCTOR', 'RECEPTIONIST'] as const;
+
+// List invoices
+router.get('/', requireRole(...STAFF), async (req, res, next) => {
     try {
         const isPaid = req.query.isPaid === 'true' ? true : req.query.isPaid === 'false' ? false : undefined;
         sendSuccess(res, await billingService.list({ isPaid, patientId: req.query.patientId as string }));
@@ -15,19 +21,23 @@ router.get('/', async (req, res, next) => {
 });
 
 // Revenue today (for dashboard)
-router.get('/revenue/today', async (req, res, next) => {
+router.get('/revenue/today', requireRole(...STAFF), async (req, res, next) => {
     try { sendSuccess(res, await billingService.getRevenueToday()); } catch (e) { next(e); }
 });
 
 // Get invoice by ID
-router.get('/:id', async (req, res, next) => {
+router.get('/:id', requireOwnership('billing', { allowRoles: [...STAFF] }), async (req, res, next) => {
     try { sendSuccess(res, await billingService.getById(req.params.id)); } catch (e) { next(e); }
 });
 
 // Mark as paid
-router.patch('/:id/pay', async (req, res, next) => {
+router.patch('/:id/pay', requireRole(...STAFF), async (req: any, res, next) => {
     try {
         const data = await billingService.markPaid(req.params.id, req.body.paymentMethod);
+        await writeAuditLog({
+            userId: req.user.id, action: 'INVOICE_PAID', resource: 'Invoice', resourceId: req.params.id,
+            details: { paymentMethod: req.body.paymentMethod }, req,
+        });
         sendSuccess(res, data, 'Payment recorded');
     } catch (e) { next(e); }
 });

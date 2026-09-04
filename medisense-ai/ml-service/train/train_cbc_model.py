@@ -137,6 +137,41 @@ def train():
         count = int((cluster_labels == k).sum())
         print(f"  Cluster {k}: {count} samples ({count/len(df)*100:.1f}%)")
 
+    # ── Map cluster IDs → clinical labels by computed severity, not by ID ────
+    # KMeans cluster numbering (0/1/2) is arbitrary and not guaranteed stable
+    # across retrains — hardcoding "cluster 0 = Normal" in the serving route
+    # would silently mislabel results after any retrain that happens to
+    # renumber the clusters. Instead, score each centroid by how far outside
+    # the clinical reference ranges (CBC_RANGES) it falls, then rank the
+    # three clusters by that score — the lowest-severity centroid is Normal,
+    # the highest is Abnormal, regardless of which raw ID KMeans assigned it.
+    centroids_original = scaler.inverse_transform(kmeans.cluster_centers_)
+    severity_scores = []
+    for centroid in centroids_original:
+        score = 0.0
+        for i, col in enumerate(feature_cols):
+            ref = CBC_RANGES.get(col)
+            if not ref:
+                continue
+            lo, hi = ref["min"], ref["max"]
+            span = (hi - lo) / 2 or 1.0
+            val = centroid[i]
+            if val > hi:
+                score += (val - hi) / span
+            elif val < lo:
+                score += (lo - val) / span
+        severity_scores.append(score)
+
+    ranked_cluster_ids = sorted(range(3), key=lambda k: severity_scores[k])
+    cluster_label_map = {
+        str(ranked_cluster_ids[0]): "Normal Pattern",
+        str(ranked_cluster_ids[1]): "Mild Concern",
+        str(ranked_cluster_ids[2]): "Abnormal Pattern",
+    }
+    print("\nCluster → label mapping (by computed severity, not raw ID):")
+    for cid, label in cluster_label_map.items():
+        print(f"  Cluster {cid} (severity={severity_scores[int(cid)]:.2f}): {label}")
+
     # ── Save artefacts ────────────────────────────────────────────────────────
     joblib.dump(iso_forest, os.path.join(MODELS_DIR, "cbc_anomaly_model.pkl"))
     joblib.dump(kmeans,     os.path.join(MODELS_DIR, "cbc_cluster_model.pkl"))
@@ -149,14 +184,16 @@ def train():
         json.dump(feature_cols, f)
 
     meta = {
-        "n_samples_clean": len(df),
-        "n_features":      len(feature_cols),
-        "features":        feature_cols,
-        "contamination":   0.05,
-        "kmeans_k":        3,
-        "n_anomalies":     n_anomaly,
-        "dataset":         "cbc information.xlsx",
-        "note":            "Isolation Forest + KMeans on CBC blood parameters",
+        "n_samples_clean":  len(df),
+        "n_features":       len(feature_cols),
+        "features":         feature_cols,
+        "contamination":    0.05,
+        "kmeans_k":         3,
+        "n_anomalies":      n_anomaly,
+        "cluster_label_map": cluster_label_map,
+        "cluster_severity_scores": {str(i): round(s, 4) for i, s in enumerate(severity_scores)},
+        "dataset":          "cbc information.xlsx",
+        "note":             "Isolation Forest + KMeans on CBC blood parameters. cluster_label_map is recomputed by centroid severity every training run — never assume cluster ID N means the same thing across retrains.",
     }
     with open(os.path.join(MODELS_DIR, "cbc_meta.json"), "w") as f:
         json.dump(meta, f, indent=2)

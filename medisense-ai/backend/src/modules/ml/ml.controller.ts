@@ -1,36 +1,6 @@
 import { Request, Response } from 'express';
-import axios from 'axios';
-
-// ML Service URL (internal Docker network)
-const ML_SERVICE_URL = process.env.ML_SERVICE_URL || 'http://ml-service:8000';
-
-async function proxyToML(endpoint: string, data?: any) {
-    const url = `${ML_SERVICE_URL}/api/medisense${endpoint}`;
-    if (data) {
-        const response = await axios.post(url, data, { timeout: 30000 });
-        return response.data;
-    } else {
-        const response = await axios.get(url, { timeout: 10000 });
-        return response.data;
-    }
-}
-
-async function proxyToCBC(endpoint: string, data?: any) {
-    const url = `${ML_SERVICE_URL}/api/cbc${endpoint}`;
-    if (data) {
-        const response = await axios.post(url, data, { timeout: 30000 });
-        return response.data;
-    } else {
-        const response = await axios.get(url, { timeout: 10000 });
-        return response.data;
-    }
-}
-
-async function proxyToHypothesis(endpoint: string, params?: Record<string, any>) {
-    const url = `${ML_SERVICE_URL}/api/hypothesis${endpoint}`;
-    const response = await axios.get(url, { params, timeout: 15000 });
-    return response.data;
-}
+import { mlService } from './ml.service';
+import { sendSuccess } from '../../utils/apiResponse';
 
 export const mlController = {
     /**
@@ -44,46 +14,34 @@ export const mlController = {
                 res.status(400).json({ success: false, message: 'symptoms array is required' });
                 return;
             }
-            const result = await proxyToML('/predict-disease', { symptoms });
-            res.json(result);
+            const result = await mlService.predictDisease(symptoms);
+            sendSuccess(res, result);
         } catch (err: any) {
-            const status = err?.response?.status || 503;
-            const msg = err?.response?.data?.detail || 'ML service unavailable';
+            const status = err?.response?.status || err?.statusCode || 503;
+            const msg = err?.response?.data?.detail || err?.message || 'ML service unavailable';
             res.status(status).json({ success: false, message: msg });
         }
     },
 
     /**
      * POST /api/v1/ml/predict-risk
+     * Runs Heart Disease Risk Prediction AND saves to DB.
      * Proxies to ml-service: POST /api/medisense/predict-risk
+     * Body: { patientId, ...heartFeatures }
      */
     predictRisk: async (req: Request, res: Response) => {
         try {
-            const result = await proxyToML('/predict-risk', req.body);
-            res.json(result);
-        } catch (err: any) {
-            const status = err?.response?.status || 503;
-            const msg = err?.response?.data?.detail || 'ML service unavailable';
-            res.status(status).json({ success: false, message: msg });
-        }
-    },
-
-    /**
-     * POST /api/v1/ml/analyze-report
-     * Proxies to ml-service: POST /api/medisense/analyze-report
-     */
-    analyzeReport: async (req: Request, res: Response) => {
-        try {
-            const { age, gender, blood_type, condition } = req.body;
-            if (!age || !gender || !blood_type || !condition) {
-                res.status(400).json({ success: false, message: 'age, gender, blood_type, condition are required' });
-                return;
+            const { patientId, ...heartData } = req.body;
+            if (patientId) {
+                const result = await mlService.predictHeartRiskAndSave(patientId, heartData);
+                sendSuccess(res, result, 'Heart risk analysis complete and saved');
+            } else {
+                const result = await mlService.predictHeartRiskOnly(heartData);
+                sendSuccess(res, result, 'Heart risk analysis complete');
             }
-            const result = await proxyToML('/analyze-report', { age, gender, blood_type, condition });
-            res.json(result);
         } catch (err: any) {
-            const status = err?.response?.status || 503;
-            const msg = err?.response?.data?.detail || 'ML service unavailable';
+            const status = err?.response?.status || err?.statusCode || 503;
+            const msg = err?.response?.data?.detail || err?.message || 'ML service unavailable';
             res.status(status).json({ success: false, message: msg });
         }
     },
@@ -94,8 +52,8 @@ export const mlController = {
      */
     getSymptoms: async (_req: Request, res: Response) => {
         try {
-            const result = await proxyToML('/symptoms');
-            res.json(result);
+            const result = await mlService.getSymptoms();
+            sendSuccess(res, result);
         } catch (err: any) {
             res.status(503).json({ success: false, message: 'ML service unavailable' });
         }
@@ -107,8 +65,8 @@ export const mlController = {
      */
     getModelStatus: async (_req: Request, res: Response) => {
         try {
-            const result = await proxyToML('/model-status');
-            res.json(result);
+            const result = await mlService.getModelStatus();
+            sendSuccess(res, result);
         } catch (err: any) {
             res.status(503).json({ success: false, message: 'ML service unavailable' });
         }
@@ -116,15 +74,18 @@ export const mlController = {
 
     /**
      * POST /api/v1/ml/cbc-analyze
+     * Analyzes CBC values and optionally persists to lab_test_results.
      * Proxies to ml-service: POST /api/cbc/analyze
+     * Body: { labRequestId?, ...cbcValues }
      */
     analyzeCBC: async (req: Request, res: Response) => {
         try {
-            const result = await proxyToCBC('/analyze', req.body);
-            res.json(result);
+            const { labRequestId, ...cbcValues } = req.body;
+            const result = await mlService.analyzeCBC(cbcValues, labRequestId);
+            sendSuccess(res, result);
         } catch (err: any) {
-            const status = err?.response?.status || 503;
-            const msg = err?.response?.data?.detail || 'CBC analyzer unavailable';
+            const status = err?.response?.status || err?.statusCode || 503;
+            const msg = err?.response?.data?.detail || err?.message || 'CBC analyzer unavailable';
             res.status(status).json({ success: false, message: msg });
         }
     },
@@ -135,8 +96,8 @@ export const mlController = {
      */
     getCBCRanges: async (_req: Request, res: Response) => {
         try {
-            const result = await proxyToCBC('/ranges');
-            res.json(result);
+            const result = await mlService.getCBCRanges();
+            sendSuccess(res, result);
         } catch (err: any) {
             res.status(503).json({ success: false, message: 'CBC service unavailable' });
         }
@@ -153,11 +114,11 @@ export const mlController = {
                 res.status(400).json({ success: false, message: 'question param must be 1-4' });
                 return;
             }
-            const result = await proxyToHypothesis('/test', { question });
+            const result = await mlService.runHypothesisTest(question);
             res.json(result);
         } catch (err: any) {
-            const status = err?.response?.status || 503;
-            const msg = err?.response?.data?.detail || 'Hypothesis service unavailable';
+            const status = err?.response?.status || err?.statusCode || 503;
+            const msg = err?.response?.data?.detail || err?.message || 'Hypothesis service unavailable';
             res.status(status).json({ success: false, message: msg });
         }
     },
@@ -168,28 +129,126 @@ export const mlController = {
      */
     getPopulationStats: async (_req: Request, res: Response) => {
         try {
-            const result = await proxyToHypothesis('/population-stats');
+            const result = await mlService.getPopulationStats();
             res.json(result);
         } catch (err: any) {
-            const status = err?.response?.status || 503;
-            const msg = err?.response?.data?.detail || 'Population stats unavailable';
+            const status = err?.response?.status || err?.statusCode || 503;
+            const msg = err?.response?.data?.detail || err?.message || 'Population stats unavailable';
+            res.status(status).json({ success: false, message: msg });
+        }
+    },
+
+    /**
+     * POST /api/v1/ml/bayesian-infer
+     * Runs Bayesian Decision Network & Uncertainty Engine
+     * Proxies to ml-service: POST /api/bayesian/infer
+     */
+    runBayesianInference: async (req: Request, res: Response) => {
+        try {
+            const result = await mlService.runBayesianInference(req.body);
+            sendSuccess(res, result);
+        } catch (err: any) {
+            const status = err?.response?.status || err?.statusCode || 503;
+            const msg = err?.response?.data?.detail || err?.message || 'Bayesian engine unavailable';
+            res.status(status).json({ success: false, message: msg });
+        }
+    },
+
+    /**
+     * POST /api/v1/ml/fuzzy-dose
+     * Runs Mamdani Fuzzy Logic Controller for Drug Dosing & Triage
+     * Proxies to ml-service: POST /api/fuzzy/dosage-triage
+     */
+    runFuzzyDosing: async (req: Request, res: Response) => {
+        try {
+            const result = await mlService.runFuzzyDosing(req.body);
+            sendSuccess(res, result);
+        } catch (err: any) {
+            const status = err?.response?.status || err?.statusCode || 503;
+            const msg = err?.response?.data?.detail || err?.message || 'Fuzzy dosing engine unavailable';
+            res.status(status).json({ success: false, message: msg });
+        }
+    },
+
+    /**
+     * POST /api/v1/ml/deep-stream
+     * Runs Deep LSTM Autoencoder & 1D-CNN Rhythm Analyzer
+     * Proxies to ml-service: POST /api/deep/anomaly-stream
+     */
+    runDeepAnomalyStream: async (req: Request, res: Response) => {
+        try {
+            const result = await mlService.runDeepAnomalyStream(req.body);
+            sendSuccess(res, result);
+        } catch (err: any) {
+            const status = err?.response?.status || err?.statusCode || 503;
+            const msg = err?.response?.data?.detail || err?.message || 'Deep waveform engine unavailable';
             res.status(status).json({ success: false, message: msg });
         }
     },
 
     /**
      * POST /api/v1/ml/lipid-analyze
+     * Analyzes Lipid Profile panel
      * Proxies to ml-service: POST /api/lipid/analyze
      */
     analyzeLipid: async (req: Request, res: Response) => {
         try {
-            const url = `${ML_SERVICE_URL}/api/lipid/analyze`;
-            const response = await axios.post(url, req.body, { timeout: 30000 });
-            res.json(response.data);
+            const result = await mlService.analyzeLipid(req.body);
+            sendSuccess(res, result);
         } catch (err: any) {
-            const status = err?.response?.status || 503;
-            const msg = err?.response?.data?.detail || 'Lipid analyzer unavailable';
+            const status = err?.response?.status || err?.statusCode || 503;
+            const msg = err?.response?.data?.detail || err?.message || 'Lipid analyzer unavailable';
             res.status(status).json({ success: false, message: msg });
+        }
+    },
+
+    /**
+     * GET /api/v1/ml/predictions/:patientId
+     * Returns all saved ML predictions for a patient from the DB.
+     */
+    getPatientPredictions: async (req: Request, res: Response) => {
+        try {
+            const result = await mlService.getPredictionsForPatient(req.params.patientId);
+            sendSuccess(res, result);
+        } catch (err: any) {
+            res.status(500).json({ success: false, message: err?.message || 'Error fetching predictions' });
+        }
+    },
+
+    /**
+     * GET /api/v1/ml/shap/:predictionId
+     * Returns SHAP values for a specific saved prediction.
+     */
+    getSHAP: async (req: Request, res: Response) => {
+        try {
+            const result = await mlService.getSHAP(req.params.predictionId);
+            sendSuccess(res, result);
+        } catch (err: any) {
+            const status = err?.statusCode || 500;
+            res.status(status).json({ success: false, message: err?.message });
+        }
+    },
+
+    /**
+     * POST /api/v1/ml/pdf-extract/:kind  (kind: heart|cbc|symptoms|lipid|text)
+     * Proxies a PDF/DOCX upload to ml-service's extraction endpoints.
+     */
+    pdfExtract: async (req: Request, res: Response) => {
+        try {
+            const kind = req.params.kind as 'heart' | 'cbc' | 'symptoms' | 'lipid' | 'text';
+            if (!['heart', 'cbc', 'symptoms', 'lipid', 'text'].includes(kind)) {
+                res.status(400).json({ success: false, message: 'Invalid extraction kind' });
+                return;
+            }
+            if (!req.file) {
+                res.status(400).json({ success: false, message: 'file is required' });
+                return;
+            }
+            const result = await mlService.proxyPdfExtract(kind, req.file);
+            res.json(result);
+        } catch (err: any) {
+            const status = err?.statusCode || 503;
+            res.status(status).json({ success: false, message: err?.message || 'PDF extraction unavailable' });
         }
     },
 };

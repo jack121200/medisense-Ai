@@ -1,9 +1,9 @@
 import React, { useState, useRef } from 'react';
-import { Brain, Heart, Droplets, Upload, FileText, AlertTriangle, CheckCircle, Info } from 'lucide-react';
+import { Brain, Heart, Droplets, Upload, FileText, AlertTriangle, CheckCircle, Info, Activity } from 'lucide-react';
 import { mlApi } from '../api/ml.api';
 import { useAuthStore } from '../store/authStore';
 import toast from 'react-hot-toast';
-import axios from 'axios';
+import apiClient from '../api/axiosInstance';
 import LipidProfileTab from '../components/ml/LipidProfileTab';
 
 // ── Colour tokens ──────────────────────────────────────────────────────────────
@@ -92,7 +92,7 @@ function HeartRiskTab() {
         try {
             const fd = new FormData();
             fd.append('file', file);
-            const res = await axios.post('http://localhost:8000/api/pdf/extract-heart', fd);
+            const res = await apiClient.post('/ml/pdf-extract/heart', fd);
             const extracted = res.data.extracted || {};
             setForm(prev => ({ ...prev, ...extracted }));
             toast.success(`Extracted ${res.data.fields_found} fields. Review & correct before predicting.`);
@@ -258,7 +258,7 @@ function CBCTab() {
         try {
             const fd = new FormData();
             fd.append('file', file);
-            const res = await axios.post('http://localhost:8000/api/pdf/extract-cbc', fd);
+            const res = await apiClient.post('/ml/pdf-extract/cbc', fd);
             const extracted = res.data.extracted || {};
             // Convert all extracted values to string for the form
             const stringified: Record<string, string> = {};
@@ -383,7 +383,7 @@ function CBCTab() {
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    {Object.entries(result.findings).map(([key, f]: [string, any]) => (
+                                     {Object.entries(result?.findings || {}).map(([key, f]: [string, any]) => (
                                         <tr key={key} style={{ borderBottom: `1px solid rgba(255,255,255,0.04)` }}
                                             onMouseOver={e => (e.currentTarget as HTMLTableRowElement).style.background = 'rgba(255,255,255,0.025)'}
                                             onMouseOut={e => (e.currentTarget as HTMLTableRowElement).style.background = ''}
@@ -457,7 +457,7 @@ function SymptomTab() {
         try {
             const fd = new FormData();
             fd.append('file', file);
-            const res = await axios.post('http://localhost:8000/api/pdf/extract-symptoms', fd);
+            const res = await apiClient.post('/ml/pdf-extract/symptoms', fd);
             const csv = res.data.symptoms_csv || '';
             if (csv) {
                 setSymptoms(prev => prev ? prev + ', ' + csv : csv);
@@ -580,21 +580,31 @@ function SymptomTab() {
 // MAIN PAGE
 // ══════════════════════════════════════════════════════════════════════════════
 
+import BayesianUncertaintyCard from '../components/BayesianUncertaintyCard';
+import FuzzyDosingCard from '../components/FuzzyDosingCard';
+import LiveWaveformMonitor from '../components/LiveWaveformMonitor';
+
 const TABS = [
+    { id: 'bayesian',label: '🔮 Bayesian Engine',      icon: Brain,    color: '#00E5FF' },
+    { id: 'fuzzy',   label: '🎛️ Fuzzy Dosing Engine', icon: Heart,    color: '#FFD166' },
+    { id: 'deep',    label: '⚡ Deep Waveform Monitor',icon: Activity, color: '#FF2D55' },
     { id: 'lipid',   label: '🫀 Lipid Profile',      icon: Heart,    color: '#00B4D8' },
     { id: 'cbc',     label: '🩸 CBC Analyzer',        icon: Droplets, color: '#FF6B6B' },
     { id: 'symptom', label: '🧠 Symptom Checker',     icon: Brain,    color: '#C77DFF' },
 ];
 
 export default function MLPredictionsPage() {
-    const [tab, setTab] = useState('lipid');
+    const [tab, setTab] = useState('bayesian');
     const { user } = useAuthStore();
     const isPatient = user?.role === 'PATIENT';
 
     const patientTabs = [
-        { id: 'lipid',   label: '🫀 Lipid Profile',    color: '#00B4D8' },
-        { id: 'cbc',     label: '🩸 CBC Report',        color: '#FF6B6B' },
-        { id: 'symptom', label: '🧠 Symptom Checker',  color: '#C77DFF' },
+        { id: 'bayesian',label: '🔮 Bayesian Uncertainty', color: '#00E5FF' },
+        { id: 'fuzzy',   label: '🎛️ Fuzzy Drug Dosing',    color: '#FFD166' },
+        { id: 'deep',    label: '⚡ Waveform Monitor',     color: '#FF2D55' },
+        { id: 'lipid',   label: '🫀 Lipid Profile',        color: '#00B4D8' },
+        { id: 'cbc',     label: '🩸 CBC Report',            color: '#FF6B6B' },
+        { id: 'symptom', label: '🧠 Symptom Checker',      color: '#C77DFF' },
     ];
     const doctorTabs = TABS;
     return (
@@ -602,10 +612,10 @@ export default function MLPredictionsPage() {
             {/* Header */}
             <div style={{ marginBottom: 28 }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 8 }}>
-                    <div style={{ width: 40, height: 40, borderRadius: 12, background: 'linear-gradient(135deg, #00B4D8, #0077B6)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 20 }}>🫀</div>
+                    <div style={{ width: 40, height: 40, borderRadius: 12, background: 'linear-gradient(135deg, #00E5FF, #0077B6)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 20 }}>🫀</div>
                     <div>
                         <h1 style={{ fontSize: 22, fontWeight: 900, color: '#fff', letterSpacing: '-0.02em' }}>AI Clinical Tools</h1>
-                        <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.4)', marginTop: 2 }}>4 specialized AI models — Lipid Profiler, CBC Analyzer, Symptom Checker, Heart Risk</p>
+                        <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.4)', marginTop: 2 }}>Research-Grade Medical AI Engine — Bayesian DAG, Mamdani FIS Dosing, Deep Autoencoder, Lipid Profiler, CBC Analyzer</p>
                     </div>
                 </div>
             </div>
@@ -627,9 +637,12 @@ export default function MLPredictionsPage() {
             </div>
 
             {/* Content */}
-            {tab === 'lipid'   && <LipidProfileTab />}
-            {tab === 'cbc'     && <CBCTab />}
-            {tab === 'symptom' && <SymptomTab />}
+            {tab === 'bayesian' && <BayesianUncertaintyCard />}
+            {tab === 'fuzzy'    && <FuzzyDosingCard />}
+            {tab === 'deep'     && <LiveWaveformMonitor />}
+            {tab === 'lipid'    && <LipidProfileTab />}
+            {tab === 'cbc'      && <CBCTab />}
+            {tab === 'symptom'  && <SymptomTab />}
         </div>
     );
 }

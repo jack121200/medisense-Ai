@@ -353,11 +353,11 @@ function PreCallModal({
 }
 
 // ── Live Transcript Panel ─────────────────────────────────────────────────────
-function LiveTranscriptPanel({ messages }: { messages: TranscriptMessage[] }) {
+function LiveTranscriptPanel({ messages, partial }: { messages: TranscriptMessage[]; partial: TranscriptMessage | null }) {
     const ref = useRef<HTMLDivElement>(null);
     useEffect(() => {
         if (ref.current) ref.current.scrollTop = ref.current.scrollHeight;
-    }, [messages]);
+    }, [messages, partial]);
 
     return (
         <div style={{
@@ -369,25 +369,45 @@ function LiveTranscriptPanel({ messages }: { messages: TranscriptMessage[] }) {
                 <span style={{ fontSize: 11, fontWeight: 700, color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase', letterSpacing: '0.1em' }}>Live Transcript</span>
             </div>
             <div ref={ref} style={{ flex: 1, overflowY: 'auto', padding: '14px 16px', display: 'flex', flexDirection: 'column', gap: 10, scrollbarWidth: 'thin' }}>
-                {messages.length === 0 ? (
+                {messages.length === 0 && !partial ? (
                     <div style={{ textAlign: 'center', color: 'rgba(255,255,255,0.2)', fontSize: 13, marginTop: 30 }}>
                         Conversation will appear here...
                     </div>
-                ) : messages.filter(m => m.role !== 'system').map((msg, i) => (
-                    <div key={i} style={{ display: 'flex', flexDirection: 'column', alignItems: msg.role === 'user' ? 'flex-end' : 'flex-start' }}>
-                        <div style={{ fontSize: 10, fontWeight: 700, color: msg.role === 'user' ? '#6366F1' : '#10b981', marginBottom: 3, letterSpacing: '0.05em' }}>
-                            {msg.role === 'user' ? 'You' : 'Dr. Priya Sharma'}
-                        </div>
-                        <div style={{
-                            maxWidth: '88%', padding: '9px 13px', borderRadius: msg.role === 'user' ? '14px 14px 4px 14px' : '14px 14px 14px 4px',
-                            background: msg.role === 'user' ? 'rgba(99,102,241,0.25)' : 'rgba(255,255,255,0.06)',
-                            border: `1px solid ${msg.role === 'user' ? 'rgba(99,102,241,0.3)' : 'rgba(255,255,255,0.08)'}`,
-                            fontSize: 13, color: 'rgba(255,255,255,0.82)', lineHeight: 1.55,
-                        }}>
-                            {msg.message}
-                        </div>
-                    </div>
-                ))}
+                ) : (
+                    <>
+                        {messages.filter(m => m.role !== 'system').map((msg, i) => (
+                            <div key={i} style={{ display: 'flex', flexDirection: 'column', alignItems: msg.role === 'user' ? 'flex-end' : 'flex-start' }}>
+                                <div style={{ fontSize: 10, fontWeight: 700, color: msg.role === 'user' ? '#6366F1' : '#10b981', marginBottom: 3, letterSpacing: '0.05em' }}>
+                                    {msg.role === 'user' ? 'You' : 'Dr. Priya Sharma'}
+                                </div>
+                                <div style={{
+                                    maxWidth: '88%', padding: '9px 13px', borderRadius: msg.role === 'user' ? '14px 14px 4px 14px' : '14px 14px 14px 4px',
+                                    background: msg.role === 'user' ? 'rgba(99,102,241,0.25)' : 'rgba(255,255,255,0.06)',
+                                    border: `1px solid ${msg.role === 'user' ? 'rgba(99,102,241,0.3)' : 'rgba(255,255,255,0.08)'}`,
+                                    fontSize: 13, color: 'rgba(255,255,255,0.82)', lineHeight: 1.55,
+                                }}>
+                                    {msg.message}
+                                </div>
+                            </div>
+                        ))}
+                        {/* In-progress (not-yet-final) speech — shows what's being said right now */}
+                        {partial && partial.message.trim() && (
+                            <div style={{ display: 'flex', flexDirection: 'column', alignItems: partial.role === 'user' ? 'flex-end' : 'flex-start' }}>
+                                <div style={{ fontSize: 10, fontWeight: 700, color: partial.role === 'user' ? '#6366F1' : '#10b981', marginBottom: 3, letterSpacing: '0.05em' }}>
+                                    {partial.role === 'user' ? 'You' : 'Dr. Priya Sharma'} <span style={{ opacity: 0.5, fontWeight: 400 }}>· speaking…</span>
+                                </div>
+                                <div style={{
+                                    maxWidth: '88%', padding: '9px 13px', borderRadius: partial.role === 'user' ? '14px 14px 4px 14px' : '14px 14px 14px 4px',
+                                    background: partial.role === 'user' ? 'rgba(99,102,241,0.12)' : 'rgba(255,255,255,0.03)',
+                                    border: `1px dashed ${partial.role === 'user' ? 'rgba(99,102,241,0.3)' : 'rgba(255,255,255,0.08)'}`,
+                                    fontSize: 13, color: 'rgba(255,255,255,0.5)', lineHeight: 1.55, fontStyle: 'italic',
+                                }}>
+                                    {partial.message}
+                                </div>
+                            </div>
+                        )}
+                    </>
+                )}
             </div>
         </div>
     );
@@ -504,6 +524,8 @@ export default function AiDoctorPage() {
     const [isMuted, setIsMuted] = useState(false);
     const [elapsed, setElapsed] = useState(0);
     const [liveMessages, setLiveMessages] = useState<TranscriptMessage[]>([]);
+    const [partialMessage, setPartialMessage] = useState<TranscriptMessage | null>(null);
+    const liveMessagesRef = useRef<TranscriptMessage[]>([]);
     const [preCallData, setPreCallData] = useState<PreCallData | null>(null);
     const [activeCallId, setActiveCallId] = useState<string | null>(null);
     const [activePatientId, setActivePatientId] = useState<string | null>(null);
@@ -512,6 +534,7 @@ export default function AiDoctorPage() {
     const vapiRef = useRef<Vapi | null>(null);
     const timerRef = useRef<NodeJS.Timeout | null>(null);
     const pollRef = useRef<NodeJS.Timeout | null>(null);
+    const elapsedRef = useRef(0);
 
     // ── History state ──────────────────────────────────────────────────────
     const [calls, setCalls] = useState<AiDoctorCallSummary[]>([]);
@@ -584,35 +607,69 @@ export default function AiDoctorPage() {
         setPreCallData(data);
         setCallStatus('connecting');
         setLiveMessages([]);
+        liveMessagesRef.current = [];
+        setPartialMessage(null);
         setElapsed(0);
+        elapsedRef.current = 0;
         setDoctorReport(null);
+
+        // Pre-verify microphone permission to prevent Daily audio ejection
+        try {
+            const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+            // Release the temporary stream so Vapi can acquire it cleanly
+            stream.getTracks().forEach(track => track.stop());
+        } catch {
+            toast.error('Microphone permission required! Please allow microphone access in your browser to speak with the doctor.');
+            setCallStatus('idle');
+            return;
+        }
+
+        // Clean up any existing Vapi instance before starting a new call
+        if (vapiRef.current) {
+            try {
+                vapiRef.current.removeAllListeners();
+                vapiRef.current.stop();
+            } catch {
+                /* ignore cleanup errors */
+            }
+            vapiRef.current = null;
+        }
 
         try {
             const res = await aiDoctorApi.startCall(data);
             const { publicKey, patientId, assistantConfig } = res.data.data;
             setActivePatientId(patientId);
 
+            if (!publicKey) {
+                toast.error('VAPI Public Key missing — please check environment setup.');
+                setCallStatus('idle');
+                return;
+            }
+
             const vapi = new Vapi(publicKey);
             vapiRef.current = vapi;
 
             vapi.on('call-start', () => {
                 setCallStatus('active');
-                timerRef.current = setInterval(() => setElapsed(e => e + 1), 1000);
+                if (timerRef.current) clearInterval(timerRef.current);
+                timerRef.current = setInterval(() => setElapsed(e => { elapsedRef.current = e + 1; return e + 1; }), 1000);
             });
 
             vapi.on('call-end', async () => {
                 setCallStatus('ended');
+                setPartialMessage(null);
                 if (timerRef.current) clearInterval(timerRef.current);
 
-                // Collect final transcript + save
-                const finalTranscript = liveMessages;
-                const vapiCallId = (vapi as any).callId ?? `local-${Date.now()}`;
+                // Collect final transcript + save (use ref — closures here are stale for state)
+                const finalTranscript = liveMessagesRef.current;
+                const rawCallId = (vapi as any)?.callId;
+                const vapiCallId = typeof rawCallId === 'string' && rawCallId.trim() ? rawCallId : `local-${Date.now()}`;
 
                 try {
                     const saveRes = await aiDoctorApi.saveCall({
                         vapiCallId,
                         patientId: patientId,
-                        durationSecs: elapsed,
+                        durationSecs: elapsedRef.current,
                         transcript: finalTranscript,
                         preCallData: data,
                     });
@@ -629,16 +686,44 @@ export default function AiDoctorPage() {
             });
 
             vapi.on('message', (message: any) => {
-                if (message.type === 'transcript' && message.transcriptType === 'final') {
-                    setLiveMessages(prev => [...prev, { role: message.role, message: message.transcript }]);
+                const text = message.transcript || message.text || message.content;
+                if (!text || !text.trim()) return;
+
+                // Interim (not-yet-final) speech — show immediately so the user sees
+                // what they're saying in real time instead of waiting for finalization
+                if (message.type === 'transcript' && message.transcriptType === 'partial') {
+                    setPartialMessage({ role: message.role || 'user', message: text });
+                    return;
+                }
+
+                if (
+                    (message.type === 'transcript' && message.transcriptType === 'final') ||
+                    (message.type === 'speech-update' && message.status === 'stopped' && text) ||
+                    (message.role && text && (message.transcriptType === 'final' || !message.transcriptType))
+                ) {
+                    setPartialMessage(null);
+                    setLiveMessages(prev => {
+                        // Avoid duplicate consecutive identical messages
+                        const last = prev[prev.length - 1];
+                        if (last && last.role === message.role && last.message === text) return prev;
+                        const next = [...prev, { role: message.role || 'assistant', message: text }];
+                        liveMessagesRef.current = next;
+                        return next;
+                    });
                 }
             });
 
             vapi.on('error', (err: any) => {
                 console.error('Vapi error:', err);
-                setCallStatus('idle');
+                // Daily ejection or call end errors shouldn't crash if call already ended
+                const errorMsg = err?.error?.errorMsg || err?.message || '';
+                if (errorMsg.includes('ejection') || errorMsg.includes('ended')) {
+                    setCallStatus('ended');
+                } else {
+                    setCallStatus('idle');
+                    toast.error('Call connection notice. You can reconnect anytime.');
+                }
                 if (timerRef.current) clearInterval(timerRef.current);
-                toast.error('Call connection error. Please try again.');
             });
 
             await vapi.start(assistantConfig);
@@ -646,11 +731,17 @@ export default function AiDoctorPage() {
             setCallStatus('idle');
             toast.error(err?.response?.data?.message || 'Could not start call. Please try again.');
         }
-    }, [elapsed, liveMessages]);
+    }, []);
 
     const endCall = useCallback(() => {
         setCallStatus('ending');
-        vapiRef.current?.stop();
+        if (vapiRef.current) {
+            try {
+                vapiRef.current.stop();
+            } catch {
+                /* ignore */
+            }
+        }
         if (timerRef.current) clearInterval(timerRef.current);
     }, []);
 
@@ -689,8 +780,8 @@ export default function AiDoctorPage() {
                         <Stethoscope size={20} color="#fff" />
                     </div>
                     <div>
-                        <h1 style={{ fontSize: 22, fontWeight: 900, color: '#fff', letterSpacing: '-0.02em' }}>AI Doctor</h1>
-                        <p style={{ fontSize: 12.5, color: 'rgba(255,255,255,0.4)', marginTop: 2 }}>Dr. Priya Sharma — MBBS, DM Cardiology · Hindi & English</p>
+                        <h1 style={{ fontSize: 22, fontWeight: 900, color: '#fff', letterSpacing: '-0.02em' }}>AI Doctor OPD</h1>
+                        <p style={{ fontSize: 12.5, color: 'rgba(255,255,255,0.4)', marginTop: 2 }}>Dr. Arjun Mehta — MBBS, MD General Medicine · Integrative & Natural Healing OPD · Hindi & English</p>
                     </div>
                 </div>
             </div>
@@ -727,8 +818,8 @@ export default function AiDoctorPage() {
                             }}>
                                 <PulsingOrb active />
                                 <div style={{ textAlign: 'center' }}>
-                                    <div style={{ fontSize: 18, fontWeight: 800, color: '#fff' }}>Dr. Priya Sharma</div>
-                                    <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.4)', marginTop: 3 }}>MBBS · DM Cardiology</div>
+                                    <div style={{ fontSize: 18, fontWeight: 800, color: '#fff' }}>Dr. Arjun Mehta</div>
+                                    <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.4)', marginTop: 3 }}>MBBS, MD General Medicine · Integrative Physician</div>
                                 </div>
                                 <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                                     <span style={{ width: 8, height: 8, borderRadius: '50%', background: '#10b981', animation: 'ping 1.2s ease infinite', display: 'inline-block' }} />
@@ -757,7 +848,7 @@ export default function AiDoctorPage() {
                             </div>
 
                             {/* Right — Live transcript */}
-                            <LiveTranscriptPanel messages={liveMessages} />
+                            <LiveTranscriptPanel messages={liveMessages} partial={partialMessage} />
                         </div>
                     )}
 
@@ -766,7 +857,7 @@ export default function AiDoctorPage() {
                         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 18, padding: '60px 0', background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)', borderRadius: 20 }}>
                             <div style={{ width: 50, height: 50, borderRadius: '50%', border: '3px solid rgba(99,102,241,0.3)', borderTopColor: '#6366F1', animation: 'spin 0.8s linear infinite' }} />
                             <div style={{ textAlign: 'center' }}>
-                                <div style={{ fontSize: 15, fontWeight: 700, color: '#fff' }}>Connecting to Dr. Priya Sharma...</div>
+                                <div style={{ fontSize: 15, fontWeight: 700, color: '#fff' }}>Connecting to Dr. Arjun Mehta...</div>
                                 <div style={{ fontSize: 12.5, color: 'rgba(255,255,255,0.35)', marginTop: 4 }}>Please allow microphone access when prompted</div>
                             </div>
                             <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
@@ -778,10 +869,10 @@ export default function AiDoctorPage() {
                         <div style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)', borderRadius: 20, padding: '32px 36px', display: 'flex', alignItems: 'center', gap: 32 }}>
                             <PulsingOrb active={false} />
                             <div style={{ flex: 1 }}>
-                                <div style={{ fontSize: 22, fontWeight: 900, color: '#fff', marginBottom: 4 }}>Dr. Priya Sharma</div>
-                                <div style={{ fontSize: 13.5, color: '#6366F1', fontWeight: 600, marginBottom: 16 }}>MBBS (AIIMS Delhi) · MD Internal Medicine · DM Cardiology (PGI Chandigarh)</div>
+                                <div style={{ fontSize: 22, fontWeight: 900, color: '#fff', marginBottom: 4 }}>Dr. Arjun Mehta</div>
+                                <div style={{ fontSize: 13.5, color: '#6366F1', fontWeight: 600, marginBottom: 16 }}>MBBS (GMC Nagpur) · MD General Medicine (KGMU) · Fellowship Integrative Medicine (AIIMS)</div>
                                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginBottom: 22 }}>
-                                    {['Cardiology', 'General Medicine', 'Hindi & English', '14 years experience', 'Emergency Protocol'].map(tag => (
+                                    {['General Medicine', 'Ayurveda & Home Remedies', '9-Phase OPD Interview', '18 yrs experience', 'Hindi & English'].map(tag => (
                                         <span key={tag} style={{ fontSize: 12, padding: '4px 12px', borderRadius: 9999, background: 'rgba(99,102,241,0.12)', color: '#6366F1', border: '1px solid rgba(99,102,241,0.25)' }}>{tag}</span>
                                     ))}
                                 </div>
@@ -794,9 +885,9 @@ export default function AiDoctorPage() {
                                     <div style={{ padding: '12px 16px', background: 'rgba(99,102,241,0.08)', border: '1px solid rgba(99,102,241,0.2)', borderRadius: 12, marginBottom: 18, display: 'flex', gap: 10 }}>
                                         <AlertCircle size={16} color="#6366F1" style={{ flexShrink: 0, marginTop: 1 }} />
                                         <div>
-                                            <div style={{ fontSize: 12.5, fontWeight: 700, color: '#6366F1', marginBottom: 3 }}>Hindi aur English dono mein baat kar sakte hain</div>
+                                            <div style={{ fontSize: 12.5, fontWeight: 700, color: '#6366F1', marginBottom: 3 }}>Hindi, English ya Hinglish mein aaram se baat karein</div>
                                             <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.5)', lineHeight: 1.6 }}>
-                                                Dr. Priya aapke medical records access kar ke personalized guidance degi. For medical emergencies, call <strong style={{ color: '#fff' }}>108</strong> immediately.
+                                                Dr. Arjun Mehta complete 9-phase OPD interview lenge aur aapko pure Ayurvedic, diet & home remedies suggest karenge. Emergency ke liye call <strong style={{ color: '#fff' }}>108</strong>.
                                             </div>
                                         </div>
                                     </div>

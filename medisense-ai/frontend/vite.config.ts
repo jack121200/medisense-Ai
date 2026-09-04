@@ -15,11 +15,24 @@ export default defineConfig({
             '/api': {
                 target: 'http://localhost:5000',
                 changeOrigin: true,
+                configure: (proxy) => {
+                    proxy.on('error', (err, _req, res) => {
+                        if (!res.headersSent) {
+                            res.writeHead(503, { 'Content-Type': 'application/json' });
+                            res.end(JSON.stringify({ success: false, message: 'Backend service offline. Please start Docker or backend server.' }));
+                        }
+                    });
+                },
             },
             '/socket.io': {
                 target: 'http://localhost:5000',
                 ws: true,
                 changeOrigin: true,
+                configure: (proxy) => {
+                    proxy.on('error', () => {
+                        // Suppress socket error noise when server is offline
+                    });
+                },
             },
         },
     },

@@ -1,0 +1,32 @@
+{
+  "architecture": "1D-CNN autoencoder (PyTorch): Conv1d(1->16->32->8) / ConvTranspose1d(8->32->16->1), 256-sample input",
+  "window_length": 256,
+  "trained_on": "Normal beats only (unsupervised anomaly detection via reconstruction error)",
+  "n_train_normal": 17732,
+  "n_eval_normal": 4433,
+  "n_eval_abnormal": 5946,
+  "threshold": 0.001427,
+  "threshold_method": "95th percentile of reconstruction MSE on held-out normal beats",
+  "eval_precision": 0.8524,
+  "eval_recall": 0.2156,
+  "eval_f1": 0.3442,
+  "eval_roc_auc": 0.7397,
+  "mean_normal_error": 0.000685,
+  "mean_abnormal_error": 0.001118,
+  "dataset": "PhysioNet MIT-BIH Arrhythmia Database (physionet.org/content/mitdb/)",
+  "records_used": [
+    "100",
+    "101",
+    "103",
+    "108",
+    "112",
+    "115",
+    "106",
+    "200",
+    "208",
+    "213",
+    "217",
+    "223"
+  ],
+  "note": "Binary anomaly detector only (normal vs abnormal beat morphology) \u2014 does not classify specific arrhythmia types (AFib/PVC/etc). A prior version of this route fabricated specific arrhythmia-type labels from a synthetic signal; this version reports only what the model actually supports."
+}

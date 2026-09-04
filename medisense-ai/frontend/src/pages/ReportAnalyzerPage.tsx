@@ -62,8 +62,9 @@ export default function ReportAnalyzerPage() {
         setLoading(true);
         try {
             const res = await mlApi.analyzeCBC(payload);
-            setResult(res.data);
-            toast.success(`CBC analyzed — ${res.data.abnormal_count} abnormal values found`);
+            const cbcData = res.data?.data || res.data;
+            setResult(cbcData);
+            toast.success(`CBC analyzed — ${cbcData?.abnormal_count ?? 0} abnormal values found`);
         } catch {
             toast.error('CBC analyzer error — check ML service connection');
         } finally {
@@ -196,7 +197,7 @@ export default function ReportAnalyzerPage() {
                                 </tr>
                             </thead>
                             <tbody>
-                                {Object.entries(result.findings).map(([key, f]: [string, any]) => {
+                                {Object.entries(result?.findings || {}).map(([key, f]: [string, any]) => {
                                     const sc = STATUS_CONFIG[f.status] || STATUS_CONFIG.NORMAL;
                                     return (
                                         <tr key={key} style={{ borderBottom: '1px solid rgba(255,255,255,0.035)' }}

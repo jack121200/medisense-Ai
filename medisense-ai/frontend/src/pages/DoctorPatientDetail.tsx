@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../store/authStore';
 import { patientApi } from '../api/patient.api';
-import { mlApi } from '../api/index';
+import api from '../api/axiosInstance';
 import { consultationApi } from '../api/hospitalApi';
 import { appointmentApi } from '../api/appointment.api';
 import {
@@ -38,8 +38,8 @@ export default function DoctorPatientDetail() {
     const [prediction, setPrediction] = useState<any>(null);
     const [appointments, setAppointments] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
-    const [predicting, setPredicting] = useState(false);
     const [starting, setStarting] = useState(false);
+    const [predicting, setPredicting] = useState(false);
 
     useEffect(() => {
         if (!id) return;
@@ -59,17 +59,42 @@ export default function DoctorPatientDetail() {
         })();
     }, [id]);
 
+    function openAITools() {
+        navigate('/ai-tools');
+    }
+
     async function runPrediction() {
-        if (!id) return;
+        if (!id || !patient) return;
         setPredicting(true);
         try {
-            const { data } = await mlApi.predictAll(id);
-            setPrediction(data.data);
-            toast.success('ML prediction complete!');
-            const r = await patientApi.getById(id);
-            setPatient(r.data.data);
-        } catch { toast.error('Prediction failed — ML service may not be ready'); }
-        finally { setPredicting(false); }
+            const patientAge = patient.dateOfBirth
+                ? Math.floor((Date.now() - new Date(patient.dateOfBirth).getTime()) / (365.25 * 24 * 3600000))
+                : 45;
+            const payload = {
+                patientId: id,
+                age: patientAge,
+                sex: patient.gender === 'MALE' ? 'Male' : 'Female',
+                chest_pain_type: 'Asymptomatic',
+                resting_blood_pressure: 120,
+                cholestoral: 200,
+                fasting_blood_sugar: patient.hasDiabetes ? 'Greater than 120 mg/dl' : 'Lower than 120 mg/dl',
+                rest_ecg: 'Normal',
+                Max_heart_rate: 150,
+                exercise_induced_angina: patient.hasHeartDisease ? 'Yes' : 'No',
+                oldpeak: 0,
+                slope: 'Flat',
+                vessels_colored_by_flourosopy: 'Zero',
+                thalassemia: 'Normal',
+            };
+            await api.post('/ml/predict-risk', payload);
+            const savedRes = await api.get(`/ml/predictions/${id}`);
+            setPrediction(savedRes.data.data?.[0] || null);
+            toast.success('AI prediction complete');
+        } catch {
+            toast.error('Failed to run prediction');
+        } finally {
+            setPredicting(false);
+        }
     }
 
     async function startConsultation() {
@@ -119,13 +144,12 @@ export default function DoctorPatientDetail() {
                     {/* Only Doctors/Admins see Run ML + Start Consultation */}
                     {!isReceptionist && (
                         <>
-                            <button onClick={runPrediction} disabled={predicting} style={{
+                            <button onClick={openAITools} style={{
                                 display: 'flex', alignItems: 'center', gap: 8, padding: '10px 18px',
                                 background: 'linear-gradient(135deg, #6366f1, #8b5cf6)', border: 'none',
                                 borderRadius: 10, color: '#fff', fontWeight: 700, fontSize: 13, cursor: 'pointer',
-                                opacity: predicting ? 0.6 : 1,
                             }}>
-                                {predicting ? <><RefreshCw size={14} style={{ animation: 'spin 0.8s linear infinite' }} /> Running...</> : <><Brain size={14} /> Run ML Prediction</>}
+                                <Brain size={14} /> AI Clinical Tools
                             </button>
                             <button onClick={startConsultation} disabled={starting} style={{
                                 display: 'flex', alignItems: 'center', gap: 8, padding: '10px 20px',

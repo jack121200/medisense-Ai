@@ -359,7 +359,7 @@ export default function LipidProfileTab() {
                         </tr>
                     </thead>
                     <tbody>
-                        {Object.entries(panel).map(([key, p]: [string, any]) => (
+                        {Object.entries(panel || {}).map(([key, p]: [string, any]) => (
                             <PanelRow key={key} paramKey={key} p={p} />
                         ))}
                     </tbody>

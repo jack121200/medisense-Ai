@@ -18,6 +18,19 @@ class Settings(BaseSettings):
     REDIS_URL:    str = "redis://:redis_password@localhost:6379"
     KAFKA_BROKER: str = "localhost:9092"
 
+    # Shared secret the backend must send as X-Internal-Service-Key on every
+    # request — ml-service is no longer host-exposed (see docker-compose.yml),
+    # but this stops it trusting "reachable == allowed" for anything that
+    # *can* still reach it on the internal network. Required, no default —
+    # the service should refuse to start without one, not silently allow
+    # unauthenticated calls.
+    INTERNAL_API_KEY: str = Field(..., alias="INTERNAL_API_KEY")
+
+    # CORS previously allowed "*" with allow_credentials=True — a combination
+    # browsers reject anyway, and pointless now that only the backend calls
+    # this service directly (never a browser). Locked to one explicit origin.
+    ALLOWED_ORIGIN: str = Field(default="http://localhost:5000", alias="ALLOWED_ORIGIN")
+
     # ML settings
     TRAINING_N_SAMPLES:     int   = 10000
     TRAINING_TEST_SIZE:     float = 0.20

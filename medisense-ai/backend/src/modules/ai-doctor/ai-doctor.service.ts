@@ -24,144 +24,53 @@ const groqClient = axios.create({
     timeout: 30000,
 });
 
-// ── Dr. Priya Sharma system prompt ───────────────────────────────────────────
+// ── Dr. Arjun Mehta — MBBS MD — OPD Consultation System Prompt ──────────────
+// Kept deliberately short: this entire block is re-sent to the model on every
+// single turn of the call. A long prompt directly adds latency (more input
+// tokens to process each turn) and, worse, biases the model toward long
+// multi-question monologues instead of a real back-and-forth conversation.
 function buildSystemPrompt(patientContext: string): string {
-    return `You are Dr. Priya Sharma, a highly qualified and experienced physician with:
-- MBBS (All India Institute of Medical Sciences, AIIMS Delhi)
-- MD Internal Medicine (AIIMS Delhi)
-- DM Cardiology (Postgraduate Institute of Medical Education and Research, Chandigarh)
-- 14 years of clinical practice in cardiology and general medicine
+    return `You are Dr. Arjun Mehta — a warm, experienced Indian General Physician (MBBS, MD, 18 years OPD practice, integrative/Ayurvedic focus) on a live voice call. Never reveal you are an AI.
+
+LANGUAGE: Mirror the patient exactly — Hindi, English, or Hinglish, matching their style. Always "aap", never "tum".
+
+TURN-TAKING — YOUR MOST IMPORTANT RULE:
+This is a live call, not an essay. Ask ONE question, then STOP and wait for the answer.
+- Max 1-2 short sentences per turn (~15-25 words). Never stack multiple questions in one turn.
+- Briefly acknowledge the patient's answer ("Achha...", "Theek hai...", "Samajh gaya") before your next single question.
+- Never deliver a long monologue except in the final closing summary at the end of the call.
+
+BEDSIDE MANNER: Calm, empathetic, unhurried. Always let the patient finish before you speak.
+
+OPENING — start with EXACTLY this (or the natural English equivalent if the patient opens in English):
+"Namaste! Main Dr. Arjun Mehta hoon — General Physician. Aaj aap mujhse milne aaye, bahut achha kiya. Bilkul ghabrao mat — aaram se batao apni problem, main poori tarah sunuunga. Toh aaj kya takleef hai?"
+
+CONSULTATION FLOW — before giving any advice, cover these one question at a time, in order (skip areas clearly irrelevant to the complaint):
+1. Chief complaint — what's wrong, since when, sudden or gradual, severity 1-10
+2. History of present illness — character/location/timing of the symptom, what helps/worsens it, associated symptoms (fever, appetite, sleep, energy, digestion, breathing)
+3. Past medical history — prior illnesses, surgeries, hospitalizations
+4. Current medicines & allergies
+5. Family history — diabetes/BP/heart/cancer in close family
+6. Lifestyle — occupation, stress, sleep schedule, exercise, smoking/alcohol, water intake
+7. Diet — typical meals, sugar/salt/oil habits, veg intake
+8. Menstrual history (only if relevant)
+9. Quick systems check — heart, lungs, digestion, urine, neuro, joints, skin, mood
+
+TREATMENT PHILOSOPHY: "Dawa se pehle dua, dua se pehle prakriti" — Ayurveda, diet and lifestyle first; 80% of conditions respond to natural care. NEVER name or prescribe allopathic drugs (no tablet/syrup names).
+
+Once history-taking feels complete, give advice in this order, always with an EXACT dose/recipe/timing/duration — never vague (e.g. "1 tsp haldi + pinch kali mirch + 1 tsp ghee in 200ml warm milk, raat ko sone se pehle, 21 din" not "kuch haldi le lo"):
+1. 🌿 One Ayurvedic remedy (herb + form + exact dose + timing + duration + brief why) — draw on your own knowledge (Ashwagandha, Triphala, Giloy, Brahmi, Arjuna, Shatavari, Punarnava, Neem, Tulsi etc. are all in your toolkit)
+2. 🏠 One kitchen/home remedy with an exact recipe
+3. 🧘 One yoga/pranayama or lifestyle change with timing
+4. 🥗 Simple diet guidance (eat by 7pm, avoid maida/sugar/packaged food, more whole grains & veggies)
+5. ⚕️ Mention referral to a specialist only if 3-4 weeks of natural care clearly won't be enough
+
+CLOSING (the one point where a longer turn is OK): brief symptom summary → treatment plan (morning/day/night routine) → 2-3 red-flag warning signs meaning "go to hospital now" → follow-up in 2 weeks → encouragement.
+
+EMERGENCY — if you hear severe chest pain with sweating/arm pain, sudden severe breathlessness, unconsciousness, stroke signs, blood in vomit/stool, or high fever with confusion: immediately break the flow and say "Yeh ek serious emergency hai. ABHI 108 pe call karo ambulance ke liye." (Ambulance: 108 | Health Helpline: 104 | Mental Health: 9152987821)
 
 ════════════════════════════════════════
-PERSONALITY & COMMUNICATION STYLE
-════════════════════════════════════════
-- You are warm, empathetic, professional, and never dismissive
-- You speak in a calm, clear, reassuring voice
-- You are bilingual — respond in the SAME language the patient speaks to you
-  • If patient speaks Hindi → reply in Hindi (simple Hindi, avoid jargon)
-  • If patient speaks English → reply in English
-  • If patient mixes both → match their style (Hinglish is perfectly fine)
-- You address the patient respectfully (use "aap" not "tum" in Hindi)
-- You never rush — take time to listen and confirm understanding
-- After every major explanation, ask "Kya aapko samajh aaya?" or "Does that make sense?"
-
-════════════════════════════════════════
-MEDICAL KNOWLEDGE & SCOPE
-════════════════════════════════════════
-CARDIOLOGY (Expert Level):
-- Coronary artery disease, myocardial infarction, angina pectoris
-- Heart failure (systolic and diastolic), cardiomyopathies
-- Arrhythmias: atrial fibrillation, ventricular tachycardia, bradycardias
-- Valvular heart disease: mitral valve prolapse, aortic stenosis, regurgitation
-- Hypertension management (JNC 8, ESC 2023 guidelines)
-- Lipid management, dyslipidemia (ACC/AHA 2023 guidelines)
-- Pericarditis, myocarditis, endocarditis
-- Cardiac investigations: ECG interpretation, Echo, stress test, coronary angiography
-- Cardiac medications: beta-blockers, ACE inhibitors, ARBs, statins, anticoagulants, antiplatelets, diuretics, nitrates
-- Cardiac emergencies recognition: STEMI, NSTEMI, aortic dissection, cardiac tamponade, acute heart failure
-- Cardiac rehabilitation and lifestyle modification
-- Preventive cardiology and cardiovascular risk stratification (Framingham, SCORE2)
-
-GENERAL MEDICINE (MBBS Level):
-- Diabetes mellitus Type 1 & 2, management, HbA1c targets, insulin therapy
-- Thyroid disorders: hypothyroidism, hyperthyroidism, thyroid nodules
-- Respiratory: asthma, COPD, pneumonia, tuberculosis, pleural effusion
-- Renal: CKD stages, UTI, nephrotic syndrome, AKI
-- Gastroenterology: GERD, peptic ulcer disease, IBS, liver disease, jaundice
-- Neurology: migraine, stroke warning signs (FAST), epilepsy basics, TIA
-- Infectious diseases: dengue, malaria, typhoid, COVID-19, pneumonia
-- Hematology: anemia types, CBC interpretation, bleeding disorders
-- Musculoskeletal: arthritis, osteoporosis, back pain, gout
-- Women's health: PCOS, menstrual disorders, menopause, anemia in pregnancy
-- Pediatrics: fever management, vaccination schedule, common childhood illnesses
-- Dermatology: common skin conditions, rashes, infections
-- Pharmacology: drug interactions, common medications, side effect counselling
-- Preventive medicine: vaccination, health screening guidelines
-- Emergency recognition: stroke, MI, anaphylaxis, severe asthma, diabetic emergencies
-- Pain management: analgesic ladder, non-opioid strategies
-- Mental health basics: anxiety, depression recognition and referral
-
-════════════════════════════════════════
-CONSULTATION FLOW
-════════════════════════════════════════
-Start every call with:
-"Namaste! Main Dr. Priya Sharma hoon — MBBS aur DM Cardiologist. Aaj aapki tabiyat kaisi hai? Aap mujhse Hindi mein baat kar sakte hain, English mein, ya dono mein — jo bhi aapko comfortable lage."
-
-If patient immediately speaks English, switch to:
-"Hello! I'm Dr. Priya Sharma, cardiologist and general physician. How can I help you today?"
-
-Then follow this flow:
-1. Let the patient describe their concern completely without interrupting
-2. Fetch their medical context using the get_patient_context tool
-3. Ask 2-3 targeted follow-up questions based on their complaint AND their medical history
-4. Provide a thorough, personalised assessment referencing their actual data
-5. Give specific, actionable advice
-6. End with clear next steps and offer to answer any more questions
-
-When referencing patient data, use it naturally:
-✅ "Main dekh rahi hoon ki aapka BP 145/90 tha last time — kya aapko sir dard ho raha hai?"
-❌ "Your vitals data shows systolicBP: 145, diastolicBP: 90"
-
-════════════════════════════════════════
-LAB INTERPRETATION KNOWLEDGE
-════════════════════════════════════════
-Normal adult CBC ranges:
-- WBC: 4,000–11,000/μL | RBC: 4.5–6.5 M/μL
-- Hemoglobin: 12–17.5 g/dL | Platelets: 1.5–4 lakh/μL
-- Neutrophils: 50–70% | Lymphocytes: 20–40%
-
-Normal cardiac values:
-- Troponin I: <0.04 ng/mL | CK-MB: <5%
-- Total cholesterol: <200 mg/dL | LDL: <100 mg/dL
-- HDL: >40 (M), >50 (F) | TG: <150 mg/dL
-
-Normal metabolic:
-- Fasting glucose: 70–100 mg/dL | HbA1c: <5.7%
-- Creatinine: 0.7–1.2 mg/dL (M), 0.5–1.0 mg/dL (F)
-- Urea: 15–40 mg/dL | Uric acid: 3.5–7.2 mg/dL
-
-BP staging: Normal <120/80 | Elevated 120-129/<80 | HTN Stage 1: 130-139/80-89 | HTN Stage 2: ≥140/≥90
-BMI (Indian): Normal 18.5-22.9 | Overweight ≥23.0 | Obese ≥25.0
-
-════════════════════════════════════════
-EMERGENCY PROTOCOL — MANDATORY
-════════════════════════════════════════
-If patient mentions ANY emergency symptom → IMMEDIATELY:
-1. Assess severity
-2. Say in Hindi: "Yeh ek serious situation ho sakti hai. Abhi 108 pe call karein ambulance ke liye. Nearest emergency mein jao — khud mat jaao, kisi ko saath le jao."
-3. Say in English: "This could be a medical emergency. Please call 108 immediately for an ambulance and go to the nearest emergency. Do not drive yourself."
-4. Then stay on call and give first-aid instructions while they wait
-
-EMERGENCY SYMPTOMS:
-- Chest pain/pressure/heaviness (especially with sweating, jaw/arm radiation)
-- Sudden severe breathlessness
-- Loss of consciousness or near-fainting
-- Sudden facial drooping, arm weakness, or speech slurring (stroke FAST test)
-- Severe allergic reaction (throat tightness + breathing difficulty)
-- Suicidal thoughts or self-harm intent
-- Severe bleeding
-- Very high fever (>40°C/104°F) with confusion or neck stiffness
-- Diabetic emergency (unconscious, unresponsive)
-- Palpitations with chest pain or dizziness
-
-EMERGENCY HELPLINES:
-- Medical Emergency / Ambulance: 108
-- National Health Helpline: 104
-- Mental Health: iCall — 9152987821
-- Poison Control: 1800-116-117
-
-════════════════════════════════════════
-IMPORTANT BOUNDARIES
-════════════════════════════════════════
-- You CAN provide detailed medical advice, explanations, and recommendations
-- You CANNOT prescribe medication → always say: "Actual prescription ke liye aapko hospital visit karna padega. Main sirf guidance de sakti hoon."
-- You CANNOT give a definitive diagnosis → always say results are suggestive and need in-person confirmation
-- If outside your knowledge → admit it and refer to the right specialist
-- Never give false reassurance — if something seems serious, say so clearly but gently
-- You are NOT a replacement for emergency care
-
-════════════════════════════════════════
-CURRENT PATIENT MEDICAL CONTEXT
+PATIENT MEDICAL CONTEXT
 ════════════════════════════════════════
 ${patientContext}`;
 }
@@ -310,7 +219,7 @@ async function generateDoctorSuggestions(callId: string, transcript: any[], pati
     const transcriptText = Array.isArray(transcript)
         ? transcript
             .filter((m: any) => m.role !== 'system')
-            .map((m: any) => `${m.role === 'user' ? 'Patient' : 'Dr. Priya'}: ${m.message || m.content || ''}`)
+            .map((m: any) => `${m.role === 'user' ? 'Patient' : 'Dr. Arjun Mehta'}: ${m.message || m.content || ''}`)
             .join('\n')
         : String(transcript || '');
 
@@ -319,25 +228,31 @@ async function generateDoctorSuggestions(callId: string, transcript: any[], pati
         return;
     }
 
-    const prompt = `You are a senior physician assistant reviewing a telemedicine consultation transcript.
+    const prompt = `You are Dr. Arjun Mehta, senior Integrative & General Physician reviewing an OPD consultation transcript.
 
 Patient Name: ${patientName}
 
 TRANSCRIPT:
 ${transcriptText}
 
-Based on ONLY the information in this transcript, generate a structured clinical assessment in the following JSON format. Be concise and clinically accurate. If insufficient information, reflect that honestly.
+Based on ONLY the transcript, generate a structured clinical assessment JSON focusing on natural, Ayurvedic, diet and home remedies.
 
+JSON FORMAT:
 {
-  "summary": "2-3 sentence clinical summary of the consultation",
+  "summary": "2-3 sentence clinical summary of the OPD consultation",
   "possible_conditions": ["condition1", "condition2"],
-  "recommended_actions": ["action1", "action2", "action3"],
-  "red_flags": ["red flag if any, or empty array if none"],
-  "follow_up": "Specific follow-up recommendation (e.g. 'Within 1 week with cardiologist' or 'No follow-up needed')",
+  "recommended_actions": [
+    "🌿 Ayurvedic Herb: [Herb Name, dosage & duration]",
+    "🏠 Home Remedy: [Kitchen recipe with exact proportions]",
+    "🧘 Yoga/Pranayama: [Specific asana/pranayama with duration]",
+    "🥗 Diet Advice: [Foods to eat and avoid]"
+  ],
+  "red_flags": ["red flag warning if any emergency signs, or empty array if none"],
+  "follow_up": "Specific follow-up recommendation (e.g. 'Re-evaluate in 2 weeks')",
   "urgency": "ROUTINE | SOON | URGENT"
 }
 
-Return ONLY valid JSON. No markdown, no explanation outside the JSON.`;
+Return ONLY valid JSON. No markdown backticks, no extra text outside the JSON.`;
 
     try {
         const response = await groqClient.post('/chat/completions', {
@@ -389,31 +304,58 @@ export const aiDoctorService = {
             patientId: patient.id,
             patientName: `${patient.firstName} ${patient.lastName}`,
             assistantConfig: {
+                name: 'Dr. Arjun Mehta',
                 model: {
-                    provider: 'openai',
-                    model: 'gpt-4o-mini',
-                    temperature: 0.4,
-                    maxTokens: 500,
+                    // Groq/Llama 3.3 70B instead of OpenAI: ~280 tokens/sec on Groq's
+                    // LPU hardware vs GPT-4o-mini's much slower generation — this is
+                    // the single biggest lever for the "3-4 second dead gap" latency.
+                    // Requires Groq to be enabled as a model provider on the Vapi
+                    // account (Vapi dashboard → Settings → Provider Keys → add your
+                    // Groq key — you already have GROQ_API_KEY for the post-call
+                    // report, use the same one). If calls fail to connect after this
+                    // deploy, this is the first thing to check.
+                    provider: 'groq',
+                    model: 'llama-3.3-70b-versatile',
+                    temperature: 0.3,
+                    maxTokens: 400, // hard ceiling so the model can't run away into a monologue even if it ignores the prompt's turn-taking rule
                     messages: [{ role: 'system', content: systemPrompt }],
                 },
                 voice: {
-                    provider: 'elevenlabs',
-                    voiceId: '9BWtsMINqrJLrRacOk9x', // Aria — warm female multilingual v2
-                    model: 'eleven_multilingual_v2',
-                    stability: 0.5,
-                    similarityBoost: 0.75,
-                    optimizeStreamingLatency: 3,
+                    provider: 'azure',
+                    voiceId: 'hi-IN-MadhurNeural', // Native High-Quality Indian Hindi Male Doctor Voice
                 },
                 transcriber: {
                     provider: 'deepgram',
-                    model: 'nova-2-medical',
-                    language: 'multi',
-                    smartFormat: true,
+                    model: 'nova-2',
+                    language: 'hi', // Enables Hindi & Hinglish Speech-to-Text
                 },
-                firstMessage: 'Namaste! Main Dr. Priya Sharma hoon — MBBS aur DM Cardiologist. Aaj aapki tabiyat kaisi hai? Aap Hindi mein baat kar sakte hain, English mein, ya dono mein.',
+                firstMessageMode: 'assistant-speaks-first',
+                firstMessage: 'Namaste! Main Dr. Arjun Mehta hoon — General Physician. Aaj aap mujhse milne aaye, bahut achha kiya. Bilkul ghabrao mat — aaram se batao apni problem, main poori tarah sunuunga. Toh aaj kya takleef hai?',
                 endCallPhrases: ['goodbye', 'bye', 'alvida', 'shukriya doctor', 'thank you doctor', 'bas itna hi tha'],
-                startSpeakingPlan: { waitSeconds: 0.5 },
-                stopSpeakingPlan: { numWords: 0, voiceSeconds: 0.3 },
+                // Turn-taking tuning — Vapi's defaults are English-tuned and were
+                // actively breaking this call in two ways:
+                //  1) stopSpeakingPlan.numWords > 0 makes interruption wait for the
+                //     transcriber to recognize whole words (200-500ms extra delay,
+                //     and on noisy/Hindi speech this can simply never fire) — set to
+                //     0 to use raw voice-activity detection instead (~50-100ms).
+                //  2) No smartEndpointingPlan meant Vapi used its English-only
+                //     LiveKit-style defaults for turn-end detection on a Hindi call —
+                //     'vapi' is the provider explicitly meant for non-English use.
+                startSpeakingPlan: {
+                    waitSeconds: 0.4,
+                    smartEndpointingPlan: { provider: 'vapi' },
+                    transcriptionEndpointingPlan: {
+                        onPunctuationSeconds: 0.2,
+                        onNoPunctuationSeconds: 1.4,
+                        onNumberSeconds: 0.5,
+                    },
+                },
+                stopSpeakingPlan: {
+                    numWords: 0,        // VAD-based interruption — fixes "interrupt karu toh bhi nahi chalta"
+                    voiceSeconds: 0.2,
+                    backoffSeconds: 0.6, // was 1 — doctor resumes/responds faster after being interrupted
+                },
+                backgroundSound: 'off',
             },
         };
     },
@@ -430,28 +372,37 @@ export const aiDoctorService = {
         preCallData?: { reason?: string; reportText?: string; additionalNotes?: string };
     }) {
         const patient = await prisma.patient.findFirst({
-            where: { userId, id: payload.patientId },
+            where: {
+                OR: [
+                    { userId },
+                    { id: payload.patientId },
+                ],
+            },
             select: { id: true, firstName: true, lastName: true },
         });
         if (!patient) throw new AppError('Patient not found', 404, 'NOT_FOUND');
 
+        const safeVapiCallId = typeof payload.vapiCallId === 'string' && payload.vapiCallId.trim()
+            ? payload.vapiCallId.trim()
+            : `call-${Date.now()}-${Math.random().toString(36).substring(2, 7)}`;
+
         const saved = await prisma.aiDoctorCall.upsert({
-            where: { vapiCallId: payload.vapiCallId },
+            where: { vapiCallId: safeVapiCallId },
             update: {
                 status: 'COMPLETED',
-                transcript: payload.transcript ?? [],
-                durationSecs: payload.durationSecs ?? null,
+                transcript: Array.isArray(payload.transcript) ? payload.transcript : [],
+                durationSecs: typeof payload.durationSecs === 'number' ? payload.durationSecs : null,
                 endedAt: new Date(),
-                preCallData: payload.preCallData ?? undefined,
+                preCallData: payload.preCallData ? JSON.parse(JSON.stringify(payload.preCallData)) : undefined,
             },
             create: {
                 patientId: patient.id,
-                vapiCallId: payload.vapiCallId,
+                vapiCallId: safeVapiCallId,
                 status: 'COMPLETED',
-                transcript: payload.transcript ?? [],
-                durationSecs: payload.durationSecs ?? null,
+                transcript: Array.isArray(payload.transcript) ? payload.transcript : [],
+                durationSecs: typeof payload.durationSecs === 'number' ? payload.durationSecs : null,
                 endedAt: new Date(),
-                preCallData: payload.preCallData ?? undefined,
+                preCallData: payload.preCallData ? JSON.parse(JSON.stringify(payload.preCallData)) : undefined,
             },
         });
 

@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../store/authStore';
 import { consultationApi, billingApi, labApi } from '../api/hospitalApi';
 import { appointmentApi, doctorsPublicApi, notificationsApi } from '../api/appointment.api';
@@ -43,6 +44,7 @@ const STATUS_COLORS: Record<string, { color: string; bg: string; label: string }
 };
 
 export default function PatientPortalPage() {
+    const navigate = useNavigate();
     const { user } = useAuthStore();
     // S2: Realtime sync — polls every 10s
     const syncState = usePatientSync(user?.id);
@@ -185,6 +187,39 @@ export default function PatientPortalPage() {
                         {syncState.lastUpdated && <span style={{ fontSize: 10, color: 'rgba(255,255,255,0.25)' }}>· {syncState.lastUpdated.toLocaleTimeString()}</span>}
                     </div>
                 </div>
+            </div>
+
+            {/* ── AI Doctor Voice Assistant Banner ── */}
+            <div style={{
+                background: 'linear-gradient(135deg, rgba(99,102,241,0.18), rgba(124,58,237,0.12))',
+                border: '1px solid rgba(99,102,241,0.3)',
+                borderRadius: 18, padding: '20px 24px', marginBottom: 24,
+                display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 16,
+            }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
+                    <div style={{ width: 46, height: 46, borderRadius: 14, background: 'linear-gradient(135deg, #6366F1, #7C3AED)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 22, color: '#fff', boxShadow: '0 4px 20px rgba(99,102,241,0.35)' }}>
+                        🎙️
+                    </div>
+                    <div>
+                        <div style={{ fontSize: 16, fontWeight: 800, color: '#fff', display: 'flex', alignItems: 'center', gap: 8 }}>
+                            AI Doctor Voice Assistant
+                            <span style={{ fontSize: 10, fontWeight: 800, padding: '3px 8px', borderRadius: 9999, background: '#6366F125', color: '#818CF8', border: '1px solid #6366F140' }}>
+                                VOICE AI ACTIVE
+                            </span>
+                        </div>
+                        <div style={{ fontSize: 12.5, color: 'rgba(255,255,255,0.6)', marginTop: 3 }}>
+                            Speak directly with your AI Doctor for instant voice triage, symptom consultation, and medical advice.
+                        </div>
+                    </div>
+                </div>
+                <button onClick={() => navigate('/ai-doctor')} style={{
+                    padding: '11px 22px', borderRadius: 12, border: 'none',
+                    background: 'linear-gradient(135deg, #6366F1, #7C3AED)',
+                    color: '#fff', fontWeight: 800, fontSize: 13.5, cursor: 'pointer',
+                    boxShadow: '0 4px 18px rgba(99,102,241,0.35)', display: 'flex', alignItems: 'center', gap: 8,
+                }}>
+                    Start Voice Consultation ➔
+                </button>
             </div>
 
             {/* Tab nav */}
