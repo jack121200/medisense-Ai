@@ -16,7 +16,6 @@ class Settings(BaseSettings):
     # Infrastructure
     DATABASE_URL: str = "postgresql://medisense:medisense_password@localhost:5432/medisense_db"
     REDIS_URL:    str = "redis://:redis_password@localhost:6379"
-    KAFKA_BROKER: str = "localhost:9092"
 
     # Shared secret the backend must send as X-Internal-Service-Key on every
     # request — ml-service is no longer host-exposed (see docker-compose.yml),

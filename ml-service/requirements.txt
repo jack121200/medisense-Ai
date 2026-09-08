@@ -4,13 +4,31 @@ pydantic==2.5.3
 pydantic-settings==2.1.0
 
 # ML Core
-scikit-learn==1.4.0
-xgboost==2.0.3
-scipy>=1.11.0
+# scikit-learn/xgboost/pandas/numpy versions below were bumped together
+# from the original 1.4.0/2.0.3/2.1.4/1.26.3 pins specifically because
+# pgmpy>=1.1 (added below, for the real Bayesian network) requires
+# numpy>=2.0 — a clean `pip install -r requirements.txt` with the old
+# pins + pgmpy fails with a ResolutionImpossible dependency conflict.
+# scikit-learn is further bumped to 1.6.1 (not just the numpy-2.x-minimum
+# 1.5.2) because pgmpy 1.1.2's causal_discovery module imports
+# sklearn.utils.validation.validate_data, which doesn't exist before
+# sklearn 1.6 — a second, separate incompatibility only pip's resolver
+# didn't catch (it isn't a declared version constraint, just an internal
+# API pgmpy assumes exists). Both issues were only found by actually
+# building the Docker image and importing everything, not by trusting a
+# messy local dev environment with mismatched ad-hoc-installed versions.
+scikit-learn==1.6.1
+# xgboost 2.1.3 doesn't implement __sklearn_tags__, which sklearn>=1.6's
+# is_classifier()/cross_val_score() call unconditionally — a third,
+# separate incompatibility in this same dependency chain, also not a
+# declared version constraint pip's resolver could have caught. 3.2.0 is
+# the latest stable release and does support it.
+xgboost==3.2.0
+scipy==1.14.1
 
 # Data Processing
-pandas==2.1.4
-numpy==1.26.3
+pandas==2.2.3
+numpy==2.1.3
 openpyxl==3.1.2
 
 # Model Persistence

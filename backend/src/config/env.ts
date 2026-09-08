@@ -11,14 +11,6 @@ const envSchema = z.object({
     JWT_ACCESS_EXPIRY: z.string().default('15m'),
     JWT_REFRESH_EXPIRY: z.string().default('7d'),
     ML_SERVICE_URL: z.string().default('http://localhost:8000'),
-    ELASTICSEARCH_URL: z.string().default('http://localhost:9200'),
-    MINIO_ENDPOINT: z.string().default('localhost'),
-    MINIO_PORT: z.string().default('9000'),
-    // No more weak hardcoded defaults (was 'minioadmin'/'minioadmin123') —
-    // every environment must supply its own values.
-    MINIO_ACCESS_KEY: z.string().min(1),
-    MINIO_SECRET_KEY: z.string().min(1),
-    MINIO_BUCKET: z.string().default('medisense-files'),
     SMTP_HOST: z.string().optional(),
     SMTP_PORT: z.string().optional(),
     SMTP_USER: z.string().optional(),

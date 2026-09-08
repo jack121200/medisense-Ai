@@ -1,0 +1,90 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main, master]
+
+jobs:
+  secret-scan:
+    name: Secret scan
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      # Catches the exact class of problem Phase 0 of this project's
+      # security pass had to fix by hand (live-looking API keys committed
+      # at the repo root with no .gitignore) — this runs on every PR going
+      # forward so it can't happen again unnoticed.
+      - name: gitleaks
+        uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  backend:
+    name: Backend (lint, build, test)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: backend/package-lock.json
+      - run: npm ci
+      - run: npx prisma generate
+      - run: npm run lint --if-present
+      - run: npm run build
+      - run: npm test
+
+  frontend:
+    name: Frontend (lint, build)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: frontend/package-lock.json
+      - run: npm ci
+      - run: npm run lint --if-present
+      - run: npm run build
+
+  ml-service:
+    name: ML service (import smoke test)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ml-service
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: pip install --no-cache-dir -r requirements.txt --extra-index-url https://download.pytorch.org/whl/cpu
+      # Full FastAPI startup needs INTERNAL_API_KEY + a live Postgres/Redis,
+      # which CI doesn't have here — this at least catches import-time
+      # errors (the missing `pathlib.Path` import Phase 2 found would have
+      # failed this) without standing up the full stack.
+      - name: Import smoke test
+        run: python -c "import app.main"
+        env:
+          INTERNAL_API_KEY: ci-smoke-test-key
+
+  compose-validate:
+    name: docker compose config
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate compose file
+        run: |
+          cp .env.example .env
+          docker compose config --quiet

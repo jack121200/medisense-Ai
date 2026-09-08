@@ -46,13 +46,34 @@ const server = http.createServer(app);
 initSocketIO(server);
 
 // ─── Core Middleware ────────────────────────────────
-app.use(helmet({ contentSecurityPolicy: false }));
+// CSP was previously disabled outright. Swagger UI (mounted below at
+// /api/docs) needs inline script/style to render, so those are scoped to
+// that concern rather than left open by disabling CSP for the whole app.
+app.use(helmet({
+    contentSecurityPolicy: {
+        directives: {
+            defaultSrc: ["'self'"],
+            scriptSrc: ["'self'", "'unsafe-inline'"],
+            styleSrc: ["'self'", "'unsafe-inline'"],
+            imgSrc: ["'self'", 'data:'],
+            connectSrc: ["'self'"],
+            objectSrc: ["'none'"],
+            frameAncestors: ["'none'"],
+        },
+    },
+    hsts: { maxAge: 31536000, includeSubDomains: true },
+}));
+
+// Dev-only origins are only allowed outside production — the original list
+// allowed them unconditionally, including in a deployed environment.
 const ALLOWED_ORIGINS = [
     env.FRONTEND_URL,
-    'http://localhost:3000',
-    'http://localhost:3001',
-    'http://localhost:3002',
-    'http://localhost:5173',
+    ...(env.NODE_ENV !== 'production' ? [
+        'http://localhost:3000',
+        'http://localhost:3001',
+        'http://localhost:3002',
+        'http://localhost:5173',
+    ] : []),
 ];
 app.use(cors({
     origin: (origin, callback) => {

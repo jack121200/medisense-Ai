@@ -3,8 +3,8 @@ WORKDIR /app
 
 RUN apk add --no-cache python3 make g++ openssl openssl-dev
 
-COPY package.json ./
-RUN npm install
+COPY package.json package-lock.json ./
+RUN npm ci
 
 COPY . .
 RUN npx prisma generate
@@ -21,7 +21,12 @@ COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/dist ./dist
 COPY prisma ./prisma
 
-RUN mkdir -p logs
+# Runs as root by default otherwise. node:20-alpine already ships an
+# unprivileged "node" user (uid 1000) — reuse it rather than defining a new
+# one, and make sure it actually owns the dirs it needs to write to
+# (uploads for lab report PDFs, logs).
+RUN mkdir -p logs uploads/lab-reports && chown -R node:node /app
+USER node
 
 EXPOSE 5000
 CMD ["node", "dist/app.js"]

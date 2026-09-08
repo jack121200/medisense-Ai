@@ -1,5 +1,10 @@
-version: '3.9'
-
+# Kafka, Zookeeper, Elasticsearch, and MinIO were removed from this stack —
+# none of them had any actual client library usage anywhere in backend/ or
+# ml-service/ (confirmed by grep before removing), so they were pure
+# unused infrastructure. Elasticsearch was additionally running with
+# xpack.security.enabled=false on a host-exposed port. If a real need for
+# search, object storage, or event streaming comes up later, add the
+# service back deliberately alongside the code that actually uses it.
 services:
   # ──────────────────────────────────────────
   # NGINX — Reverse Proxy
@@ -11,11 +16,18 @@ services:
     volumes:
       - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
     depends_on:
-      - frontend
-      - backend
+      frontend:
+        condition: service_healthy
+      backend:
+        condition: service_healthy
     networks:
       - medisense-net
     restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 128M
 
   # ──────────────────────────────────────────
   # FRONTEND — React + Vite
@@ -25,7 +37,7 @@ services:
       context: ./frontend
       dockerfile: Dockerfile
     ports:
-      - "3000:80"
+      - "3000:8080"
     environment:
       - VITE_API_URL=http://localhost:5000
       - VITE_WS_URL=http://localhost:5000
@@ -35,6 +47,17 @@ services:
     networks:
       - medisense-net
     restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:8080/"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 128M
 
   # ──────────────────────────────────────────
   # BACKEND — Node.js + Express
@@ -52,15 +75,6 @@ services:
       - REDIS_URL=redis://:${REDIS_PASSWORD}@redis:6379
       - ML_SERVICE_URL=http://ml-service:8000
       - ML_SERVICE_INTERNAL_KEY=${ML_SERVICE_INTERNAL_KEY}
-      - KAFKA_BROKER=kafka:9092
-      - KAFKA_VITALS_TOPIC=patient-vitals
-      - KAFKA_ALERTS_TOPIC=medical-alerts
-      - ELASTICSEARCH_URL=http://elasticsearch:9200
-      - MINIO_ENDPOINT=minio
-      - MINIO_PORT=9000
-      - MINIO_ACCESS_KEY=${MINIO_ACCESS_KEY}
-      - MINIO_SECRET_KEY=${MINIO_SECRET_KEY}
-      - MINIO_BUCKET=medisense-files
       - JWT_ACCESS_SECRET=${JWT_ACCESS_SECRET}
       - JWT_REFRESH_SECRET=${JWT_REFRESH_SECRET}
       - JWT_ACCESS_EXPIRY=15m
@@ -76,12 +90,23 @@ services:
       redis:
         condition: service_healthy
       ml-service:
-        condition: service_started
+        condition: service_healthy
     networks:
       - medisense-net
     restart: unless-stopped
     volumes:
       - ./backend/logs:/app/logs
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:5000/health"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 15s
+    deploy:
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: 512M
 
   # ──────────────────────────────────────────
   # ML SERVICE — Python FastAPI
@@ -98,7 +123,6 @@ services:
     environment:
       - DATABASE_URL=postgresql://medisense:${POSTGRES_PASSWORD}@postgres:5432/medisense_db
       - REDIS_URL=redis://:${REDIS_PASSWORD}@redis:6379
-      - KAFKA_BROKER=kafka:9092
       - MODEL_PATH=/app/models
       - HEART_CSV=/app/data/HeartDiseaseTrain-Test.csv
       - INTERNAL_API_KEY=${ML_SERVICE_INTERNAL_KEY}
@@ -114,16 +138,28 @@ services:
     networks:
       - medisense-net
     restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/api/health')"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 15s
+    deploy:
+      resources:
+        limits:
+          cpus: '2.0'
+          memory: 1536M
 
   # ──────────────────────────────────────────
   # POSTGRESQL + TIMESCALEDB
   # ──────────────────────────────────────────
   postgres:
     image: timescale/timescaledb:latest-pg15
-    ports:
-      - "5432:5432"
-    # NOTE: host-exposing the DB port is addressed in Phase 5 (network
-    # segmentation) — left as-is here to keep this pass scoped to secrets.
+    # No host port binding — every consumer (backend, ml-service) reaches
+    # Postgres over the internal Docker network. Uncomment if you need
+    # direct access from the host (e.g. a local GUI client / psql).
+    # ports:
+    #   - "5432:5432"
     environment:
       - POSTGRES_DB=medisense_db
       - POSTGRES_USER=medisense
@@ -138,6 +174,11 @@ services:
     networks:
       - medisense-net
     restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: 1024M
 
   # ──────────────────────────────────────────
   # REDIS
@@ -157,77 +198,11 @@ services:
     networks:
       - medisense-net
     restart: unless-stopped
-
-  # ──────────────────────────────────────────
-  # ZOOKEEPER (for Kafka)
-  # ──────────────────────────────────────────
-  zookeeper:
-    image: confluentinc/cp-zookeeper:7.5.0
-    environment:
-      ZOOKEEPER_CLIENT_PORT: 2181
-      ZOOKEEPER_TICK_TIME: 2000
-    volumes:
-      - zookeeper_data:/var/lib/zookeeper/data
-    networks:
-      - medisense-net
-    restart: unless-stopped
-
-  # ──────────────────────────────────────────
-  # APACHE KAFKA
-  # ──────────────────────────────────────────
-  kafka:
-    image: confluentinc/cp-kafka:7.5.0
-    ports:
-      - "9092:9092"
-    environment:
-      KAFKA_BROKER_ID: 1
-      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
-      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092,PLAINTEXT_HOST://localhost:29092
-      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
-      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
-      KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
-    depends_on:
-      - zookeeper
-    volumes:
-      - kafka_data:/var/lib/kafka/data
-    networks:
-      - medisense-net
-    restart: unless-stopped
-
-  # ──────────────────────────────────────────
-  # ELASTICSEARCH
-  # ──────────────────────────────────────────
-  elasticsearch:
-    image: elasticsearch:8.11.0
-    ports:
-      - "9200:9200"
-    environment:
-      - discovery.type=single-node
-      - xpack.security.enabled=false
-      - ES_JAVA_OPTS=-Xms512m -Xmx512m
-    volumes:
-      - elasticsearch_data:/usr/share/elasticsearch/data
-    networks:
-      - medisense-net
-    restart: unless-stopped
-
-  # ──────────────────────────────────────────
-  # MINIO (S3-compatible storage)
-  # ──────────────────────────────────────────
-  minio:
-    image: minio/minio:latest
-    ports:
-      - "9000:9000"
-      - "9001:9001"
-    command: server /data --console-address ":9001"
-    environment:
-      - MINIO_ROOT_USER=${MINIO_ACCESS_KEY}
-      - MINIO_ROOT_PASSWORD=${MINIO_SECRET_KEY}
-    volumes:
-      - minio_data:/data
-    networks:
-      - medisense-net
-    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 256M
 
 networks:
   medisense-net:
@@ -236,7 +211,3 @@ networks:
 volumes:
   postgres_data:
   redis_data:
-  kafka_data:
-  zookeeper_data:
-  elasticsearch_data:
-  minio_data:

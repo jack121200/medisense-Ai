@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-09-08T07:39:49.072774+00:00",
+  "generated_at": "2026-09-08T09:22:12.533623+00:00",
   "models": {
     "symptom_checker": {
       "status": "trained",
@@ -20,9 +20,9 @@
       },
       "artifacts": {
         "disease_model.pkl": {
-          "sha256": "4838025bab2c65434f0a27fa6ee1e0c8c0485fe91cea1475b85de8c5b4c30c6e",
-          "size_bytes": 14366561,
-          "modified_at": "2026-08-26T08:40:48.883010+00:00"
+          "sha256": "a9adf4c1e64ac4354bdb143a4a31f9797d3958e68c6d7756272a0f5cb5f72aa7",
+          "size_bytes": 14367377,
+          "modified_at": "2026-09-08T09:20:31.883639+00:00"
         }
       }
     },
@@ -30,14 +30,14 @@
       "status": "trained",
       "training_script": "train/train_heart_risk.py",
       "meta": {
-        "algorithm": "RandomForest",
-        "accuracy": 0.9154,
-        "roc_auc": 0.9843,
-        "cv_auc": 0.9849,
-        "decision_threshold": 0.5544,
+        "algorithm": "XGBoost",
+        "accuracy": 0.9552,
+        "roc_auc": 0.9947,
+        "cv_auc": 0.9934,
+        "decision_threshold": 0.557,
         "threshold_method": "Youden's J statistic on held-out test set (sensitivity + specificity - 1, maximized)",
-        "sensitivity_at_threshold": 0.951,
-        "specificity_at_threshold": 0.9394,
+        "sensitivity_at_threshold": 0.9804,
+        "specificity_at_threshold": 0.9596,
         "features": [
           "age",
           "sex",
@@ -73,38 +73,38 @@
         "n_train": 803,
         "n_test": 201,
         "feature_importance": {
-          "vessels_colored_by_flourosopy": 0.15645229821801693,
-          "chest_pain_type": 0.15058529125436704,
-          "thalassemia": 0.14467989484110635,
-          "Max_heart_rate": 0.10966400101841614,
-          "oldpeak": 0.10414264470993322,
-          "age": 0.07291197351469822,
-          "exercise_induced_angina": 0.059580921889667335,
-          "cholestoral": 0.05687612397979868,
-          "resting_blood_pressure": 0.054202164453370984,
-          "slope": 0.03912374947469253,
-          "sex": 0.02931917322340782,
-          "rest_ecg": 0.01508555061529555,
-          "fasting_blood_sugar": 0.0073762128072291785
+          "chest_pain_type": 0.1989450752735138,
+          "thalassemia": 0.18155956268310547,
+          "vessels_colored_by_flourosopy": 0.1628590226173401,
+          "exercise_induced_angina": 0.0671459436416626,
+          "oldpeak": 0.062139637768268585,
+          "sex": 0.053330421447753906,
+          "slope": 0.050066761672496796,
+          "age": 0.04578172415494919,
+          "Max_heart_rate": 0.04239474982023239,
+          "resting_blood_pressure": 0.038730595260858536,
+          "rest_ecg": 0.03811219707131386,
+          "cholestoral": 0.03485884517431259,
+          "fasting_blood_sugar": 0.024075515568256378
         },
         "dataset": "HeartDiseaseTrain-Test.csv",
         "note": "Trained on 1025-row cardiac dataset, cleaned for clinical validity. Scaler is fit on the training split only (see load_and_clean/train) to avoid test-set leakage."
       },
       "artifacts": {
         "heart_risk_model.pkl": {
-          "sha256": "c31f3a6ec47a80200cbb7e3d28f91de8220e91f8f28222bec7dd93b2da42fdfb",
-          "size_bytes": 1770841,
-          "modified_at": "2026-08-19T09:33:04.469055+00:00"
+          "sha256": "00dfe1c69c81b85d11ef6a7078cf9b6b0f418dc5825a7492dc623720660d5021",
+          "size_bytes": 295251,
+          "modified_at": "2026-09-08T09:20:21.085505+00:00"
         },
         "heart_scaler.pkl": {
-          "sha256": "a3d18f5bdd1719c3daabae842ee81b41e79ce1a5e68b282c63bba42ec194c5a7",
-          "size_bytes": 1007,
-          "modified_at": "2026-08-19T09:33:04.470055+00:00"
+          "sha256": "c4ebea4778f57190bc051f4caa7e9086e15d4d7ccf61635c4e7c32c4da2478f9",
+          "size_bytes": 1103,
+          "modified_at": "2026-09-08T09:20:21.094590+00:00"
         },
         "heart_encoder.pkl": {
-          "sha256": "5be997dac2ef261c830239eec044bf863e289e51c00d4a3a9f812c05ab9fc753",
-          "size_bytes": 2389,
-          "modified_at": "2026-08-19T09:33:04.472055+00:00"
+          "sha256": "dc072031503c08cf1fc411df4d7b5145d9c55db64255aad114031494f9e25e81",
+          "size_bytes": 2849,
+          "modified_at": "2026-09-08T09:20:21.099813+00:00"
         }
       }
     },
@@ -154,19 +154,19 @@
       },
       "artifacts": {
         "cbc_anomaly_model.pkl": {
-          "sha256": "73b2d0aea1c851eead71d0ca625874ae80538fef98fef6a1c7da6e5127f44bce",
-          "size_bytes": 2236873,
-          "modified_at": "2026-08-19T09:33:18.368482+00:00"
+          "sha256": "6d3ed3463eb61713046e6a8168992f5e657377264cf8918fe433174976804825",
+          "size_bytes": 2237657,
+          "modified_at": "2026-09-08T09:20:25.818507+00:00"
         },
         "cbc_cluster_model.pkl": {
-          "sha256": "5442b70dee8cc9f6d93f7c9d298f33b48ed9941f65b3647016b24cfd47cd9fad",
+          "sha256": "b46e05b1766724730f30f581d0f55824164f65bb6b1fed35ef01d5a3de73f89b",
           "size_bytes": 2871,
-          "modified_at": "2026-08-19T09:33:18.371021+00:00"
+          "modified_at": "2026-09-08T09:20:25.863039+00:00"
         },
         "cbc_scaler.pkl": {
-          "sha256": "9d620769e8943bbbd572aeaaa53e7f8d3eda49fae2e35c2be7d7be5d734e942b",
-          "size_bytes": 1447,
-          "modified_at": "2026-08-19T09:33:18.372552+00:00"
+          "sha256": "e5ddef32b5a109e436373fca9d0bf2d6dadb0733430e153deeaaf0f0bc3a6881",
+          "size_bytes": 1607,
+          "modified_at": "2026-09-08T09:20:25.909449+00:00"
         }
       }
     },
@@ -290,9 +290,9 @@
       },
       "artifacts": {
         "bayesian_network.pkl": {
-          "sha256": "88eb0bc03d237b38e1609871e7a44f1b6552c688e13145cbaf93458260e8f015",
+          "sha256": "697106b6cb4fffdf0ffbe94f456f07a75cbe47188ba2992834936450acd3b938",
           "size_bytes": 3523,
-          "modified_at": "2026-08-26T08:31:44.218909+00:00"
+          "modified_at": "2026-09-08T09:20:40.716674+00:00"
         }
       }
     },
@@ -306,14 +306,14 @@
         "n_train_normal": 17732,
         "n_eval_normal": 4433,
         "n_eval_abnormal": 5946,
-        "threshold": 0.001427,
+        "threshold": 0.001253,
         "threshold_method": "95th percentile of reconstruction MSE on held-out normal beats",
-        "eval_precision": 0.8524,
-        "eval_recall": 0.2156,
-        "eval_f1": 0.3442,
-        "eval_roc_auc": 0.7397,
-        "mean_normal_error": 0.000685,
-        "mean_abnormal_error": 0.001118,
+        "eval_precision": 0.8723,
+        "eval_recall": 0.255,
+        "eval_f1": 0.3946,
+        "eval_roc_auc": 0.7502,
+        "mean_normal_error": 0.000582,
+        "mean_abnormal_error": 0.00103,
         "dataset": "PhysioNet MIT-BIH Arrhythmia Database (physionet.org/content/mitdb/)",
         "records_used": [
           "100",
@@ -333,9 +333,9 @@
       },
       "artifacts": {
         "ecg_autoencoder.pt": {
-          "sha256": "4e7abcd4735272f800b6e708f2e124bb943b5d11df89f3409e5c940480a6950f",
+          "sha256": "7c6058b7657df1015433baa941fc1e92055e0bd13fcf4503a823a1f51c181465",
           "size_bytes": 49295,
-          "modified_at": "2026-08-26T08:58:46.753438+00:00"
+          "modified_at": "2026-09-08T09:21:51.551865+00:00"
         }
       }
     }
