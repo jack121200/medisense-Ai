@@ -5,9 +5,10 @@ import { patientApi } from '../api/patient.api';
 import api from '../api/axiosInstance';
 import { consultationApi } from '../api/hospitalApi';
 import { appointmentApi } from '../api/appointment.api';
+import { aiDoctorApi, AiDoctorCallSummary } from '../api/aiDoctorApi';
 import {
     ArrowLeft, Brain, RefreshCw, Stethoscope, Calendar, FileText,
-    Phone, Mail, Clock, AlertTriangle,
+    Phone, Mail, Clock, AlertTriangle, Bot,
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 
@@ -40,6 +41,8 @@ export default function DoctorPatientDetail() {
     const [loading, setLoading] = useState(true);
     const [starting, setStarting] = useState(false);
     const [predicting, setPredicting] = useState(false);
+    const [aiDoctorCalls, setAiDoctorCalls] = useState<AiDoctorCallSummary[]>([]);
+    const [expandedCallId, setExpandedCallId] = useState<string | null>(null);
 
     useEffect(() => {
         if (!id) return;
@@ -57,6 +60,9 @@ export default function DoctorPatientDetail() {
             } catch { toast.error('Failed to load patient'); }
             finally { setLoading(false); }
         })();
+        aiDoctorApi.getCallsForPatient(id, 1, 5)
+            .then(res => setAiDoctorCalls(res.data.data))
+            .catch(() => { /* non-critical section, fail silently */ });
     }, [id]);
 
     function openAITools() {
@@ -412,6 +418,65 @@ export default function DoctorPatientDetail() {
                             {rx.notes && <span style={{ marginLeft: 10, color: 'rgba(255,255,255,0.3)', fontStyle: 'italic' }}>{rx.notes}</span>}
                         </div>
                     ))}
+                </div>
+            )}
+
+            {/* AI Doctor Call History — previously fully siloed to the patient's own portal */}
+            {aiDoctorCalls.length > 0 && (
+                <div style={{ background: 'rgba(255,255,255,0.025)', border: '1px solid rgba(99,102,241,0.2)', borderRadius: 18, padding: 20, marginTop: 20 }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 14 }}>
+                        <Bot size={15} color="#6366F1" />
+                        <div style={{ fontSize: 11, fontWeight: 700, color: '#6366F1', textTransform: 'uppercase', letterSpacing: '0.1em' }}>
+                            AI Doctor Consultations (Voice Assistant)
+                        </div>
+                    </div>
+                    {aiDoctorCalls.map(call => {
+                        const suggestions = call.doctorSuggestions;
+                        const isExpanded = expandedCallId === call.id;
+                        return (
+                            <div key={call.id} style={{ borderBottom: '1px solid rgba(255,255,255,0.04)', padding: '10px 0' }}>
+                                <div
+                                    onClick={() => setExpandedCallId(isExpanded ? null : call.id)}
+                                    style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', cursor: 'pointer' }}
+                                >
+                                    <div style={{ fontSize: 12.5, color: 'rgba(255,255,255,0.6)' }}>
+                                        {new Date(call.startedAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}
+                                        {call.durationSecs ? ` · ${Math.round(call.durationSecs / 60)} min` : ''}
+                                    </div>
+                                    {suggestions?.urgency && (
+                                        <span style={{
+                                            fontSize: 10, fontWeight: 700, padding: '2px 9px', borderRadius: 20,
+                                            color: suggestions.urgency === 'URGENT' ? '#FF2D55' : suggestions.urgency === 'SOON' ? '#FFD166' : '#00FF87',
+                                            background: suggestions.urgency === 'URGENT' ? 'rgba(255,45,85,0.1)' : suggestions.urgency === 'SOON' ? 'rgba(255,209,102,0.1)' : 'rgba(0,255,135,0.1)',
+                                        }}>{suggestions.urgency}</span>
+                                    )}
+                                </div>
+                                {isExpanded && suggestions && (
+                                    <div style={{ marginTop: 10, fontSize: 12.5, color: 'rgba(255,255,255,0.65)', lineHeight: 1.6 }}>
+                                        <div style={{ marginBottom: 8 }}>{suggestions.summary}</div>
+                                        {suggestions.possible_conditions?.length > 0 && (
+                                            <div style={{ marginBottom: 6 }}>
+                                                <strong style={{ color: '#fff' }}>Possible conditions: </strong>
+                                                {suggestions.possible_conditions.join(', ')}
+                                            </div>
+                                        )}
+                                        {suggestions.red_flags?.length > 0 && (
+                                            <div style={{ marginBottom: 6, color: '#FF6B6B' }}>
+                                                <strong>Red flags: </strong>
+                                                {suggestions.red_flags.join(' | ')}
+                                            </div>
+                                        )}
+                                        {suggestions.follow_up && (
+                                            <div style={{ color: 'rgba(255,255,255,0.45)' }}>
+                                                <strong style={{ color: 'rgba(255,255,255,0.6)' }}>Follow-up: </strong>
+                                                {suggestions.follow_up}
+                                            </div>
+                                        )}
+                                    </div>
+                                )}
+                            </div>
+                        );
+                    })}
                 </div>
             )}
         </div>

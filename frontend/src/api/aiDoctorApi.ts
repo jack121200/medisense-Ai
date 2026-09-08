@@ -78,6 +78,14 @@ export const aiDoctorApi = {
     getUsageToday: () =>
         api.get<{ success: boolean; data: { count: number; cap: number } }>('/ai-doctor/usage-today'),
 
+    /** Doctor/staff-facing read-only view of one patient's AI Doctor call history */
+    getCallsForPatient: (patientId: string, page = 1, limit = 10) =>
+        api.get<{
+            success: boolean;
+            data: AiDoctorCallSummary[];
+            pagination: { page: number; limit: number; total: number; totalPages: number };
+        }>(`/ai-doctor/patient/${patientId}`, { params: { page, limit } }),
+
     /**
      * Extract raw text from a PDF for the pre-call form upload.
      * Goes through the backend proxy (POST /ml/pdf-extract/text) — ml-service

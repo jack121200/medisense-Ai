@@ -76,4 +76,16 @@ export const aiDoctorController = {
         const usage = await getTodayAiDoctorCallCount();
         sendSuccess(res, usage);
     }),
+
+    /**
+     * GET /api/v1/ai-doctor/patient/:patientId
+     * Doctor/staff-facing read-only view — ownership already enforced by
+     * requireOwnership('patient') at the router level.
+     */
+    getCallsForPatient: asyncHandler(async (req: AuthRequest, res: Response) => {
+        const page = parseInt(req.query.page as string) || 1;
+        const limit = parseInt(req.query.limit as string) || 10;
+        const { calls, pagination } = await aiDoctorService.getCallsForPatient(req.params.patientId, page, limit);
+        sendSuccess(res, calls, 'Patient AI Doctor call history retrieved', 200, pagination);
+    }),
 };

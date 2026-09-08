@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import { aiDoctorController } from './ai-doctor.controller';
 import { authenticate } from '../../middleware/auth.middleware';
-import { requireRole } from '../../middleware/rbac.middleware';
+import { requireRole, requireOwnership } from '../../middleware/rbac.middleware';
 import { verifyVapiWebhook } from '../../middleware/vapiWebhook.middleware';
 import { aiDoctorCallLimiter } from '../../middleware/rateLimiter.middleware';
 import { globalAiDoctorCostCap } from '../../middleware/globalCostCap.middleware';
@@ -78,6 +78,20 @@ router.get(
     authenticate,
     requireRole('PATIENT'),
     aiDoctorController.getUsageToday
+);
+
+/**
+ * GET /api/v1/ai-doctor/patient/:patientId?page=1&limit=10
+ * Doctor/staff-facing read-only view of a patient's AI Doctor call history —
+ * previously this data was fully siloed to the patient's own portal.
+ * requireOwnership('patient') lets staff roles through and 403s a PATIENT
+ * caller looking at anyone but themselves.
+ */
+router.get(
+    '/patient/:patientId',
+    authenticate,
+    requireOwnership('patient'),
+    aiDoctorController.getCallsForPatient
 );
 
 export default router;

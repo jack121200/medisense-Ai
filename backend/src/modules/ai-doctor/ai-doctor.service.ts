@@ -109,6 +109,12 @@ async function fetchPatientByUserId(userId: string) {
                 orderBy: { createdAt: 'desc' },
                 take: 3,
             },
+            aiDoctorCalls: {
+                where: { status: 'COMPLETED' },
+                orderBy: { startedAt: 'desc' },
+                take: 2,
+                select: { startedAt: true, summary: true, doctorSuggestions: true },
+            },
         },
     });
 
@@ -189,6 +195,22 @@ function buildPatientContextString(
         lines.push('\nRecent Lab Reports:');
         patient.labReports.forEach(r => {
             lines.push(`  - ${r.reportType} on ${new Date(r.reportDate).toLocaleDateString('en-IN')}`);
+        });
+    }
+
+    // ── Call memory: prior AI Doctor consultations ────────────────────────────
+    // Without this, every call starts from zero and re-asks the same history
+    // questions the patient already answered last time — a real continuity
+    // gap for a "follow-up in 2 weeks" style consultation.
+    if (patient.aiDoctorCalls.length > 0) {
+        lines.push('\nPREVIOUS AI DOCTOR CONSULTATIONS (for continuity — do not re-ask what is already known here, just confirm if it has changed):');
+        patient.aiDoctorCalls.forEach(call => {
+            const suggestions = call.doctorSuggestions as { summary?: string; follow_up?: string } | null;
+            const dateStr = new Date(call.startedAt).toLocaleDateString('en-IN');
+            const summaryText = suggestions?.summary || call.summary;
+            if (summaryText) {
+                lines.push(`  - ${dateStr}: ${summaryText}${suggestions?.follow_up ? ` (Follow-up advised: ${suggestions.follow_up})` : ''}`);
+            }
         });
     }
 
@@ -635,5 +657,43 @@ export const aiDoctorService = {
         });
         if (!call) throw new AppError('Call record not found', 404, 'NOT_FOUND');
         return call;
+    },
+
+    /**
+     * Doctor/staff-facing read-only view of a patient's AI Doctor call
+     * history — this data was previously fully siloed to the patient's own
+     * "My Consultations" tab, with nothing on the clinical side able to see
+     * what the AI assistant discussed or recommended. Ownership (patient
+     * belongs to the caller, or caller is staff) is enforced by
+     * requireOwnership('patient') at the router level before this runs.
+     */
+    async getCallsForPatient(patientId: string, page = 1, limit = 10) {
+        const skip = (page - 1) * limit;
+        const [calls, total] = await Promise.all([
+            prisma.aiDoctorCall.findMany({
+                where: { patientId, status: 'COMPLETED' },
+                orderBy: { startedAt: 'desc' },
+                skip,
+                take: limit,
+                select: {
+                    id: true,
+                    vapiCallId: true,
+                    durationSecs: true,
+                    summary: true,
+                    doctorSuggestions: true,
+                    preCallData: true,
+                    transcript: true,
+                    status: true,
+                    startedAt: true,
+                    endedAt: true,
+                },
+            }),
+            prisma.aiDoctorCall.count({ where: { patientId, status: 'COMPLETED' } }),
+        ]);
+
+        return {
+            calls,
+            pagination: { page, limit, total, totalPages: Math.ceil(total / limit) },
+        };
     },
 };
