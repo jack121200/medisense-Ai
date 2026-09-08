@@ -50,6 +50,10 @@ __pycache__/
 venv/
 ml-service/**/*.pkl
 ml-service/**/*.joblib
+ml-service/**/*.pt
+# Reproducible training-data cache built by prepare_ecg_dataset.py from
+# PhysioNet — regenerate rather than commit (~7MB, derived, not source).
+ml-service/data/mitbih_beats.npz
 
 # ============================================================
 # Editor / OS

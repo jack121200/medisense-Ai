@@ -20,7 +20,7 @@ import pandas as pd
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.linear_model import LogisticRegression
 from sklearn.model_selection import train_test_split, StratifiedKFold, cross_val_score
-from sklearn.metrics import classification_report, roc_auc_score, accuracy_score
+from sklearn.metrics import classification_report, roc_auc_score, accuracy_score, roc_curve
 from sklearn.preprocessing import LabelEncoder, StandardScaler
 
 try:
@@ -106,16 +106,22 @@ def train():
     print(f"\nClass distribution: {dict(y.value_counts())}")
     print(f"Features ({len(feature_cols)}): {feature_cols}")
 
-    # ── Scale numerical features ───────────────────────────────────────────────
-    scaler = StandardScaler()
-    X_scaled = X.copy()
-    num_present = [c for c in NUM_COLS if c in X.columns]
-    X_scaled[num_present] = scaler.fit_transform(X[num_present])
-
-    # ── Train / test split (stratified) ───────────────────────────────────────
+    # ── Train / test split FIRST (stratified) ─────────────────────────────────
+    # Scaling must happen after the split, fit only on the training fold —
+    # scaling on the full dataset before splitting lets the test set's
+    # distribution leak into the statistics (mean/std) used to transform the
+    # training data, which quietly inflates reported performance.
     X_train, X_test, y_train, y_test = train_test_split(
-        X_scaled, y, test_size=0.2, random_state=42, stratify=y
+        X, y, test_size=0.2, random_state=42, stratify=y
     )
+
+    # ── Scale numerical features — fit on train only, apply to both ──────────
+    scaler = StandardScaler()
+    num_present = [c for c in NUM_COLS if c in X.columns]
+    X_train = X_train.copy()
+    X_test = X_test.copy()
+    X_train[num_present] = scaler.fit_transform(X_train[num_present])
+    X_test[num_present] = scaler.transform(X_test[num_present])
 
     # ── Candidate models ──────────────────────────────────────────────────────
     candidates = {
@@ -164,6 +170,22 @@ def train():
     print("\nClassification Report:")
     print(classification_report(y_test, y_pred))
 
+    # ── Decision threshold — Youden's J statistic ─────────────────────────────
+    # The serving route (medisense_predict.py) previously hardcoded 0.38 with
+    # no documented rationale and no link back to the model that produced it.
+    # Youden's J = sensitivity + specificity - 1, maximized over the ROC
+    # curve, is a standard, principled way to pick an operating threshold
+    # when there's no explicit cost-of-error ratio given — it's computed here
+    # from the held-out test set and versioned in the metadata below instead
+    # of living as a magic number in application code.
+    fpr, tpr, thresholds = roc_curve(y_test, y_proba)
+    youden_j = tpr - fpr
+    best_idx = int(np.argmax(youden_j))
+    optimal_threshold = float(thresholds[best_idx])
+    print(f"\n  Optimal threshold (Youden's J) : {optimal_threshold:.4f}")
+    print(f"  Sensitivity at threshold        : {tpr[best_idx]:.4f}")
+    print(f"  Specificity at threshold        : {1 - fpr[best_idx]:.4f}")
+
     # ── Feature importance (if available) ─────────────────────────────────────
     feature_importance = {}
     if hasattr(best_model, "feature_importances_"):
@@ -189,6 +211,10 @@ def train():
         "accuracy":           round(acc, 4),
         "roc_auc":            round(auc, 4),
         "cv_auc":             round(best_auc, 4),
+        "decision_threshold": round(optimal_threshold, 4),
+        "threshold_method":   "Youden's J statistic on held-out test set (sensitivity + specificity - 1, maximized)",
+        "sensitivity_at_threshold": round(float(tpr[best_idx]), 4),
+        "specificity_at_threshold": round(float(1 - fpr[best_idx]), 4),
         "features":           feature_cols,
         "categorical_cols":   CAT_COLS,
         "numerical_cols":     NUM_COLS,
@@ -196,7 +222,7 @@ def train():
         "n_test":             len(X_test),
         "feature_importance": feature_importance,
         "dataset":            "HeartDiseaseTrain-Test.csv",
-        "note":               "Trained on 1025-row cardiac dataset, cleaned for clinical validity",
+        "note":               "Trained on 1025-row cardiac dataset, cleaned for clinical validity. Scaler is fit on the training split only (see load_and_clean/train) to avoid test-set leakage.",
     }
     with open(os.path.join(MODELS_DIR, "heart_risk_meta.json"), "w") as f:
         json.dump(meta, f, indent=2)

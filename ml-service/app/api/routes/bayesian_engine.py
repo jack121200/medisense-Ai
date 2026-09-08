@@ -6,18 +6,42 @@ Syllabus Mapping: Unit I — Uncertainty, Bayesian Networks, Bayes Theorem, Join
 
 Computes:
   1. Causal DAG Network topology (nodes & directed probabilistic edges)
-  2. Joint Probability Inference P(Coronary_Heart_Disease | Evidence) via Bayes Theorem
+  2. Joint Probability Inference P(Coronary_Heart_Disease | Evidence) via exact
+     inference (variable elimination) over a REAL Bayesian network whose CPDs
+     were fit on HeartDiseaseTrain-Test.csv (see train/train_bayesian_network.py)
+     — not the six hand-picked likelihood-ratio constants this route used to
+     multiply together.
   3. Epistemic Uncertainty Estimation (Shannon Entropy & 95% Bayesian Credible Interval)
   4. Value of Information (VOI) / Next Best Test recommendation engine
 """
 from __future__ import annotations
 
+import json
 import math
+from pathlib import Path
 from typing import Any, Dict, List, Optional
+
+import joblib
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel, Field
 
 router = APIRouter(prefix="/api/bayesian", tags=["Bayesian Clinical Engine"])
+
+MODELS_DIR = Path(__file__).parent.parent.parent / "models"
+_cache: Dict[str, Any] = {}
+
+
+def _load(name: str):
+    if name not in _cache:
+        path = MODELS_DIR / name
+        if not path.exists():
+            return None
+        if name.endswith(".json"):
+            with open(path) as f:
+                _cache[name] = json.load(f)
+        else:
+            _cache[name] = joblib.load(path)
+    return _cache[name]
 
 # ══════════════════════════════════════════════════════════════════
 #  SCHEMAS
@@ -34,27 +58,31 @@ class BayesianInferenceRequest(BaseModel):
 
 
 # ══════════════════════════════════════════════════════════════════
-#  BAYESIAN NETWORK DAG & CONDITIONAL PROBABILITY TABLES (CPTs)
+#  BAYESIAN NETWORK DAG TOPOLOGY (fallback display only — see below)
 # ══════════════════════════════════════════════════════════════════
-
-DAG_TOPOLOGY = {
+# This dict is only used if bayesian_meta.json isn't present yet (i.e. the
+# model has never been trained). Once trained, dag_topology + the actual
+# fitted CPDs come from train/train_bayesian_network.py's output — the
+# per-edge "weight" numbers below were always cosmetic display values, not
+# real conditional probabilities, and are dropped once we have the real thing.
+FALLBACK_DAG_TOPOLOGY = {
     "nodes": [
-        {"id": "Age_Risk",           "label": "Age > 55",              "type": "demographic"},
-        {"id": "Hypertension",       "label": "Hypertension (BP>130)",  "type": "risk_factor"},
-        {"id": "Hypercholesterolemia","label": "High Cholesterol (>240)","type": "risk_factor"},
-        {"id": "Hyperglycemia",      "label": "High Fasting Sugar",    "type": "risk_factor"},
-        {"id": "Chest_Pain",         "label": "Anginal Chest Pain",     "type": "symptom"},
-        {"id": "ECG_St_T",           "label": "ECG ST-T Abnormality",   "type": "finding"},
-        {"id": "Coronary_Disease",   "label": "Coronary Artery Disease","type": "target"},
+        {"id": "Age_Risk",             "label": "Age > 55",                "type": "demographic"},
+        {"id": "Hypertension",         "label": "Hypertension (BP>130)",   "type": "risk_factor"},
+        {"id": "Hypercholesterolemia", "label": "High Cholesterol (>240)", "type": "risk_factor"},
+        {"id": "Hyperglycemia",        "label": "High Fasting Sugar",      "type": "risk_factor"},
+        {"id": "Chest_Pain",           "label": "Anginal Chest Pain",      "type": "symptom"},
+        {"id": "ECG_St_T",             "label": "ECG ST-T Abnormality",    "type": "finding"},
+        {"id": "Coronary_Disease",     "label": "Coronary Artery Disease", "type": "target"},
     ],
     "edges": [
-        {"source": "Age_Risk",            "target": "Hypertension",        "weight": 0.65},
-        {"source": "Age_Risk",            "target": "Coronary_Disease",    "weight": 0.72},
-        {"source": "Hypertension",        "target": "Coronary_Disease",    "weight": 0.85},
-        {"source": "Hypercholesterolemia","target": "Coronary_Disease",    "weight": 0.78},
-        {"source": "Hyperglycemia",       "target": "Coronary_Disease",    "weight": 0.60},
-        {"source": "Coronary_Disease",    "target": "Chest_Pain",          "weight": 0.90},
-        {"source": "Coronary_Disease",    "target": "ECG_St_T",            "weight": 0.88},
+        {"source": "Age_Risk",             "target": "Hypertension"},
+        {"source": "Age_Risk",             "target": "Coronary_Disease"},
+        {"source": "Hypertension",         "target": "Coronary_Disease"},
+        {"source": "Hypercholesterolemia", "target": "Coronary_Disease"},
+        {"source": "Hyperglycemia",        "target": "Coronary_Disease"},
+        {"source": "Coronary_Disease",     "target": "Chest_Pain"},
+        {"source": "Coronary_Disease",     "target": "ECG_St_T"},
     ]
 }
 
@@ -72,37 +100,40 @@ def _shannon_entropy(p: float) -> float:
 @router.post("/infer", summary="Bayesian Decision & Uncertainty Inference Engine")
 def run_bayesian_inference(req: BayesianInferenceRequest):
     """
-    Computes P(Coronary_Disease | Evidence) via Bayes Theorem,
-    estimates Epistemic Uncertainty (entropy + 95% credible interval),
-    and evaluates Value of Information (VOI) to suggest Next Best Diagnostic Test.
+    Computes P(Coronary_Disease | Evidence) via exact inference (variable
+    elimination) over a Bayesian network fit on real data, estimates
+    Epistemic Uncertainty (entropy + 95% credible interval), and evaluates
+    Value of Information (VOI) to suggest the Next Best Diagnostic Test.
     """
-    # 1. Evidence Extraction
-    is_age_high   = req.age > 55
-    is_bp_high    = req.resting_blood_pressure > 130
-    is_chol_high  = req.cholestoral > 240
-    is_fbs_high   = req.fasting_blood_sugar > 120
-    has_angina    = req.chest_pain_present
-    has_ecg_abn   = req.ecg_abnormal
+    from pgmpy.inference import VariableElimination
 
-    # 2. Prior Probability P(Disease) in adult population baseline
-    prior_prob = 0.15
+    model = _load("bayesian_network.pkl")
+    meta = _load("bayesian_meta.json")
+    if model is None or meta is None:
+        raise HTTPException(
+            503,
+            "Bayesian network not trained — run train/train_bayesian_network.py first"
+        )
 
-    # 3. Bayes Likelihood Ratios & Weight Factors
-    lr_multiplier = 1.0
+    # 1. Evidence Extraction — discretized exactly the way
+    #    train_bayesian_network.py discretizes HeartDiseaseTrain-Test.csv,
+    #    so the evidence values line up with what the network's CPDs were
+    #    actually fit on.
+    evidence = {
+        "Age_Risk": int(req.age > 55),
+        "Hypertension": int(req.resting_blood_pressure > 130),
+        "Hypercholesterolemia": int(req.cholestoral > 240),
+        "Hyperglycemia": int(req.fasting_blood_sugar > 120),
+        "Chest_Pain": int(req.chest_pain_present),
+        "ECG_St_T": int(req.ecg_abnormal),
+    }
 
-    if is_age_high:    lr_multiplier *= 1.45
-    if is_bp_high:     lr_multiplier *= 1.85
-    if is_chol_high:   lr_multiplier *= 1.70
-    if is_fbs_high:    lr_multiplier *= 1.35
-    if has_angina:     lr_multiplier *= 2.40
-    if has_ecg_abn:    lr_multiplier *= 2.10
-
-    # Prior Odds
-    prior_odds = prior_prob / (1.0 - prior_prob)
-    # Posterior Odds = Prior Odds * Product of Likelihood Ratios
-    posterior_odds = prior_odds * lr_multiplier
-    # Posterior Probability P(Disease | Evidence)
-    posterior_prob = posterior_odds / (1.0 + posterior_odds)
+    # 2 & 3. Exact inference: P(Coronary_Disease | Evidence) via variable
+    # elimination over the fitted joint distribution — this is the actual
+    # Bayes-theorem computation the old code only described in comments.
+    infer = VariableElimination(model)
+    result = infer.query(["Coronary_Disease"], evidence=evidence, show_progress=False)
+    posterior_prob = float(result.values[1])  # P(Coronary_Disease = 1 | evidence)
     posterior_prob = round(max(0.02, min(0.98, posterior_prob)), 4)
 
     # 4. Epistemic Uncertainty Estimation (Shannon Entropy)
@@ -211,16 +242,21 @@ def run_bayesian_inference(req: BayesianInferenceRequest):
             "epistemic_uncertainty_pct": uncertainty_pct,
             "credible_interval_95":      {"lower_pct": ci_lower, "upper_pct": ci_upper, "margin_pct": margin},
             "shannon_entropy_bits":      round(entropy_bits, 4),
-            "dag_topology":              DAG_TOPOLOGY,
+            "dag_topology":              meta.get("dag_topology", FALLBACK_DAG_TOPOLOGY),
             "next_best_test_recommendation": best_test,
             "all_voi_rankings":          voi_results,
             "evidence_evaluated": {
-                "age_gt_55":             is_age_high,
-                "hypertension_gt_130":    is_bp_high,
-                "cholesterol_gt_240":    is_chol_high,
-                "fasting_sugar_gt_120":   is_fbs_high,
-                "anginal_chest_pain":    has_angina,
-                "ecg_st_t_abnormality":  has_ecg_abn,
+                "age_gt_55":            bool(evidence["Age_Risk"]),
+                "hypertension_gt_130":  bool(evidence["Hypertension"]),
+                "cholesterol_gt_240":   bool(evidence["Hypercholesterolemia"]),
+                "fasting_sugar_gt_120": bool(evidence["Hyperglycemia"]),
+                "anginal_chest_pain":   bool(evidence["Chest_Pain"]),
+                "ecg_st_t_abnormality": bool(evidence["ECG_St_T"]),
+            },
+            "model_info": {
+                "method": "Exact inference (variable elimination) over a Bayesian network fit via pgmpy.BayesianEstimator",
+                "trained_on": meta.get("dataset"),
+                "n_train": meta.get("n_train"),
             },
         },
     }

@@ -8,7 +8,9 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     rm -rf /var/lib/apt/lists/*
 
 COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
+# --extra-index-url is needed for the torch==...+cpu build (deep_anomaly.py's
+# ECG autoencoder) — plain PyPI doesn't host CPU-only torch wheels.
+RUN pip install --no-cache-dir -r requirements.txt --extra-index-url https://download.pytorch.org/whl/cpu
 
 COPY . .
 

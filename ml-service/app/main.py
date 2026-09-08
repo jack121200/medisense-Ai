@@ -1,17 +1,24 @@
 """
 FastAPI Main Entry Point — MediSense AI ML Service
 ====================================================
-Active ML features (4):
-  1. AI Symptom Checker         → /api/medisense/predict-disease
-  2. Heart Disease Risk AI      → /api/medisense/predict-risk
-  3. CBC Blood Analyzer         → /api/cbc/analyze
-  4. Lipid Profile Analyzer     → /api/lipid/analyze
+Trained-model-backed features (5) — see CORE_MODEL_FILES / models_manifest.json:
+  1. AI Symptom Checker         → /api/medisense/predict-disease   (RandomForest)
+  2. Heart Disease Risk AI      → /api/medisense/predict-risk      (RandomForest)
+  3. CBC Blood Analyzer         → /api/cbc/analyze                 (IsolationForest + KMeans)
+  4. Bayesian Decision Engine   → /api/bayesian/infer               (pgmpy Bayesian network)
+  5. ECG Anomaly Detector       → /api/deep/anomaly-stream          (1D-CNN autoencoder, PyTorch)
+
+Rule-based (no trained model, documented guideline thresholds):
+  6. Lipid Profile Analyzer     → /api/lipid/analyze                (ATP III / ACC-AHA rules)
+  7. Fuzzy Dosing Engine        → /api/fuzzy/dosage-triage          (Mamdani fuzzy logic)
+  8. Population Hypothesis Tests → /api/hypothesis/*                (statistical tests over the training CSV)
 """
 from __future__ import annotations
 
 import time
 import threading
 import hmac
+import json
 from contextlib import asynccontextmanager
 from pathlib import Path
 from typing import Any, Dict
@@ -40,21 +47,28 @@ def _inc(key: str):
 
 
 # ── Model pre-load on startup ─────────────────────────────────────────────────
+# lipid_model.pkl is intentionally not in this list any more — lipid_analyze.py
+# is now a rule-based classifier with no trained model to wait on (see its
+# module docstring for why the old RandomForest wrapper was removed).
+CORE_MODEL_FILES = {
+    "disease_model.pkl",
+    "heart_risk_model.pkl",
+    "cbc_anomaly_model.pkl",
+    "bayesian_network.pkl",
+    "ecg_autoencoder.pt",
+}
+
+
 def _preload_models():
     import os
 
     models_dir = Path(os.getenv("MODEL_PATH", str(Path(__file__).parent / "models")))
-    ready = []
-
-    for fname in ["disease_model.pkl", "heart_risk_model.pkl", "cbc_anomaly_model.pkl", "lipid_model.pkl"]:
-        if (models_dir / fname).exists():
-            ready.append(fname)
+    ready = {fname for fname in CORE_MODEL_FILES if (models_dir / fname).exists()}
 
     with _metrics_lock:
-        _metrics["models_ready"] = ("lipid_model.pkl" in ready)
-    print(f"Models pre-checked: {ready}")
-    core_models = {"disease_model.pkl", "heart_risk_model.pkl", "cbc_anomaly_model.pkl", "lipid_model.pkl"}
-    missing = core_models - set(ready)
+        _metrics["models_ready"] = (ready == CORE_MODEL_FILES)
+    print(f"Models pre-checked: {sorted(ready)}")
+    missing = CORE_MODEL_FILES - ready
     if missing:
         print(f"Missing models (run training scripts): {missing}")
 
@@ -63,11 +77,15 @@ def _preload_models():
 async def lifespan(app: FastAPI):
     print(f"\n{'='*55}")
     print(f"  MediSense AI — ML Service  v{settings.VERSION}")
-    print(f"  4 Active ML Features:")
-    print(f"    Symptom Checker   ->  /api/medisense/predict-disease")
-    print(f"    Heart Disease     ->  /api/medisense/predict-risk")
-    print(f"    CBC Blood Analyzer->  /api/cbc/analyze")
-    print(f"    Lipid Profile AI  ->  /api/lipid/analyze")
+    print(f"  Trained-model features:")
+    print(f"    Symptom Checker    ->  /api/medisense/predict-disease")
+    print(f"    Heart Disease Risk ->  /api/medisense/predict-risk")
+    print(f"    CBC Blood Analyzer ->  /api/cbc/analyze")
+    print(f"    Bayesian Engine    ->  /api/bayesian/infer")
+    print(f"    ECG Anomaly        ->  /api/deep/anomaly-stream")
+    print(f"  Rule-based features:")
+    print(f"    Lipid Profile      ->  /api/lipid/analyze")
+    print(f"    Fuzzy Dosing       ->  /api/fuzzy/dosage-triage")
     print(f"{'='*55}\n")
     t = threading.Thread(target=_preload_models, daemon=True)
     t.start()
@@ -137,6 +155,29 @@ app.include_router(fuzzy_dosing.router,      tags=["Fuzzy Dosing Engine"])
 app.include_router(deep_anomaly.router,      tags=["Deep Waveform Autoencoder"])
 
 
+def _load_manifest_versions() -> Dict[str, str]:
+    """Echoes each model's artifact sha256 from models_manifest.json (run
+    scripts/build_manifest.py to regenerate) — lets /api/health answer
+    "which exact model build is this?" without trusting a hand-maintained
+    version string that can drift from what's actually loaded."""
+    manifest_path = Path(__file__).parent.parent / "models_manifest.json"
+    if not manifest_path.exists():
+        return {}
+    try:
+        with open(manifest_path) as f:
+            manifest = json.load(f)
+        versions = {}
+        for name, entry in manifest.get("models", {}).items():
+            if entry.get("status") == "trained":
+                hashes = [a["sha256"][:12] for a in entry.get("artifacts", {}).values()]
+                versions[name] = hashes[0] if hashes else "unknown"
+            else:
+                versions[name] = "not_trained"
+        return versions
+    except Exception:
+        return {}
+
+
 # ── Health & Metrics ──────────────────────────────────────────────────────────
 @app.get("/api/health", tags=["Health"])
 def health():
@@ -146,13 +187,18 @@ def health():
         "service":       "medisense-ml",
         "version":       settings.VERSION,
         "models_ready":  _metrics["models_ready"],
+        "model_versions": _load_manifest_versions(),
         "uptime_s":      uptime_s,
         "active_features": [
             "AI Symptom Checker",
             "Heart Disease Risk AI",
             "CBC Blood Analyzer",
-            "Lipid Profile Analyzer",
+            "Bayesian Decision Engine",
+            "ECG Anomaly Detector",
+            "Lipid Profile Analyzer (rule-based)",
+            "Fuzzy Dosing Engine (rule-based)",
         ],
+        "models_ready_detail": sorted(CORE_MODEL_FILES),
     }
 
 

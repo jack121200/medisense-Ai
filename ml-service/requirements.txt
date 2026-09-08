@@ -23,3 +23,19 @@ python-docx>=1.1.0
 # HTTP client
 httpx==0.26.0
 python-multipart>=0.0.6
+
+# Bayesian network (bayesian_engine.py) — replaces hand-picked likelihood-ratio
+# constants with CPDs actually fit on HeartDiseaseTrain-Test.csv
+pgmpy==1.1.2
+
+# ECG signal access for the deep-anomaly autoencoder (train/train_deep_anomaly.py)
+# — reads directly from PhysioNet's open MIT-BIH Arrhythmia Database
+wfdb==4.3.1
+
+# 1D-CNN autoencoder for the ECG anomaly detector (deep_anomaly.py).
+# CPU-only build — the Dockerfile passes --extra-index-url
+# https://download.pytorch.org/whl/cpu when installing this file, since
+# plain PyPI doesn't host the "+cpu" build. Installing this requirements.txt
+# directly (e.g. local dev) needs the same flag:
+#   pip install -r requirements.txt --extra-index-url https://download.pytorch.org/whl/cpu
+torch==2.13.0+cpu

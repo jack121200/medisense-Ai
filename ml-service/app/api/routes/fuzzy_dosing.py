@@ -57,7 +57,16 @@ def _trimf(x: float, a: float, b: float, c: float) -> float:
     return 0.0
 
 
-# Standard drug reference adult dosages (mg)
+# Standard drug reference adult dosages (mg) — these min/max ranges match
+# each drug's standard FDA prescribing-information dosing range (typical
+# starting dose -> maximum adult daily dose for the stated indication):
+#   Ramipril 1.25-10mg/day, Metoprolol (tartrate) 12.5-100mg BID,
+#   Amlodipine 2.5-10mg/day, Atorvastatin 10-80mg/night.
+# The fuzzy membership functions and rule base below (which decide WHERE in
+# that already-approved range a given patient falls) are this engine's own
+# heuristic, not sourced from a specific published dosing algorithm — treat
+# the output as a starting-point suggestion for clinician review, not a
+# validated clinical decision rule.
 DRUG_SPECS = {
     "Ramipril":    {"std_dose": 10.0, "min_dose": 1.25, "unit": "mg Daily",    "ind": "ACE Inhibitor for BP & Heart Failure"},
     "Metoprolol":  {"std_dose": 100.0,"min_dose": 12.5, "unit": "mg Twice/Day","ind": "Beta Blocker for HR & Angina"},

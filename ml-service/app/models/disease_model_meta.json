@@ -1,7 +1,14 @@
 {
-  "accuracy": 0.0,
+  "accuracy": 1.0,
+  "macro_f1": 1.0,
+  "cv_accuracy_mean": 1.0,
+  "cv_accuracy_std": 0.0,
   "n_estimators": 200,
-  "n_symptoms": 134,
-  "n_diseases": 42,
-  "algorithm": "RandomForestClassifier"
+  "n_symptoms": 132,
+  "n_diseases": 41,
+  "n_train": 3936,
+  "n_test": 984,
+  "algorithm": "RandomForestClassifier",
+  "dataset": "disease_symptom_train.csv (4920 rows, 41 balanced classes, 120 rows/class)",
+  "note": "Replaces the previous model trained on the repo's 42-row Testing.csv, which recorded 0.0 test accuracy (unstratified split on too few rows for the class count). This dataset is large enough for a real stratified split and 5-fold cross-validation. CAVEAT: this public dataset gives every disease a fixed, non-overlapping symptom signature with no noise, so accuracy near 100% here reflects that the dataset is perfectly separable, not that real-world ambiguous/overlapping symptom presentations are solved. Treat this model's confidence as dataset-clean-case performance, not clinical validation."
 }

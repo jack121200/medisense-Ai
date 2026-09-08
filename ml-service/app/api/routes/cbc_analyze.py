@@ -55,7 +55,11 @@ FALLBACK_RANGES: Dict[str, Any] = {
     "MPV":   {"min": 7.5,   "max": 12.5,  "unit": "fL",      "name": "Mean Platelet Volume"},
 }
 
-CLUSTER_NAMES = {0: "Normal Pattern", 1: "Mild Concern", 2: "Abnormal Pattern"}
+# Fallback only for a model trained before the severity-based mapping fix —
+# once train_cbc_model.py has been re-run, cluster_label_map from
+# cbc_meta.json (computed from centroid severity, not a fixed ID) is used
+# instead. See train_cbc_model.py for why hardcoding IDs here is wrong.
+FALLBACK_CLUSTER_NAMES = {0: "Normal Pattern", 1: "Mild Concern", 2: "Abnormal Pattern"}
 
 
 # ── Schemas ───────────────────────────────────────────────────────────────────
@@ -249,7 +253,12 @@ def analyze_cbc(req: CBCRequest):
             X_raw    = np.array([[imputed_values.get(f, 0.0) for f in features]], dtype=float)
             X_scaled = cbc_scaler.transform(X_raw)
             cluster_id   = int(km_model.predict(X_scaled)[0])
-            cluster_name = CLUSTER_NAMES.get(cluster_id, f"Cluster {cluster_id}")
+            cbc_meta     = _load("cbc_meta.json") or {}
+            label_map    = cbc_meta.get("cluster_label_map")
+            if label_map:
+                cluster_name = label_map.get(str(cluster_id), f"Cluster {cluster_id}")
+            else:
+                cluster_name = FALLBACK_CLUSTER_NAMES.get(cluster_id, f"Cluster {cluster_id}")
             cluster_result = {
                 "available":    True,
                 "cluster_id":   cluster_id,

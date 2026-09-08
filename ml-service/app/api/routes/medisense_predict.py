@@ -11,7 +11,7 @@ from __future__ import annotations
 import json
 import os
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Literal, Optional
 
 import numpy as np
 import joblib
@@ -49,20 +49,31 @@ class DiseaseRequest(BaseModel):
 
 
 class HeartRiskRequest(BaseModel):
-    """14-feature cardiac risk model (HeartDiseaseTrain-Test.csv)."""
-    age:                           float = Field(..., description="Age in years")
-    sex:                           str   = Field(..., description="Male / Female")
-    chest_pain_type:               str   = Field(..., description="Typical angina / Atypical angina / Non-anginal pain / Asymptomatic")
-    resting_blood_pressure:        float = Field(..., description="Resting BP in mmHg")
-    cholestoral:                   float = Field(..., description="Cholesterol in mg/dL")
-    fasting_blood_sugar:           str   = Field(..., description="Greater than 120 mg/dl / Lower than 120 mg/dl")
-    rest_ecg:                      str   = Field(..., description="Normal / ST-T wave abnormality / Left ventricular hypertrophy")
-    Max_heart_rate:                float = Field(..., description="Maximum heart rate achieved")
-    exercise_induced_angina:       str   = Field(..., description="Yes / No")
+    """
+    14-feature cardiac risk model (HeartDiseaseTrain-Test.csv).
+
+    Categorical fields are `Literal` types, not bare `str` — this was a real
+    bug: an invalid string used to pass validation, then silently get
+    encoded as 0 in the try/except below (corrupting the prediction with no
+    error surfaced to the caller) instead of being rejected with a 422.
+    `vessels_colored_by_flourosopy` deliberately excludes "Four" — rows with
+    that value were dropped during training (see train_heart_risk.py), so
+    the model genuinely cannot score it; rejecting it is more honest than
+    silently zeroing it.
+    """
+    age:                           float = Field(..., gt=0, lt=120, description="Age in years")
+    sex:                           Literal["Male", "Female"]
+    chest_pain_type:               Literal["Typical angina", "Atypical angina", "Non-anginal pain", "Asymptomatic"]
+    resting_blood_pressure:        float = Field(..., gt=0, description="Resting BP in mmHg")
+    cholestoral:                   float = Field(..., gt=0, description="Cholesterol in mg/dL")
+    fasting_blood_sugar:           Literal["Greater than 120 mg/ml", "Lower than 120 mg/ml"]
+    rest_ecg:                      Literal["Normal", "ST-T wave abnormality", "Left ventricular hypertrophy"]
+    Max_heart_rate:                float = Field(..., gt=0, description="Maximum heart rate achieved")
+    exercise_induced_angina:       Literal["Yes", "No"]
     oldpeak:                       float = Field(..., description="ST depression induced by exercise")
-    slope:                         str   = Field(..., description="Upsloping / Flat / Downsloping")
-    vessels_colored_by_flourosopy: str   = Field(..., description="Zero / One / Two / Three")
-    thalassemia:                   str   = Field(..., description="Normal / Fixed Defect / Reversable Defect")
+    slope:                         Literal["Upsloping", "Flat", "Downsloping"]
+    vessels_colored_by_flourosopy: Literal["Zero", "One", "Two", "Three"]
+    thalassemia:                   Literal["Normal", "No", "Fixed Defect", "Reversable Defect"]
 
 
 # ══════════════════════════════════════════════════════════════════
@@ -162,6 +173,11 @@ def predict_heart_risk(req: HeartRiskRequest):
         )
 
     req_dict = req.dict()
+    # Training's load_and_clean() remaps this exact string before fitting
+    # the encoder — the API must apply the same remap or a valid "No" input
+    # (a real category the Literal type accepts) would fail le.transform().
+    if req_dict.get("thalassemia") == "No":
+        req_dict["thalassemia"] = "Normal"
 
     # Build raw feature array in training order
     row = {}
@@ -169,13 +185,15 @@ def predict_heart_risk(req: HeartRiskRequest):
         val = req_dict.get(col, 0)
         if col in CAT_COLS:
             le = encoders.get(col)
-            if le:
-                try:
-                    val = int(le.transform([str(val)])[0])
-                except ValueError:
-                    val = 0
-            else:
-                val = 0
+            if le is None:
+                raise HTTPException(500, f"No encoder found for categorical field '{col}' — model artifacts are inconsistent, retrain with train/train_heart_risk.py")
+            try:
+                val = int(le.transform([str(val)])[0])
+            except ValueError:
+                # Pydantic's Literal validation should make this unreachable
+                # for real requests, but fail loudly rather than silently
+                # zeroing a value the model was never trained to interpret.
+                raise HTTPException(422, f"Value '{val}' for '{col}' is not a category this model was trained on")
         row[col] = float(val)
 
     X_raw = np.array([[row[f] for f in features]], dtype=float)
@@ -188,13 +206,20 @@ def predict_heart_risk(req: HeartRiskRequest):
 
     raw_probability = float(model.predict_proba(X_scaled)[0][1])
 
-    # Docx Section 8: Use 0.38 threshold (lean toward sensitivity — missing high-risk is worse than false alarm)
-    # Risk buckets: 0–35% = LOW | 35–65% = MEDIUM | 65%+ = HIGH
+    # Decision threshold comes from the model's own training run (Youden's J
+    # statistic computed on held-out data in train_heart_risk.py) rather than
+    # a hardcoded literal disconnected from whichever model is actually
+    # loaded. Falls back to the previous 0.38 only if a model trained before
+    # this fix is still in place and its meta file has no threshold recorded.
+    meta = _load("heart_risk_meta.json") or {}
+    medium_threshold = meta.get("decision_threshold", 0.38)
+    high_threshold = 0.65  # HIGH bucket is a fixed clinical cutoff, not model-derived
+
     probability = raw_probability  # percentage display uses raw prob * 100
 
-    if raw_probability >= 0.65:
+    if raw_probability >= high_threshold:
         level, color, message = "HIGH",   "#E63946", "Immediate cardiology evaluation strongly recommended. High probability of cardiac disease detected."
-    elif raw_probability >= 0.38:
+    elif raw_probability >= medium_threshold:
         level, color, message = "MEDIUM", "#FFD166", "Elevated cardiac risk — further diagnostic tests advised (ECG, stress test, echocardiography)."
     else:
         level, color, message = "LOW",    "#06D6A0", "Low cardiac risk profile. Maintain heart-healthy lifestyle and regular check-ups."
