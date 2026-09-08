@@ -108,7 +108,7 @@ function DoctorReportCard({ suggestions, onDismiss }: { suggestions: DoctorSugge
                         <Stethoscope size={18} color="#fff" />
                     </div>
                     <div>
-                        <div style={{ fontSize: 14, fontWeight: 800, color: '#fff' }}>Dr. Priya's Assessment</div>
+                        <div style={{ fontSize: 14, fontWeight: 800, color: '#fff' }}>Priya's Assessment (AI-Generated)</div>
                         <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.4)', marginTop: 1 }}>AI-generated post-consultation report</div>
                     </div>
                 </div>
@@ -242,7 +242,7 @@ function PreCallModal({
                 <div style={{ padding: '22px 26px', borderBottom: '1px solid rgba(255,255,255,0.07)', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                     <div>
                         <div style={{ fontSize: 16, fontWeight: 800, color: '#fff' }}>Before we begin...</div>
-                        <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.4)', marginTop: 2 }}>Help Dr. Priya Sharma prepare for your consultation</div>
+                        <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.4)', marginTop: 2 }}>Help Priya, your AI health assistant, prepare</div>
                     </div>
                     <button onClick={onCancel} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'rgba(255,255,255,0.3)', padding: 6 }}>
                         <X size={18} />
@@ -313,7 +313,7 @@ function PreCallModal({
                     {/* Additional Notes */}
                     <div>
                         <label style={{ fontSize: 12, fontWeight: 700, color: 'rgba(255,255,255,0.55)', textTransform: 'uppercase', letterSpacing: '0.07em', display: 'block', marginBottom: 8 }}>
-                            📝 Anything else Dr. Priya should know? (optional)
+                            📝 Anything else Priya should know? (optional)
                         </label>
                         <textarea
                             value={notes}
@@ -378,7 +378,7 @@ function LiveTranscriptPanel({ messages, partial }: { messages: TranscriptMessag
                         {messages.filter(m => m.role !== 'system').map((msg, i) => (
                             <div key={i} style={{ display: 'flex', flexDirection: 'column', alignItems: msg.role === 'user' ? 'flex-end' : 'flex-start' }}>
                                 <div style={{ fontSize: 10, fontWeight: 700, color: msg.role === 'user' ? '#6366F1' : '#10b981', marginBottom: 3, letterSpacing: '0.05em' }}>
-                                    {msg.role === 'user' ? 'You' : 'Dr. Priya Sharma'}
+                                    {msg.role === 'user' ? 'You' : 'Priya (AI)'}
                                 </div>
                                 <div style={{
                                     maxWidth: '88%', padding: '9px 13px', borderRadius: msg.role === 'user' ? '14px 14px 4px 14px' : '14px 14px 14px 4px',
@@ -394,7 +394,7 @@ function LiveTranscriptPanel({ messages, partial }: { messages: TranscriptMessag
                         {partial && partial.message.trim() && (
                             <div style={{ display: 'flex', flexDirection: 'column', alignItems: partial.role === 'user' ? 'flex-end' : 'flex-start' }}>
                                 <div style={{ fontSize: 10, fontWeight: 700, color: partial.role === 'user' ? '#6366F1' : '#10b981', marginBottom: 3, letterSpacing: '0.05em' }}>
-                                    {partial.role === 'user' ? 'You' : 'Dr. Priya Sharma'} <span style={{ opacity: 0.5, fontWeight: 400 }}>· speaking…</span>
+                                    {partial.role === 'user' ? 'You' : 'Priya (AI)'} <span style={{ opacity: 0.5, fontWeight: 400 }}>· speaking…</span>
                                 </div>
                                 <div style={{
                                     maxWidth: '88%', padding: '9px 13px', borderRadius: partial.role === 'user' ? '14px 14px 4px 14px' : '14px 14px 14px 4px',
@@ -496,7 +496,7 @@ function CallHistoryItem({ call }: { call: AiDoctorCallSummary }) {
                                                     color: 'rgba(255,255,255,0.7)', border: '1px solid rgba(255,255,255,0.06)',
                                                 }}>
                                                     <div style={{ fontSize: 10, fontWeight: 700, color: msg.role === 'user' ? '#6366F1' : '#10b981', marginBottom: 3 }}>
-                                                        {msg.role === 'user' ? 'You' : 'Dr. Priya'}
+                                                        {msg.role === 'user' ? 'You' : 'Priya'}
                                                     </div>
                                                     {msg.message}
                                                 </div>
@@ -781,7 +781,7 @@ export default function AiDoctorPage() {
                     </div>
                     <div>
                         <h1 style={{ fontSize: 22, fontWeight: 900, color: '#fff', letterSpacing: '-0.02em' }}>AI Doctor OPD</h1>
-                        <p style={{ fontSize: 12.5, color: 'rgba(255,255,255,0.4)', marginTop: 2 }}>Dr. Arjun Mehta — MBBS, MD General Medicine · Integrative & Natural Healing OPD · Hindi & English</p>
+                        <p style={{ fontSize: 12.5, color: 'rgba(255,255,255,0.4)', marginTop: 2 }}>Priya — AI Health Assistant · Integrative & Natural Healing Guidance · Hindi & English</p>
                     </div>
                 </div>
             </div>
@@ -818,8 +818,20 @@ export default function AiDoctorPage() {
                             }}>
                                 <PulsingOrb active />
                                 <div style={{ textAlign: 'center' }}>
-                                    <div style={{ fontSize: 18, fontWeight: 800, color: '#fff' }}>Dr. Arjun Mehta</div>
-                                    <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.4)', marginTop: 3 }}>MBBS, MD General Medicine · Integrative Physician</div>
+                                    <div style={{ fontSize: 18, fontWeight: 800, color: '#fff' }}>Priya</div>
+                                    {/* Persistent, always-visible AI disclosure during the live call —
+                                        not just spoken once at the start, so it stays visible even if
+                                        the patient joined the call already in progress or looks away
+                                        from the opening line. */}
+                                    <div style={{
+                                        display: 'inline-flex', alignItems: 'center', gap: 5, marginTop: 6,
+                                        fontSize: 11, fontWeight: 800, padding: '3px 10px', borderRadius: 9999,
+                                        background: 'rgba(99,102,241,0.18)', color: '#a5b4fc',
+                                        border: '1px solid rgba(99,102,241,0.35)', letterSpacing: '0.03em',
+                                    }}>
+                                        🤖 AI ASSISTANT — NOT A REAL DOCTOR
+                                    </div>
+                                    <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.4)', marginTop: 6 }}>Integrative &amp; Ayurvedic self-care guidance</div>
                                 </div>
                                 <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                                     <span style={{ width: 8, height: 8, borderRadius: '50%', background: '#10b981', animation: 'ping 1.2s ease infinite', display: 'inline-block' }} />
@@ -857,7 +869,7 @@ export default function AiDoctorPage() {
                         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 18, padding: '60px 0', background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)', borderRadius: 20 }}>
                             <div style={{ width: 50, height: 50, borderRadius: '50%', border: '3px solid rgba(99,102,241,0.3)', borderTopColor: '#6366F1', animation: 'spin 0.8s linear infinite' }} />
                             <div style={{ textAlign: 'center' }}>
-                                <div style={{ fontSize: 15, fontWeight: 700, color: '#fff' }}>Connecting to Dr. Arjun Mehta...</div>
+                                <div style={{ fontSize: 15, fontWeight: 700, color: '#fff' }}>Connecting to Priya...</div>
                                 <div style={{ fontSize: 12.5, color: 'rgba(255,255,255,0.35)', marginTop: 4 }}>Please allow microphone access when prompted</div>
                             </div>
                             <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
@@ -869,10 +881,13 @@ export default function AiDoctorPage() {
                         <div style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)', borderRadius: 20, padding: '32px 36px', display: 'flex', alignItems: 'center', gap: 32 }}>
                             <PulsingOrb active={false} />
                             <div style={{ flex: 1 }}>
-                                <div style={{ fontSize: 22, fontWeight: 900, color: '#fff', marginBottom: 4 }}>Dr. Arjun Mehta</div>
-                                <div style={{ fontSize: 13.5, color: '#6366F1', fontWeight: 600, marginBottom: 16 }}>MBBS (GMC Nagpur) · MD General Medicine (KGMU) · Fellowship Integrative Medicine (AIIMS)</div>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 4 }}>
+                                    <div style={{ fontSize: 22, fontWeight: 900, color: '#fff' }}>Priya</div>
+                                    <span style={{ fontSize: 11, fontWeight: 800, padding: '3px 10px', borderRadius: 9999, background: 'rgba(99,102,241,0.18)', color: '#a5b4fc', border: '1px solid rgba(99,102,241,0.35)', letterSpacing: '0.03em' }}>AI HEALTH ASSISTANT — NOT A REAL DOCTOR</span>
+                                </div>
+                                <div style={{ fontSize: 13.5, color: '#6366F1', fontWeight: 600, marginBottom: 16 }}>Voice-based AI trained to discuss symptoms and suggest natural/Ayurvedic self-care — not a substitute for medical diagnosis or a licensed physician</div>
                                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginBottom: 22 }}>
-                                    {['General Medicine', 'Ayurveda & Home Remedies', '9-Phase OPD Interview', '18 yrs experience', 'Hindi & English'].map(tag => (
+                                    {['Ayurveda & Home Remedies', '9-Phase OPD-style Interview', 'Hindi & English'].map(tag => (
                                         <span key={tag} style={{ fontSize: 12, padding: '4px 12px', borderRadius: 9999, background: 'rgba(99,102,241,0.12)', color: '#6366F1', border: '1px solid rgba(99,102,241,0.25)' }}>{tag}</span>
                                     ))}
                                 </div>
@@ -887,7 +902,7 @@ export default function AiDoctorPage() {
                                         <div>
                                             <div style={{ fontSize: 12.5, fontWeight: 700, color: '#6366F1', marginBottom: 3 }}>Hindi, English ya Hinglish mein aaram se baat karein</div>
                                             <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.5)', lineHeight: 1.6 }}>
-                                                Dr. Arjun Mehta complete 9-phase OPD interview lenge aur aapko pure Ayurvedic, diet & home remedies suggest karenge. Emergency ke liye call <strong style={{ color: '#fff' }}>108</strong>.
+                                                Priya ek 9-phase OPD-style interview lengi aur aapko pure Ayurvedic, diet & home remedies suggest karenge. Emergency ke liye call <strong style={{ color: '#fff' }}>108</strong>.
                                             </div>
                                         </div>
                                     </div>
@@ -913,7 +928,7 @@ export default function AiDoctorPage() {
                                 <div style={{ width: 22, height: 22, borderRadius: '50%', border: '2px solid rgba(99,102,241,0.4)', borderTopColor: '#6366F1', animation: 'spin 0.8s linear infinite', flexShrink: 0 }} />
                                 <div>
                                     <div style={{ fontSize: 13.5, fontWeight: 700, color: '#fff', marginBottom: 2 }}>Generating Doctor's Report...</div>
-                                    <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.4)' }}>Dr. Priya's AI is analysing your consultation. This takes ~20s.</div>
+                                    <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.4)' }}>Priya is analysing your consultation. This takes ~20s.</div>
                                 </div>
                             </div>
                         ) : doctorReport ? (

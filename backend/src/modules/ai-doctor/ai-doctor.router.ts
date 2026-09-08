@@ -21,18 +21,6 @@ router.post(
 );
 
 /**
- * GET /api/v1/ai-doctor/patient-context
- * Real-time patient data endpoint — called by Vapi tool call mid-conversation.
- * Requires valid JWT in Authorization header (passed by Vapi tool server config).
- */
-router.get(
-    '/patient-context',
-    authenticate,
-    requireRole('PATIENT'),
-    aiDoctorController.getPatientContext
-);
-
-/**
  * POST /api/v1/ai-doctor/webhook
  * Vapi webhook — receives end-of-call report (transcript + summary).
  * No authenticated user — Vapi server sends this, NOT the patient — but

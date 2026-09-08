@@ -23,17 +23,6 @@ export const aiDoctorController = {
     }),
 
     /**
-     * GET /api/v1/ai-doctor/patient-context
-     * Vapi tool call endpoint — fetches live patient data during a call.
-     * Auth is via the Bearer token passed in the tool call headers.
-     */
-    getPatientContext: asyncHandler(async (req: AuthRequest, res: Response) => {
-        const userId = req.user!.id;
-        const context = await aiDoctorService.getPatientContext(userId);
-        res.json(context); // Vapi expects raw JSON (not our sendSuccess wrapper)
-    }),
-
-    /**
      * POST /api/v1/ai-doctor/webhook
      * Vapi webhook — receives end-of-call report with transcript and summary.
      * No auth middleware here — Vapi sends this, not the user.

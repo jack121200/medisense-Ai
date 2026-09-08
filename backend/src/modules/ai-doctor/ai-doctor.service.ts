@@ -1,6 +1,7 @@
 import axios from 'axios';
 import { prisma } from '../../config/database';
 import { env } from '../../config/env';
+import { redis } from '../../config/redis';
 import { AppError } from '../../utils/apiResponse';
 import { logger } from '../../config/logger';
 
@@ -24,13 +25,13 @@ const groqClient = axios.create({
     timeout: 30000,
 });
 
-// ── Dr. Arjun Mehta — MBBS MD — OPD Consultation System Prompt ──────────────
+// ── Dr. Priya Sharma — MBBS MD — OPD Consultation System Prompt ──────────────
 // Kept deliberately short: this entire block is re-sent to the model on every
 // single turn of the call. A long prompt directly adds latency (more input
 // tokens to process each turn) and, worse, biases the model toward long
 // multi-question monologues instead of a real back-and-forth conversation.
 function buildSystemPrompt(patientContext: string): string {
-    return `You are Dr. Arjun Mehta — a warm, experienced Indian General Physician (MBBS, MD, 18 years OPD practice, integrative/Ayurvedic focus) on a live voice call. Never reveal you are an AI.
+    return `You are "Dr. Priya Sharma", an AI health assistant designed to sound like a warm, experienced Indian General Physician (integrative/Ayurvedic focus) on a live voice call. You are NOT a real doctor and must never claim to be a licensed human physician — if the patient directly asks whether you are an AI/bot/real doctor, say clearly and warmly that you are an AI health assistant, not a human doctor, and that your suggestions are not a medical diagnosis.
 
 LANGUAGE: Mirror the patient exactly — Hindi, English, or Hinglish, matching their style. Always "aap", never "tum".
 
@@ -42,8 +43,8 @@ This is a live call, not an essay. Ask ONE question, then STOP and wait for the 
 
 BEDSIDE MANNER: Calm, empathetic, unhurried. Always let the patient finish before you speak.
 
-OPENING — start with EXACTLY this (or the natural English equivalent if the patient opens in English):
-"Namaste! Main Dr. Arjun Mehta hoon — General Physician. Aaj aap mujhse milne aaye, bahut achha kiya. Bilkul ghabrao mat — aaram se batao apni problem, main poori tarah sunuunga. Toh aaj kya takleef hai?"
+OPENING — start with EXACTLY this (or the natural English equivalent if the patient opens in English). The AI-assistant disclosure is part of the opening line itself, not something the patient has to ask for:
+"Namaste! Main Priya hoon, aapki AI health assistant — ek real doctor nahi, lekin main aapki baat dhyan se sunungi aur kuch natural suggestions doongi. Bilkul ghabrao mat — aaram se batao apni problem. Toh aaj kya takleef hai?"
 
 CONSULTATION FLOW — before giving any advice, cover these one question at a time, in order (skip areas clearly irrelevant to the complaint):
 1. Chief complaint — what's wrong, since when, sudden or gradual, severity 1-10
@@ -209,8 +210,28 @@ function buildPatientContextString(
     return lines.filter(Boolean).join('\n');
 }
 
+/**
+ * Both the client's saveCall (right after the call ends in the browser)
+ * and Vapi's own server-side webhook independently try to trigger report
+ * generation for the same call — that's the expected normal case, not an
+ * edge case, since both fire on every real call. Without this lock,
+ * generateDoctorSuggestions ran twice concurrently for one call, wasting
+ * a paid Groq request and letting whichever finished last silently win
+ * with no guarantee the two generations agreed.
+ */
+async function acquireReportLock(callId: string): Promise<boolean> {
+    // "OK" (not the count) is redis's success sentinel for SET ... NX
+    const result = await redis.set(`ai-doctor-report-lock:${callId}`, '1', 'EX', 60, 'NX');
+    return result === 'OK';
+}
+
 // ── Groq: Generate Doctor Suggestions ────────────────────────────────────────
 async function generateDoctorSuggestions(callId: string, transcript: any[], patientName: string): Promise<void> {
+    if (!(await acquireReportLock(callId))) {
+        logger.info(`[Groq] Report generation already in progress/done for call ${callId}, skipping duplicate trigger`);
+        return;
+    }
+
     if (!process.env.GROQ_API_KEY) {
         logger.warn('GROQ_API_KEY not set — skipping doctor suggestions generation');
         return;
@@ -219,7 +240,7 @@ async function generateDoctorSuggestions(callId: string, transcript: any[], pati
     const transcriptText = Array.isArray(transcript)
         ? transcript
             .filter((m: any) => m.role !== 'system')
-            .map((m: any) => `${m.role === 'user' ? 'Patient' : 'Dr. Arjun Mehta'}: ${m.message || m.content || ''}`)
+            .map((m: any) => `${m.role === 'user' ? 'Patient' : 'Dr. Priya Sharma'}: ${m.message || m.content || ''}`)
             .join('\n')
         : String(transcript || '');
 
@@ -228,7 +249,7 @@ async function generateDoctorSuggestions(callId: string, transcript: any[], pati
         return;
     }
 
-    const prompt = `You are Dr. Arjun Mehta, senior Integrative & General Physician reviewing an OPD consultation transcript.
+    const prompt = `You are Dr. Priya Sharma, senior Integrative & General Physician reviewing an OPD consultation transcript.
 
 Patient Name: ${patientName}
 
@@ -304,7 +325,7 @@ export const aiDoctorService = {
             patientId: patient.id,
             patientName: `${patient.firstName} ${patient.lastName}`,
             assistantConfig: {
-                name: 'Dr. Arjun Mehta',
+                name: 'Priya (AI Health Assistant)',
                 model: {
                     // Groq/Llama 3.3 70B instead of OpenAI: ~280 tokens/sec on Groq's
                     // LPU hardware vs GPT-4o-mini's much slower generation — this is
@@ -330,7 +351,11 @@ export const aiDoctorService = {
                     language: 'hi', // Enables Hindi & Hinglish Speech-to-Text
                 },
                 firstMessageMode: 'assistant-speaks-first',
-                firstMessage: 'Namaste! Main Dr. Arjun Mehta hoon — General Physician. Aaj aap mujhse milne aaye, bahut achha kiya. Bilkul ghabrao mat — aaram se batao apni problem, main poori tarah sunuunga. Toh aaj kya takleef hai?',
+                // Must stay in sync with the OPENING line in buildSystemPrompt()
+                // above — both carry the same AI-assistant disclosure, since
+                // Vapi speaks this literal string first before the LLM turn loop
+                // even starts.
+                firstMessage: 'Namaste! Main Priya hoon, aapki AI health assistant — ek real doctor nahi, lekin main aapki baat dhyan se sunungi aur kuch natural suggestions doongi. Bilkul ghabrao mat — aaram se batao apni problem. Toh aaj kya takleef hai?',
                 endCallPhrases: ['goodbye', 'bye', 'alvida', 'shukriya doctor', 'thank you doctor', 'bas itna hi tha'],
                 // Turn-taking tuning — Vapi's defaults are English-tuned and were
                 // actively breaking this call in two ways:
@@ -382,9 +407,20 @@ export const aiDoctorService = {
         });
         if (!patient) throw new AppError('Patient not found', 404, 'NOT_FOUND');
 
-        const safeVapiCallId = typeof payload.vapiCallId === 'string' && payload.vapiCallId.trim()
+        // A fallback ID here means the frontend's Vapi SDK didn't expose a
+        // real call ID (see AiDoctorPage.tsx). Vapi's own webhook always
+        // reports the REAL vapiCallId, which won't match this fallback, so
+        // a call saved under one will never receive the webhook's
+        // transcript/summary enrichment — logged loudly rather than
+        // silently accepted, since it's a real (if rare) gap, not a
+        // solved edge case.
+        const hasRealVapiCallId = typeof payload.vapiCallId === 'string' && payload.vapiCallId.trim().length > 0;
+        const safeVapiCallId = hasRealVapiCallId
             ? payload.vapiCallId.trim()
             : `call-${Date.now()}-${Math.random().toString(36).substring(2, 7)}`;
+        if (!hasRealVapiCallId) {
+            logger.warn(`AI Doctor saveCall received no real Vapi call ID for patient ${patient.id} — using fallback ${safeVapiCallId}; this call will not be reconciled with Vapi's webhook`);
+        }
 
         const saved = await prisma.aiDoctorCall.upsert({
             where: { vapiCallId: safeVapiCallId },
@@ -416,78 +452,6 @@ export const aiDoctorService = {
         return { saved: true, callId: saved.id };
     },
 
-    /**
-     * Real-time patient context endpoint — called by Vapi tool call mid-conversation.
-     */
-    async getPatientContext(userId: string) {
-        const patient = await fetchPatientByUserId(userId);
-
-        const latestVitals = patient.vitalsReadings[0] ?? null;
-        const latestML = patient.mlPredictions[0] ?? null;
-        const latestPrescription = patient.prescriptions[0] ?? null;
-
-        const age = patient.dateOfBirth
-            ? Math.floor((Date.now() - new Date(patient.dateOfBirth).getTime()) / (365.25 * 24 * 3600 * 1000))
-            : null;
-
-        return {
-            patient: {
-                name: `${patient.firstName} ${patient.lastName}`,
-                age,
-                gender: patient.gender,
-                bloodGroup: patient.bloodGroup,
-                bmi: patient.bmi,
-                height: patient.height,
-                weight: patient.weight,
-            },
-            comorbidities: {
-                diabetes: patient.hasDiabetes,
-                hypertension: patient.hasHypertension,
-                heartDisease: patient.hasHeartDisease,
-                ckd: patient.hasCKD,
-                asthma: patient.hasAsthma,
-                copd: patient.hasCOPD,
-                obesity: patient.hasObesity,
-                cancer: patient.hasCancer,
-            },
-            lifestyle: {
-                smoking: patient.smokingStatus,
-                alcohol: patient.alcoholUse,
-                activity: patient.physicalActivity,
-            },
-            riskLevel: patient.currentRiskLevel,
-            allergies: patient.allergies,
-            medicalHistory: patient.medicalHistory,
-            currentMedications: patient.currentMedications,
-            latestVitals: latestVitals ? {
-                heartRate: latestVitals.heartRate,
-                systolicBP: latestVitals.systolicBP,
-                diastolicBP: latestVitals.diastolicBP,
-                oxygenSaturation: latestVitals.oxygenSaturation,
-                temperature: latestVitals.temperature,
-                isAnomaly: latestVitals.isAnomaly,
-                anomalyType: latestVitals.anomalyType,
-                recordedAt: latestVitals.recordedAt,
-            } : null,
-            latestMLPrediction: latestML ? {
-                riskLevel: latestML.predictedRiskLevel,
-                highRiskProbability: Math.round(latestML.riskProbabilityHigh * 100),
-                topRiskFactors: latestML.topRiskFactors,
-                recommendations: latestML.clusterName,
-            } : null,
-            activePrescriptions: latestPrescription?.items.map(item => ({
-                medicine: item.medicineName,
-                dosage: item.dosage,
-                frequency: item.frequency,
-                duration: item.duration,
-                instructions: item.instructions,
-            })) ?? [],
-            activeAlerts: patient.alerts.map(a => ({
-                severity: a.severity,
-                message: a.message,
-            })),
-        };
-    },
 
     /**
      * Handle Vapi webhook — save transcript and trigger Groq suggestions.
