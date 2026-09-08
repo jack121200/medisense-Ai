@@ -27,11 +27,45 @@ export default {
                 'vitals-bp': '#A855F7',
                 'vitals-temp': '#F97316',
                 'vitals-glucose': '#22C55E',
+                // Generic status names — the design tokens above (risk-*,
+                // alert-*) are domain-specific to clinical severity, but a
+                // shared component (Button, Badge, Toast) needs a
+                // vocabulary that isn't cardiology-specific. These are
+                // aliases onto the same palette, not new colors, so a
+                // status color and a risk color painted at the same
+                // semantic level always match.
+                success: '#06D6A0',
+                warning: '#FFD166',
+                danger: '#FF2D55',
+                info: '#00B4D8',
             },
             fontFamily: {
                 display: ['"DM Sans"', 'sans-serif'],
                 body: ['Inter', 'sans-serif'],
                 mono: ['"JetBrains Mono"', 'monospace'],
+            },
+            // Named type scale — every component below (and every page as
+            // it migrates off inline styles) should reach for one of these
+            // instead of a one-off px value, so text sizing stays
+            // consistent across ~20 pages instead of drifting per-file.
+            fontSize: {
+                display: ['2.25rem', { lineHeight: '1.15', fontWeight: '800' }],
+                h1: ['1.75rem', { lineHeight: '1.2', fontWeight: '800' }],
+                h2: ['1.375rem', { lineHeight: '1.25', fontWeight: '700' }],
+                h3: ['1.125rem', { lineHeight: '1.3', fontWeight: '700' }],
+                h4: ['0.9375rem', { lineHeight: '1.35', fontWeight: '700' }],
+                'body-lg': ['1rem', { lineHeight: '1.6' }],
+                body: ['0.875rem', { lineHeight: '1.6' }],
+                'body-sm': ['0.8125rem', { lineHeight: '1.55' }],
+                caption: ['0.6875rem', { lineHeight: '1.4', letterSpacing: '0.06em' }],
+            },
+            // Semantic spacing — named intents on top of Tailwind's numeric
+            // scale, so a page reaches for "the gap between cards" rather
+            // than re-deciding a px value every time.
+            spacing: {
+                'section-gap': '1.75rem',
+                'card-padding': '1.5rem',
+                'form-gap': '0.875rem',
             },
             borderRadius: {
                 sm: '6px',

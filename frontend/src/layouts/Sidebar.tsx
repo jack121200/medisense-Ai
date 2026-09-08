@@ -135,7 +135,7 @@ export default function Sidebar() {
             )}
 
             {/* Nav items */}
-            <nav style={{ flex: 1, overflowY: 'auto', padding: '12px 0' }}>
+            <nav aria-label="Main navigation" style={{ flex: 1, overflowY: 'auto', padding: '12px 0' }}>
                 {navItems.map(item => {
                     const Icon = item.icon;
                     return (
@@ -171,15 +171,20 @@ export default function Sidebar() {
                         <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.35)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{user.email}</div>
                     </div>
                 )}
-                <button onClick={handleLogout} style={{ width: '100%', display: 'flex', alignItems: 'center', gap: 10, padding: collapsed ? '10px 0' : '10px 12px', justifyContent: collapsed ? 'center' : 'flex-start', background: 'rgba(255,45,85,0.08)', border: '1px solid rgba(255,45,85,0.15)', borderRadius: 10, color: '#FF2D55', cursor: 'pointer', fontSize: 13, fontWeight: 700, transition: 'background 0.15s' }}>
-                    <LogOut size={16} />
+                <button onClick={handleLogout} aria-label="Sign out" style={{ width: '100%', display: 'flex', alignItems: 'center', gap: 10, padding: collapsed ? '10px 0' : '10px 12px', justifyContent: collapsed ? 'center' : 'flex-start', background: 'rgba(255,45,85,0.08)', border: '1px solid rgba(255,45,85,0.15)', borderRadius: 10, color: '#FF2D55', cursor: 'pointer', fontSize: 13, fontWeight: 700, transition: 'background 0.15s' }}>
+                    <LogOut size={16} aria-hidden="true" />
                     {!collapsed && 'Sign Out'}
                 </button>
             </div>
 
             {/* Collapse toggle */}
-            <button onClick={() => setCollapsed(!collapsed)} style={{ position: 'absolute', top: 28, right: -12, width: 24, height: 24, borderRadius: '50%', background: 'var(--bg-secondary)', border: '1px solid rgba(255,255,255,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', color: 'rgba(255,255,255,0.4)', zIndex: 10 }}>
-                {collapsed ? <ChevronRight size={13} /> : <ChevronLeft size={13} />}
+            <button
+                onClick={() => setCollapsed(!collapsed)}
+                aria-label={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+                aria-expanded={!collapsed}
+                style={{ position: 'absolute', top: 28, right: -12, width: 24, height: 24, borderRadius: '50%', background: 'var(--bg-secondary)', border: '1px solid rgba(255,255,255,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', color: 'rgba(255,255,255,0.4)', zIndex: 10 }}
+            >
+                {collapsed ? <ChevronRight size={13} aria-hidden="true" /> : <ChevronLeft size={13} aria-hidden="true" />}
             </button>
         </aside>
     );

@@ -210,7 +210,7 @@ function PreCallModal({
         try {
             const result = await aiDoctorApi.extractPdfText(file);
             setReportText(result.text);
-            toast.success(`Extracted ${result.char_count} characters from ${file.name}`);
+            toast.success(`Extracted ${result.text.length} characters from ${file.name}`);
         } catch {
             toast.error('PDF extraction failed — report text will not be included');
         } finally {

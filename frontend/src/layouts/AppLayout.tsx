@@ -27,10 +27,25 @@ export default function AppLayout() {
 
     return (
         <div style={{ display: 'flex', minHeight: '100vh', background: 'var(--bg-primary)' }}>
+            {/* Skip-to-content link — invisible until focused, lets keyboard
+                users bypass the sidebar nav instead of tabbing through
+                every link on every single page load. */}
+            <a
+                href="#main-content"
+                style={{
+                    position: 'absolute', left: -9999, top: 0, zIndex: 2000,
+                    padding: '10px 16px', background: 'var(--accent-primary)', color: '#fff',
+                    borderRadius: 8, fontSize: 13, fontWeight: 700, textDecoration: 'none',
+                }}
+                onFocus={e => { e.currentTarget.style.left = '12px'; e.currentTarget.style.top = '12px'; }}
+                onBlur={e => { e.currentTarget.style.left = '-9999px'; }}
+            >
+                Skip to main content
+            </a>
             <Sidebar />
             <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
                 <Topbar onOpenNotifications={() => setDrawerOpen(true)} />
-                <main style={{ flex: 1, overflowY: 'auto', padding: '24px 28px' }} className="page-enter">
+                <main id="main-content" tabIndex={-1} style={{ flex: 1, overflowY: 'auto', padding: '24px 28px' }} className="page-enter">
                     <Outlet />
                 </main>
             </div>

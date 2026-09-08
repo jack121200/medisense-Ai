@@ -5,7 +5,7 @@ import {
     MessageSquare, Search, Filter, User, Stethoscope, Phone,
     Bell, CheckCircle2
 } from 'lucide-react';
-import { appointmentApi } from '../api/appointment.api';
+import { appointmentApi, doctorsPublicApi } from '../api/appointment.api';
 import { patientApi } from '../api/patient.api';
 import { useAuthStore } from '../store/authStore';
 import toast from 'react-hot-toast';
@@ -32,6 +32,18 @@ const TIME_SLOT_LABELS: Record<string, string> = {
 };
 
 const TIMES = ['09:00', '09:30', '10:00', '10:30', '11:00', '11:30', '12:00', '13:00', '13:30', '14:00', '14:30', '15:00', '15:30', '16:00', '16:30', '17:00', '18:00', '19:00', '20:00'];
+
+// The backend's AppointmentRequest.timeSlot is one of 4 broad buckets, not
+// a specific clock time — this maps the picker's specific time onto the
+// bucket it falls in (MORNING/NOON/NIGHT/LATE_NIGHT), so the actual
+// requested time is still recorded in `reason`/notes for the doctor to see.
+function timeToSlot(time: string): 'MORNING' | 'NOON' | 'NIGHT' | 'LATE_NIGHT' {
+    const hour = parseInt(time.split(':')[0], 10);
+    if (hour < 12) return 'MORNING';
+    if (hour < 18) return 'NOON';
+    if (hour < 21) return 'NIGHT';
+    return 'LATE_NIGHT';
+}
 const DEPARTMENTS = ['Cardiology', 'Neurology', 'Orthopedics', 'Pediatrics', 'General Medicine', 'Emergency', 'Radiology', 'Oncology', 'Pulmonology', 'Nephrology'];
 const REASONS = ['Routine Check-up', 'Follow-up', 'Consultation', 'Lab Results Review', 'Emergency', 'Surgery Pre-Op', 'Post-Surgery Follow-up', 'Physiotherapy', 'Vaccination', 'Other'];
 
@@ -286,12 +298,16 @@ function BookTab() {
     });
 
     useEffect(() => {
+        // doctorsPublicApi.list() is the correct, authenticated-instance call
+        // for this — the previous bare fetch('/api/v1/users') sent no auth
+        // header at all and would 401 in any environment that actually
+        // enforces auth on that route.
         Promise.all([
             patientApi.list({ limit: 100 }),
-            fetch('/api/v1/users').then(r => r.json()),
-        ]).then(([pRes, uData]) => {
+            doctorsPublicApi.list(),
+        ]).then(([pRes, dRes]) => {
             setPatients(pRes.data.data || []);
-            setDoctors((uData.data || []).filter((u: any) => u.role === 'DOCTOR'));
+            setDoctors(dRes.data.data || []);
         }).finally(() => setLoading(false));
     }, []);
 
@@ -304,13 +320,23 @@ function BookTab() {
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        if (!form.patientId || !form.doctorName) return toast.error('Select patient and doctor');
+        if (!form.patientId || !form.doctorId) return toast.error('Select patient and doctor');
         setSaving(true);
         try {
-            const entry = { ...form, id: `BK-${Date.now()}`, status: 'BOOKED', createdAt: new Date().toISOString() };
-            setBooked(prev => [entry, ...prev]);
+            const reasonWithTime = `${form.reason} — requested ${form.time}${form.notes ? ` (${form.notes})` : ''}`;
+            const res = await appointmentApi.bookForPatient({
+                patientId: form.patientId,
+                doctorId: form.doctorId,
+                requestedDate: form.date,
+                timeSlot: timeToSlot(form.time),
+                reason: reasonWithTime,
+            });
+            const saved = res.data?.data;
+            setBooked(prev => [{ ...form, id: saved?.id, status: 'BOOKED', createdAt: new Date().toISOString() }, ...prev]);
             setForm(f => ({ ...f, patientId: '', patientName: '', patientPhone: '', notes: '' }));
-            toast.success('✅ Appointment booked! SMS sent to patient.');
+            toast.success('Appointment booked and confirmed.');
+        } catch (err: any) {
+            toast.error(err?.response?.data?.message || 'Failed to book appointment');
         } finally { setSaving(false); }
     };
 
@@ -337,7 +363,7 @@ function BookTab() {
                                 <option value="">— Select Patient —</option>
                                 {patients.map((p: any) => <option key={p.id} value={p.id}>{p.firstName} {p.lastName} ({p.patientCode})</option>)}
                             </select>
-                            {form.patientPhone && <div style={{ fontSize: 11.5, color: 'var(--accent-green)', marginTop: 5 }}>📱 SMS → {form.patientPhone}</div>}
+                            {form.patientPhone && <div style={{ fontSize: 11.5, color: 'var(--text-muted)', marginTop: 5 }}>📞 {form.patientPhone}</div>}
                         </div>
                         {/* Doctor */}
                         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
@@ -392,10 +418,10 @@ function BookTab() {
 
                         <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '9px 12px', background: 'rgba(0,255,135,0.04)', border: '1px solid rgba(0,255,135,0.12)', borderRadius: 9, fontSize: 12, color: 'var(--text-secondary)' }}>
                             <MessageSquare size={13} color="var(--accent-green)" />
-                            Patient will receive SMS confirmation automatically.
+                            Patient will get an in-app notification if they have a portal account.
                         </div>
                         <button type="submit" disabled={saving} className="btn-primary" style={{ justifyContent: 'center' }}>
-                            {saving ? 'Booking...' : <><Calendar size={14} /> Confirm & Send SMS</>}
+                            {saving ? 'Booking...' : <><Calendar size={14} /> Confirm Booking</>}
                         </button>
                     </div>
                 </form>

@@ -11,17 +11,6 @@ export const analyticsApi = {
     getBigData: () => api.get('/analytics/big-data/report'),
 };
 
-export const mlApi = {
-    predictAll: (patientId: string) => api.post('/ml/predict/all', { patientId }),
-    getPredictions: (patientId: string) => api.get(`/ml/predictions/${patientId}`),
-    getClusterResults: () => api.get('/ml/cluster/results'),
-    getPatientCluster: (patientId: string) => api.get(`/ml/cluster/${patientId}`),
-    generateRecommendations: (patientId: string) => api.post(`/ml/recommend/${patientId}`),
-    getModelPerformance: () => api.get('/ml/models/performance'),
-    getSHAP: (predictionId: string) => api.get(`/ml/shap/${predictionId}`),
-    triggerRetrain: () => api.post('/ml/models/retrain'),
-};
-
 export const alertApi = {
     list: (params?: Record<string, unknown>) => api.get('/alerts', { params }),
     getUnreadCount: () => api.get('/alerts/unread/count'),

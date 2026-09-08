@@ -65,6 +65,75 @@ export const appointmentRequestService = {
         return request;
     },
 
+    /**
+     * Receptionist/admin books directly on behalf of a patient (walk-in or
+     * phone booking) — skips the PENDING->APPROVED patient-request dance
+     * since staff is creating it directly, and takes patientId rather than
+     * a User.id, since many Patient records (walk-ins, staff-entered
+     * patients) have no linked User/login at all.
+     *
+     * This replaces the frontend's previous BookTab, which didn't call any
+     * backend at all — it pushed a fabricated object into local component
+     * state and showed a "SMS sent" toast that was never true, and the
+     * "booking" vanished on refresh.
+     */
+    async createByStaff(data: {
+        patientId: string;
+        doctorId: string;
+        requestedDate: string;
+        timeSlot: string;
+        reason?: string;
+    }) {
+        const patient = await prisma.patient.findUnique({
+            where: { id: data.patientId },
+            select: { id: true, firstName: true, lastName: true, patientCode: true, userId: true },
+        });
+        if (!patient) throw new AppError('Patient not found', 404, 'NOT_FOUND');
+
+        const doctor = await prisma.user.findUnique({
+            where: { id: data.doctorId, role: 'DOCTOR' },
+            select: { id: true, firstName: true, lastName: true, specialization: true },
+        });
+        if (!doctor) throw new AppError('Doctor not found', 404, 'NOT_FOUND');
+
+        const request = await prisma.appointmentRequest.create({
+            data: {
+                patientId: patient.id,
+                doctorId: data.doctorId,
+                requestedDate: new Date(data.requestedDate),
+                timeSlot: data.timeSlot as any,
+                reason: data.reason,
+                status: 'APPROVED',
+                approvedAt: new Date(),
+            },
+            include: {
+                patient: { select: { id: true, firstName: true, lastName: true, patientCode: true } },
+            },
+        });
+
+        // Walk-in / staff-entered patients often have no linked User login
+        // at all — only notify in-app if there's actually an account to
+        // notify.
+        if (patient.userId) {
+            emitAppointmentApproved(patient.userId, data.doctorId, {
+                id: request.id,
+                doctorName: `Dr. ${doctor.firstName} ${doctor.lastName}`,
+                requestedDate: data.requestedDate,
+                timeSlot: data.timeSlot,
+                slotLabel: SLOT_LABELS[data.timeSlot] || data.timeSlot,
+            });
+            await notificationService.create(
+                patient.userId,
+                '📅 Appointment Booked',
+                `Your appointment with Dr. ${doctor.firstName} ${doctor.lastName} on ${data.requestedDate} (${SLOT_LABELS[data.timeSlot] || data.timeSlot}) has been confirmed.`,
+                'SUCCESS',
+                { appointmentRequestId: request.id },
+            );
+        }
+
+        return request;
+    },
+
     /** List all appointment requests (for receptionist) */
     async listAll(status?: string) {
         return prisma.appointmentRequest.findMany({

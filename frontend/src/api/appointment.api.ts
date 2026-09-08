@@ -23,6 +23,16 @@ export const appointmentApi = {
     // Patient: respond to counter-offer
     respond: (id: string, accept: boolean) =>
         api.patch(`/appointment-requests/${id}/respond`, { accept }),
+
+    // Receptionist/admin: book directly on behalf of a patient (walk-in/phone),
+    // confirmed immediately - no separate patient-approval step.
+    bookForPatient: (data: {
+        patientId: string;
+        doctorId: string;
+        requestedDate: string;
+        timeSlot: 'MORNING' | 'NOON' | 'NIGHT' | 'LATE_NIGHT';
+        reason?: string;
+    }) => api.post('/appointment-requests/staff-book', data),
 };
 
 export const doctorsPublicApi = {

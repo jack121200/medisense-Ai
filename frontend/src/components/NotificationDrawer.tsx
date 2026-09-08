@@ -117,8 +117,8 @@ export default function NotificationDrawer({ open, onClose }: NotificationDrawer
                                 </div>
                             </div>
                         </div>
-                        <button onClick={onClose} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-muted)', padding: 4 }}>
-                            <X size={20} />
+                        <button onClick={onClose} aria-label="Close notifications" style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-muted)', padding: 4 }}>
+                            <X size={20} aria-hidden="true" />
                         </button>
                     </div>
                 </div>

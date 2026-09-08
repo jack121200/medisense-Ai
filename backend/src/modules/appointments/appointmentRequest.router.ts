@@ -21,6 +21,22 @@ router.post('/', authenticate, requireRole('PATIENT'), async (req: Request, res:
 });
 
 
+// POST /api/v1/appointment-requests/staff-book — receptionist/admin books
+// directly on behalf of a patient (walk-in/phone booking), immediately
+// confirmed — no separate patient-approval step, since staff initiated it.
+router.post('/staff-book', authenticate, requireRole('RECEPTIONIST', 'ADMIN'), async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const result = await appointmentRequestService.createByStaff({
+            patientId: req.body.patientId,
+            doctorId: req.body.doctorId,
+            requestedDate: req.body.requestedDate,
+            timeSlot: req.body.timeSlot,
+            reason: req.body.reason,
+        });
+        sendSuccess(res, result, 'Appointment booked', 201);
+    } catch (e) { next(e); }
+});
+
 // GET /api/v1/appointment-requests — receptionist sees all, patient sees their own
 router.get('/', authenticate, async (req: Request, res: Response, next: NextFunction) => {
     try {

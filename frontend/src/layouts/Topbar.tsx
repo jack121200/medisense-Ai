@@ -30,7 +30,9 @@ export default function Topbar({ onOpenNotifications }: TopbarProps) {
             backdropFilter: 'blur(20px)',
         }}>
             {/* Search */}
-            <div style={{
+            <div
+                role="search"
+                style={{
                 flex: 1, display: 'flex', alignItems: 'center', gap: 10,
                 background: 'rgba(255,255,255,0.04)',
                 border: '1px solid rgba(255,255,255,0.07)',
@@ -48,18 +50,19 @@ export default function Topbar({ onOpenNotifications }: TopbarProps) {
                     (e.currentTarget as HTMLDivElement).style.boxShadow = 'none';
                 }}
             >
-                <Search size={14} color="var(--text-muted)" style={{ flexShrink: 0 }} />
+                <Search size={14} color="var(--text-muted)" style={{ flexShrink: 0 }} aria-hidden="true" />
                 <input
                     value={search}
                     onChange={e => setSearch(e.target.value)}
                     placeholder="Search patients, MRN, diagnosis..."
+                    aria-label="Search patients, MRN, diagnosis"
                     style={{
                         background: 'none', border: 'none', outline: 'none',
                         color: 'var(--text-primary)', fontSize: 13, width: '100%',
                     }}
                 />
                 {search && (
-                    <button onClick={() => setSearch('')} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-muted)', display: 'flex' }}>
+                    <button onClick={() => setSearch('')} aria-label="Clear search" style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-muted)', display: 'flex' }}>
                         <X size={13} />
                     </button>
                 )}
@@ -103,6 +106,7 @@ export default function Topbar({ onOpenNotifications }: TopbarProps) {
                 {/* Notification bell — opens drawer */}
                 <button
                     onClick={onOpenNotifications}
+                    aria-label={unreadCount > 0 ? `Notifications, ${unreadCount} unread` : 'Notifications'}
                     style={{
                         position: 'relative', padding: '7px 8px', display: 'flex',
                         background: unreadCount > 0 ? 'rgba(255,45,85,0.08)' : 'rgba(255,255,255,0.04)',
@@ -110,9 +114,9 @@ export default function Topbar({ onOpenNotifications }: TopbarProps) {
                         borderRadius: 10, transition: 'all 0.15s ease', cursor: 'pointer',
                     }}
                 >
-                    <Bell size={17} color={unreadCount > 0 ? 'var(--risk-critical)' : 'var(--text-secondary)'} strokeWidth={1.75} style={{ animation: unreadCount > 0 ? 'pulse 2s infinite' : 'none' }} />
+                    <Bell size={17} color={unreadCount > 0 ? 'var(--risk-critical)' : 'var(--text-secondary)'} strokeWidth={1.75} aria-hidden="true" style={{ animation: unreadCount > 0 ? 'pulse 2s infinite' : 'none' }} />
                     {unreadCount > 0 && (
-                        <span style={{
+                        <span aria-hidden="true" style={{
                             position: 'absolute', top: 2, right: 2,
                             background: 'var(--risk-critical)',
                             color: 'white', borderRadius: 9999, fontSize: 8.5, fontWeight: 800,

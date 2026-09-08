@@ -1,8 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate, useSearchParams, Link } from 'react-router-dom';
-import axios from 'axios';
-
-const API = '/api/v1';
+import api from '../api/axiosInstance';
 const BLOOD_GROUPS = ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'];
 const GENDERS = ['Male', 'Female', 'Other'];
 const SMOKING = ['Never', 'Former', 'Current'];
@@ -109,7 +107,7 @@ export default function RegisterPage() {
         setError('');
         try {
             if (isPatient) {
-                await axios.post(`${API}/auth/patient-register`, {
+                await api.post('/auth/patient-register', {
                     firstName: form.firstName, lastName: form.lastName,
                     email: form.email, password: form.password,
                     dateOfBirth: form.dateOfBirth, gender: form.gender.toUpperCase(),
@@ -125,7 +123,7 @@ export default function RegisterPage() {
                     emergencyContactRel: form.emergencyContactRel || undefined,
                 });
             } else {
-                await axios.post(`${API}/auth/register`, {
+                await api.post('/auth/register', {
                     firstName: form.firstName, lastName: form.lastName,
                     email: form.email, password: form.password,
                     role: selectedRole,

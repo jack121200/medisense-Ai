@@ -3,9 +3,8 @@
  * Polls patient data every 10 seconds and returns refreshed state.
  */
 import { useState, useEffect, useRef } from 'react';
-import axios from 'axios';
+import api from '../api/axiosInstance';
 
-const API = '/api/v1';
 const POLL_MS = 10_000;
 
 interface SyncState {
@@ -35,21 +34,15 @@ export function usePatientSync(patientId?: string) {
 
     const fetch = async () => {
         try {
-            const headers = (() => {
-                try {
-                    // Zustand persist name is 'medisense-auth', token field is 'accessToken'
-                    const raw = localStorage.getItem('medisense-auth');
-                    const parsed = raw ? JSON.parse(raw) : null;
-                    const token = parsed?.state?.accessToken;
-                    return token ? { Authorization: `Bearer ${token}` } : {};
-                } catch { return {}; }
-            })();
-
+            // Uses the shared axios instance — it already attaches the auth
+            // token via its request interceptor and handles 401/refresh, so
+            // there's no need to read/parse the auth store's localStorage
+            // entry manually here.
             const [prescRes, billRes, apptRes, profileRes] = await Promise.allSettled([
-                axios.get(`${API}/patient/my-prescriptions`, { headers }),
-                axios.get(`${API}/patient/my-bills`, { headers }),
-                axios.get(`${API}/patient/my-appointments`, { headers }),
-                axios.get(`${API}/patient/my-profile`, { headers }),
+                api.get('/patient/my-prescriptions'),
+                api.get('/patient/my-bills'),
+                api.get('/patient/my-appointments'),
+                api.get('/patient/my-profile'),
             ]);
 
             setState(prev => ({
