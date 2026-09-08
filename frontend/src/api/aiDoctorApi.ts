@@ -74,6 +74,10 @@ export const aiDoctorApi = {
     getCallById: (id: string) =>
         api.get<{ success: boolean; data: AiDoctorCallDetail }>(`/ai-doctor/calls/${id}`),
 
+    /** Remaining quota against the global daily cost cap (globalCostCap.middleware.ts) */
+    getUsageToday: () =>
+        api.get<{ success: boolean; data: { count: number; cap: number } }>('/ai-doctor/usage-today'),
+
     /**
      * Extract raw text from a PDF for the pre-call form upload.
      * Goes through the backend proxy (POST /ml/pdf-extract/text) — ml-service

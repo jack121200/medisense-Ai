@@ -4,6 +4,7 @@ import { aiDoctorService } from './ai-doctor.service';
 import { asyncHandler } from '../../utils/asyncHandler';
 import { sendSuccess } from '../../utils/apiResponse';
 import { logger } from '../../config/logger';
+import { getTodayAiDoctorCallCount } from '../../middleware/globalCostCap.middleware';
 
 export const aiDoctorController = {
 
@@ -63,5 +64,16 @@ export const aiDoctorController = {
         const userId = req.user!.id;
         const call = await aiDoctorService.getCallById(req.params.id, userId);
         sendSuccess(res, call, 'Call details retrieved');
+    }),
+
+    /**
+     * GET /api/v1/ai-doctor/usage-today
+     * Lets the frontend show remaining daily quota against the global
+     * cost cap (globalCostCap.middleware.ts) before the patient even
+     * opens the pre-call form.
+     */
+    getUsageToday: asyncHandler(async (_req: AuthRequest, res: Response) => {
+        const usage = await getTodayAiDoctorCallCount();
+        sendSuccess(res, usage);
     }),
 };

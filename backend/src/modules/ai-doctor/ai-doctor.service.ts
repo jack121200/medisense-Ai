@@ -4,6 +4,12 @@ import { env } from '../../config/env';
 import { redis } from '../../config/redis';
 import { AppError } from '../../utils/apiResponse';
 import { logger } from '../../config/logger';
+import {
+    renderContraindicationsForPrompt,
+    scanRecommendationsForContraindications,
+} from './herbInteractions';
+import { detectEmergencyKeywords } from './emergencyDetection';
+import { emitNewAlert } from '../../config/socket';
 
 // ── Vapi REST client ─────────────────────────────────────────────────────────
 const vapiClient = axios.create({
@@ -186,6 +192,20 @@ function buildPatientContextString(
         });
     }
 
+    // ── Herb safety guard (see herbInteractions.ts) ───────────────────────────
+    // Also cross-references the patient's active prescription drug names,
+    // not just the free-text currentMedications field, since a patient may
+    // not think to repeat what's already in their own prescription.
+    const prescriptionDrugNames = latestPrescription?.items.map(i => i.medicineName).join(', ') || '';
+    const contraindicationBlock = renderContraindicationsForPrompt({
+        currentMedications: [patient.currentMedications, prescriptionDrugNames].filter(Boolean).join(', '),
+        hasHypertension: patient.hasHypertension,
+        hasDiabetes: patient.hasDiabetes,
+        hasHeartDisease: patient.hasHeartDisease,
+        hasCancer: patient.hasCancer,
+    });
+    if (contraindicationBlock) lines.push(contraindicationBlock);
+
     // ── Pre-call form data injected here ──────────────────────────────────────
     if (preCallData?.reason) {
         lines.push(
@@ -226,7 +246,7 @@ async function acquireReportLock(callId: string): Promise<boolean> {
 }
 
 // ── Groq: Generate Doctor Suggestions ────────────────────────────────────────
-async function generateDoctorSuggestions(callId: string, transcript: any[], patientName: string): Promise<void> {
+async function generateDoctorSuggestions(callId: string, transcript: any[], patientName: string, patientId: string): Promise<void> {
     if (!(await acquireReportLock(callId))) {
         logger.info(`[Groq] Report generation already in progress/done for call ${callId}, skipping duplicate trigger`);
         return;
@@ -288,6 +308,77 @@ Return ONLY valid JSON. No markdown backticks, no extra text outside the JSON.`;
         // Extract JSON even if model wraps it in backticks
         const jsonMatch = rawContent.match(/\{[\s\S]*\}/);
         const parsed = jsonMatch ? JSON.parse(jsonMatch[0]) : {};
+
+        // Deterministic post-call backstop (see herbInteractions.ts) — the
+        // system prompt already tells the model what to avoid, but this
+        // catches it anyway if the live conversation suggested a
+        // contraindicated herb regardless.
+        if (Array.isArray(parsed.recommended_actions)) {
+            const patientForCheck = await prisma.patient.findUnique({
+                where: { id: patientId },
+                select: { currentMedications: true, hasHypertension: true, hasDiabetes: true, hasHeartDisease: true, hasCancer: true },
+            });
+            const hits = patientForCheck
+                ? scanRecommendationsForContraindications(parsed.recommended_actions, patientForCheck)
+                : [];
+            if (hits.length > 0) {
+                parsed.red_flags = Array.isArray(parsed.red_flags) ? parsed.red_flags : [];
+                for (const hit of hits) {
+                    parsed.red_flags.push(
+                        `⚠️ FLAGGED FOR CLINICIAN REVIEW: the AI suggested ${hit.herb}, which may interact with this patient's medications/conditions — ${hit.reason}`
+                    );
+                }
+                // A flagged interaction is never "routine" — force at least SOON.
+                if (parsed.urgency === 'ROUTINE' || !parsed.urgency) parsed.urgency = 'SOON';
+                logger.warn(`[AI Doctor] Herb interaction flagged for call ${callId}: ${hits.map(h => h.herb).join(', ')}`);
+            }
+        }
+
+        // Deterministic emergency-keyword backstop (see emergencyDetection.ts)
+        // — independent of whether the model itself caught a red flag mid-call.
+        const emergency = detectEmergencyKeywords(transcriptText);
+        if (emergency.matched) {
+            parsed.red_flags = Array.isArray(parsed.red_flags) ? parsed.red_flags : [];
+            for (const label of emergency.labels) {
+                parsed.red_flags.push(`🚨 AUTO-DETECTED: ${label} — mentioned in this call's transcript.`);
+            }
+            parsed.urgency = 'URGENT';
+            logger.warn(`[AI Doctor] Emergency keywords detected for call ${callId}: ${emergency.labels.join(', ')}`);
+        }
+
+        // Real escalation, not just a message in the report: URGENT calls
+        // create an actual clinical Alert, visible on the receptionist/doctor
+        // alert dashboards in real time — previously a detected red flag
+        // just sat inside the JSON report with nothing downstream reacting.
+        if (parsed.urgency === 'URGENT') {
+            try {
+                const alert = await prisma.alert.create({
+                    data: {
+                        patientId,
+                        type: 'RISK_ESCALATION',
+                        severity: emergency.matched ? 'EMERGENCY' : 'CRITICAL',
+                        message: emergency.matched
+                            ? `AI Doctor call flagged a possible emergency: ${emergency.labels.join('; ')}`
+                            : `AI Doctor call flagged URGENT — clinician review needed`,
+                        details: { aiDoctorCallId: callId, redFlags: parsed.red_flags, summary: parsed.summary },
+                    },
+                });
+                emitNewAlert({
+                    alertId: alert.id,
+                    patientId,
+                    patientName,
+                    type: alert.type,
+                    severity: alert.severity,
+                    message: alert.message,
+                    source: 'ai-doctor',
+                });
+                logger.warn(`[AI Doctor] Escalation alert ${alert.id} created for call ${callId}`);
+            } catch (alertErr: any) {
+                // Never let an escalation-alert failure stop the report from
+                // saving — a missing alert is bad, a lost transcript is worse.
+                logger.error(`[AI Doctor] Failed to create escalation alert for call ${callId}: ${alertErr?.message}`);
+            }
+        }
 
         await prisma.aiDoctorCall.update({
             where: { id: callId },
@@ -446,7 +537,7 @@ export const aiDoctorService = {
 
         // Trigger Groq doctor suggestions — non-blocking
         const patientName = `${patient.firstName} ${patient.lastName}`;
-        generateDoctorSuggestions(saved.id, payload.transcript ?? [], patientName)
+        generateDoctorSuggestions(saved.id, payload.transcript ?? [], patientName, patient.id)
             .catch(err => logger.error(`[Groq] Doctor suggestions failed: ${err?.message}`));
 
         return { saved: true, callId: saved.id };
@@ -483,7 +574,7 @@ export const aiDoctorService = {
 
             // Non-blocking doctor suggestions
             const patientName = `${updated.patient.firstName} ${updated.patient.lastName}`;
-            generateDoctorSuggestions(updated.id, transcript ?? [], patientName)
+            generateDoctorSuggestions(updated.id, transcript ?? [], patientName, updated.patientId)
                 .catch(err => logger.error(`[Groq] Webhook suggestions failed: ${err?.message}`));
         } catch {
             logger.warn(`Call record not found for vapiCallId: ${vapiCallId}, skipping update`);

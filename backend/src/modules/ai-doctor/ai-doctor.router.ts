@@ -4,6 +4,7 @@ import { authenticate } from '../../middleware/auth.middleware';
 import { requireRole } from '../../middleware/rbac.middleware';
 import { verifyVapiWebhook } from '../../middleware/vapiWebhook.middleware';
 import { aiDoctorCallLimiter } from '../../middleware/rateLimiter.middleware';
+import { globalAiDoctorCostCap } from '../../middleware/globalCostCap.middleware';
 
 const router = Router();
 
@@ -11,12 +12,17 @@ const router = Router();
  * POST /api/v1/ai-doctor/start-call
  * Patient starts a new AI Doctor voice call.
  * Returns vapiCallId + publicKey to the frontend SDK.
+ *
+ * Two layers of cost protection: aiDoctorCallLimiter caps one user's calls
+ * per hour, globalAiDoctorCostCap caps total calls across every user per
+ * day — each call is real billable usage across Vapi/Groq/Deepgram/TTS.
  */
 router.post(
     '/start-call',
     authenticate,
     requireRole('PATIENT'),
     aiDoctorCallLimiter,
+    globalAiDoctorCostCap,
     aiDoctorController.startCall
 );
 
@@ -60,6 +66,18 @@ router.get(
     authenticate,
     requireRole('PATIENT'),
     aiDoctorController.getCallById
+);
+
+/**
+ * GET /api/v1/ai-doctor/usage-today
+ * Remaining daily quota against the global cost cap — lets the frontend
+ * show "N calls left today" before the patient starts filling the form.
+ */
+router.get(
+    '/usage-today',
+    authenticate,
+    requireRole('PATIENT'),
+    aiDoctorController.getUsageToday
 );
 
 export default router;

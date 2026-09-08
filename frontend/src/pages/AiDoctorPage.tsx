@@ -542,6 +542,15 @@ export default function AiDoctorPage() {
     const [historyPage, setHistoryPage] = useState(1);
     const [totalPages, setTotalPages] = useState(1);
 
+    // ── Daily quota (global cost cap) ──────────────────────────────────────
+    const [usage, setUsage] = useState<{ count: number; cap: number } | null>(null);
+
+    useEffect(() => {
+        aiDoctorApi.getUsageToday()
+            .then(res => setUsage(res.data.data))
+            .catch(() => { /* non-critical — hide quota UI on failure */ });
+    }, [callStatus]);
+
     // ── Load localStorage report on mount ─────────────────────────────────
     useEffect(() => {
         try {
@@ -907,16 +916,29 @@ export default function AiDoctorPage() {
                                         </div>
                                     </div>
                                 )}
-                                <button onClick={openPreCallForm} style={{
-                                    display: 'flex', alignItems: 'center', gap: 10, padding: '13px 30px',
-                                    borderRadius: 12, border: 'none', cursor: 'pointer',
-                                    background: 'linear-gradient(135deg, #059669, #10b981)',
-                                    color: '#fff', fontWeight: 800, fontSize: 15,
-                                    boxShadow: '0 8px 24px rgba(5,150,105,0.35)',
-                                    transition: 'all 0.2s',
-                                }}>
-                                    <Phone size={20} /> Start Consultation
-                                </button>
+                                {usage && usage.count >= usage.cap ? (
+                                    <div style={{ padding: '12px 16px', background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.25)', borderRadius: 12, marginBottom: 10 }}>
+                                        <span style={{ fontSize: 12.5, fontWeight: 700, color: '#f87171' }}>
+                                            Daily consultation limit reached ({usage.cap}/{usage.cap}). Please try again tomorrow.
+                                        </span>
+                                    </div>
+                                ) : (
+                                    <button onClick={openPreCallForm} style={{
+                                        display: 'flex', alignItems: 'center', gap: 10, padding: '13px 30px',
+                                        borderRadius: 12, border: 'none', cursor: 'pointer',
+                                        background: 'linear-gradient(135deg, #059669, #10b981)',
+                                        color: '#fff', fontWeight: 800, fontSize: 15,
+                                        boxShadow: '0 8px 24px rgba(5,150,105,0.35)',
+                                        transition: 'all 0.2s',
+                                    }}>
+                                        <Phone size={20} /> Start Consultation
+                                    </button>
+                                )}
+                                {usage && usage.count < usage.cap && (
+                                    <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.35)', marginTop: 8 }}>
+                                        {usage.cap - usage.count} of {usage.cap} consultations left today (shared demo limit)
+                                    </div>
+                                )}
                             </div>
                         </div>
                     )}
