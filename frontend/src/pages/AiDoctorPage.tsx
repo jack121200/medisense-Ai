@@ -61,13 +61,13 @@ function PulsingOrb({ active }: { active: boolean }) {
                 width: 130, height: 130, borderRadius: '50%',
                 background: active
                     ? 'linear-gradient(135deg, var(--accent-primary), var(--accent-primary-dim))'
-                    : 'var(--text-muted)',
-                border: `3px solid ${active ? 'rgba(194, 91, 60, 0.4)' : 'var(--surface-border)'}`,
+                    : 'var(--surface-2)',
+                border: `3px solid ${active ? 'rgba(194, 91, 60, 0.4)' : 'var(--surface-border-md)'}`,
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
                 transition: 'all 0.4s ease',
-                boxShadow: active ? '0 0 60px rgba(194, 91, 60, 0.35)' : 'none',
+                boxShadow: active ? 'var(--glow-cyan)' : 'var(--shadow-sm)',
             }}>
-                <Stethoscope size={48} color={active ? 'var(--text-primary)' : 'var(--text-muted)'} />
+                <Stethoscope size={48} color={active ? '#fff' : 'var(--accent-primary)'} />
             </div>
             <style>{`
                 @keyframes ping {

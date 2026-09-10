@@ -135,7 +135,7 @@ export default function DashboardPage() {
             <div style={{ marginBottom: 28, display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end' }}>
                 <div>
                     <h1 style={{ fontSize: 26, fontWeight: 800, fontFamily: 'var(--font-display)', letterSpacing: '-0.02em', marginBottom: 4 }}>
-                        Cardiac Overview
+                        Hospital Overview
                     </h1>
                     <p style={{ color: 'var(--text-secondary)', fontSize: 13 }}>
                         {new Date().toLocaleDateString('en-IN', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}
@@ -160,10 +160,10 @@ export default function DashboardPage() {
             {/* ── Quick Actions ── */}
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 12, marginBottom: 24 }}>
                 {[
-                    { label: '❤️ Heart Risk AI', sub: 'Predict cardiac disease risk', to: '/ml-predictions', color: 'var(--accent-primary)' },
+                    { label: '❤️ Heart Risk AI', sub: 'Predict heart disease risk', to: '/ml-predictions', color: 'var(--accent-primary)' },
                     { label: '🩸 CBC Analyzer', sub: 'Analyze blood report', to: '/report-analyzer', color: 'var(--accent-primary-hover)' },
-                    { label: '👥 Cardiac Patients', sub: 'Browse patient registry', to: '/patients', color: 'var(--risk-medium)' },
-                    { label: '🚨 View Alerts', sub: 'Check cardiac alerts', to: '/alerts', color: 'var(--risk-low)' },
+                    { label: '👥 Patients', sub: 'Browse patient registry', to: '/patients', color: 'var(--risk-medium)' },
+                    { label: '🚨 View Alerts', sub: 'Review open alerts', to: '/alerts', color: 'var(--risk-low)' },
                 ].map(a => (
                     <Link key={a.to} to={a.to} style={{
                         display: 'flex', flexDirection: 'column', gap: 4, background: `${a.color}08`,
