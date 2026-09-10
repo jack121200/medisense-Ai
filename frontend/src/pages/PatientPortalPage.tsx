@@ -1,7 +1,8 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../store/authStore';
-import { consultationApi, billingApi, labApi } from '../api/hospitalApi';
+import { consultationApi, labApi } from '../api/hospitalApi';
+import { patientApi } from '../api/patient.api';
 import { appointmentApi, doctorsPublicApi, notificationsApi } from '../api/appointment.api';
 import { Calendar, Pill, FlaskConical, Receipt, MessageCircle, Send, Bell, Plus, CheckCircle, XCircle, Clock, ExternalLink, Heart } from 'lucide-react';
 import { usePatientSync } from '../hooks/usePatientSync';
@@ -78,9 +79,19 @@ export default function PatientPortalPage() {
         if (!user) return;
         try {
             setLoading(true);
+            // user.id identifies the User, not the Patient record — consultations
+            // are keyed by patient id, so resolve it first rather than sending a
+            // user id that will never match.
+            const profile = await patientApi.getMyProfile().catch(() => null);
+            const patientId = profile?.data?.data?.id;
+
             const [consRes, invRes, labRes, apptRes, notifRes, countRes, docRes] = await Promise.all([
-                consultationApi.getByPatient(user.id).catch(() => ({ data: { data: [] } })),
-                billingApi.list().catch(() => ({ data: { data: [] } })),      // server uses auth JWT to filter
+                patientId
+                    ? consultationApi.getByPatient(patientId).catch(() => ({ data: { data: [] } }))
+                    : Promise.resolve({ data: { data: [] } }),
+                // /patients/my-bills resolves the caller from the JWT; the staff
+                // billing list this used to call 403s for a patient.
+                patientApi.getMyBills().catch(() => ({ data: { data: [] } })),
                 labApi.getMyTests().catch(() => ({ data: { data: [] } })),
                 appointmentApi.list().catch(() => ({ data: { data: [] } })),
                 notificationsApi.list().catch(() => ({ data: { data: [] } })),
@@ -176,7 +187,7 @@ export default function PatientPortalPage() {
                             <Heart size={11} /> PATIENT PORTAL
                         </div>
                         <h1 style={{ fontSize: 28, fontWeight: 900, color: 'var(--text-primary)', margin: 0 }}>Welcome, {user?.firstName}!</h1>
-                        <div style={{ fontSize: 13, color: 'var(--text-muted)', marginTop: 4 }}>Your complete cardiac health dashboard</div>
+                        <div style={{ fontSize: 13, color: 'var(--text-muted)', marginTop: 4 }}>Your health records, consultations and reports in one place</div>
                     </div>
                     {/* S2: Live sync indicator */}
                     <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '8px 14px', background: syncState.isLive ? 'rgba(24, 155, 130, 0.08)' : 'var(--surface-2)', border: `1px solid ${syncState.isLive ? 'rgba(24, 155, 130, 0.2)' : 'var(--surface-border)'}`, borderRadius: 10 }}>

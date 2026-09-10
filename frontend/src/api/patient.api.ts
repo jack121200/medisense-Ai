@@ -14,4 +14,13 @@ export const patientApi = {
     getPredictions: (id: string) => api.get(`/patients/${id}/predictions`),
     getRecommendations: (id: string) => api.get(`/patients/${id}/recommendations`),
     getAlerts: (id: string) => api.get(`/patients/${id}/alerts`),
+
+    /**
+     * Patient-scoped reads. These resolve the caller's own patient record
+     * from the JWT, so they need no id and no staff role — which the portal
+     * was previously working around by calling staff endpoints that 403.
+     */
+    getMyProfile: () => api.get('/patients/my-profile'),
+    getMyBills: () => api.get('/patients/my-bills'),
+    getMyPrescriptions: () => api.get('/patients/my-prescriptions'),
 };

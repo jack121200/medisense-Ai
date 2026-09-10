@@ -5,15 +5,20 @@ import Topbar from './Topbar';
 import NotificationDrawer from '../components/NotificationDrawer';
 import { useSocket } from '../hooks/useSocket';
 import { useAlertStore } from '../store/alertStore';
+import { useAuthStore } from '../store/authStore';
 import { alertApi } from '../api/index';
 
 export default function AppLayout() {
     useSocket();
     const [drawerOpen, setDrawerOpen] = useState(false);
     const { setUnreadCount } = useAlertStore();
+    const { user } = useAuthStore();
 
-    // Auto-open drawer if there are unread alerts on first load
+    // Clinical alerts are staff-facing; patients have their own notifications
+    // in the portal. Calling this for a patient guaranteed a 403 on every page
+    // load, swallowed by the catch below.
     useEffect(() => {
+        if (!user || user.role === 'PATIENT') return;
         alertApi.getUnreadCount()
             .then(r => {
                 const count = r.data.data?.count || 0;
