@@ -14,7 +14,7 @@ const Field = ({ label, required, children }: { label: string; required?: boolea
             display: 'block', fontSize: 11, fontWeight: 700, textTransform: 'uppercase',
             letterSpacing: '0.08em', color: 'var(--text-muted)', marginBottom: 7,
         }}>
-            {label} {required && <span style={{ color: 'var(--risk-critical)' }}>*</span>}
+            {label} {required && <span style={{ color: 'var(--risk-critical-text)' }}>*</span>}
         </label>
         {children}
     </div>
@@ -100,7 +100,7 @@ export default function AddPatientPage() {
                         background: 'rgba(24, 155, 130, 0.12)', border: '2px solid rgba(24, 155, 130, 0.30)',
                         display: 'flex', alignItems: 'center', justifyContent: 'center',
                     }}>
-                        <CheckCircle2 size={36} color="var(--accent-green)" />
+                        <CheckCircle2 size={36} color="var(--accent-green-text)" />
                     </div>
                     <h2 style={{ fontSize: 24, fontWeight: 800, fontFamily: 'var(--font-display)', marginBottom: 8 }}>
                         Patient Registered!
@@ -245,7 +245,7 @@ export default function AddPatientPage() {
                     {/* ── CONTACT ── */}
                     <div style={{ background: 'var(--surface-1)', border: '1px solid var(--surface-border)', borderRadius: 18, padding: '24px', position: 'relative', overflow: 'hidden' }}>
                         <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 2, background: 'var(--accent-green)', opacity: 0.5 }} />
-                        <h3 style={{ fontSize: 14, fontWeight: 700, marginBottom: 20, color: 'var(--accent-green)', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
+                        <h3 style={{ fontSize: 14, fontWeight: 700, marginBottom: 20, color: 'var(--accent-green-text)', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
                             Contact Details
                         </h3>
                         <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
@@ -267,7 +267,7 @@ export default function AddPatientPage() {
                     {/* ── EMERGENCY CONTACT ── */}
                     <div style={{ background: 'var(--surface-1)', border: '1px solid var(--surface-border)', borderRadius: 18, padding: '24px', position: 'relative', overflow: 'hidden' }}>
                         <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 2, background: 'var(--risk-high)', opacity: 0.5 }} />
-                        <h3 style={{ fontSize: 14, fontWeight: 700, marginBottom: 20, color: 'var(--risk-high)', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
+                        <h3 style={{ fontSize: 14, fontWeight: 700, marginBottom: 20, color: 'var(--risk-high-text)', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
                             Emergency Contact
                         </h3>
                         <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>

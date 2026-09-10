@@ -201,7 +201,7 @@ export default function PatientsPage() {
                                                         display: 'inline-flex', alignItems: 'center', gap: 4,
                                                         padding: '2px 9px', borderRadius: 9999,
                                                         background: 'rgba(209, 63, 74, 0.10)',
-                                                        color: 'var(--risk-critical)', fontWeight: 700, fontSize: 12,
+                                                        color: 'var(--risk-critical-text)', fontWeight: 700, fontSize: 12,
                                                         border: '1px solid rgba(209, 63, 74, 0.20)',
                                                     }}>
                                                         {p.alerts.length}

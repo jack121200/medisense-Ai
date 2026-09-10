@@ -53,7 +53,7 @@ export default function FuzzyDosingCard() {
                         border: '1px solid rgba(217, 165, 32, 0.3)',
                         display: 'flex', alignItems: 'center', justifyContent: 'center'
                     }}>
-                        <Cpu size={22} color="var(--risk-medium)" />
+                        <Cpu size={22} color="var(--risk-medium-text)" />
                     </div>
                     <div>
                         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
@@ -62,7 +62,7 @@ export default function FuzzyDosingCard() {
                             </h2>
                             <span style={{
                                 fontSize: 10, fontWeight: 800, padding: '2px 8px', borderRadius: 12,
-                                background: 'rgba(217, 165, 32, 0.15)', color: 'var(--risk-medium)', border: '1px solid rgba(217, 165, 32, 0.3)'
+                                background: 'rgba(217, 165, 32, 0.15)', color: 'var(--risk-medium-text)', border: '1px solid rgba(217, 165, 32, 0.3)'
                             }}>
                                 UNIT III — MAMDANI FIS
                             </span>
@@ -100,7 +100,7 @@ export default function FuzzyDosingCard() {
                         background: 'rgba(217, 165, 32, 0.06)', border: '1px solid rgba(217, 165, 32, 0.3)',
                         borderRadius: 14, padding: 18
                     }}>
-                        <div style={{ fontSize: 11, color: 'var(--risk-medium)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em' }}>
+                        <div style={{ fontSize: 11, color: 'var(--risk-medium-text)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em' }}>
                             💊 Centroid Defuzzified Dose
                         </div>
                         <div className="font-mono" style={{ fontSize: 30, fontWeight: 900, color: 'var(--text-primary)', marginTop: 4 }}>
@@ -161,7 +161,7 @@ export default function FuzzyDosingCard() {
                             <strong style={{ color: 'var(--text-primary)' }}>{bp} mmHg</strong>
                         </div>
                         <input type="range" min={80} max={220} value={bp} onChange={e => setBp(Number(e.target.value))} style={{ width: '100%', accentColor: 'var(--risk-medium)' }} />
-                        <div style={{ fontSize: 10, color: 'var(--risk-medium)', marginTop: 2 }}>
+                        <div style={{ fontSize: 10, color: 'var(--risk-medium-text)', marginTop: 2 }}>
                             Membership Level: {result?.fuzzified_memberships?.bp_level || '—'}
                         </div>
                     </div>
@@ -172,7 +172,7 @@ export default function FuzzyDosingCard() {
                             <strong style={{ color: 'var(--text-primary)' }}>{creatinine} mg/dL</strong>
                         </div>
                         <input type="range" min={0.6} max={4.5} step={0.1} value={creatinine} onChange={e => setCreatinine(Number(e.target.value))} style={{ width: '100%', accentColor: 'var(--risk-medium)' }} />
-                        <div style={{ fontSize: 10, color: 'var(--risk-high)', marginTop: 2 }}>
+                        <div style={{ fontSize: 10, color: 'var(--risk-high-text)', marginTop: 2 }}>
                             Membership Level: {result?.fuzzified_memberships?.creatinine_level || '—'}
                         </div>
                     </div>
@@ -209,7 +209,7 @@ export default function FuzzyDosingCard() {
                                 <div style={{ color: 'var(--text-primary)', fontWeight: 600 }}>
                                     Rule #{r.rule_id}: {r.rule_text}
                                 </div>
-                                <div style={{ color: 'var(--risk-medium)', fontWeight: 800, fontFamily: 'monospace' }}>
+                                <div style={{ color: 'var(--risk-medium-text)', fontWeight: 800, fontFamily: 'monospace' }}>
                                     Firing $\alpha$ = {r.firing_strength_alpha}
                                 </div>
                             </div>

@@ -26,12 +26,12 @@ function FieldChrome({
         <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
             {label && (
                 <label htmlFor={id} style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.07em' }}>
-                    {label} {required && <span style={{ color: 'var(--risk-critical)' }} aria-hidden="true">*</span>}
+                    {label} {required && <span style={{ color: 'var(--risk-critical-text)' }} aria-hidden="true">*</span>}
                 </label>
             )}
             {children}
             {hint && !error && <span id={hintId} style={{ fontSize: 11.5, color: 'var(--text-muted)' }}>{hint}</span>}
-            {error && <span id={errorId} role="alert" style={{ fontSize: 11.5, color: 'var(--risk-critical)' }}>{error}</span>}
+            {error && <span id={errorId} role="alert" style={{ fontSize: 11.5, color: 'var(--risk-critical-text)' }}>{error}</span>}
         </div>
     );
 }

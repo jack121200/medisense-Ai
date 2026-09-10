@@ -26,7 +26,7 @@ type ActiveTab = 'talk' | 'history';
 const URGENCY_CFG: Record<string, { color: string; bg: string; label: string }> = {
     URGENT:  { color: 'var(--accent-primary)', bg: 'rgba(13, 92, 126, 0.12)',  label: '🚨 URGENT'  },
     SOON:    { color: 'var(--vitals-temp)', bg: 'rgba(232, 131, 58, 0.12)', label: '⚠️ SOON'    },
-    ROUTINE: { color: 'var(--risk-low)', bg: 'rgba(24, 155, 130, 0.12)',  label: '✅ ROUTINE'  },
+    ROUTINE: { color: 'var(--risk-low-text)', bg: 'rgba(24, 155, 130, 0.12)',  label: '✅ ROUTINE'  },
 };
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
@@ -173,7 +173,7 @@ function DoctorReportCard({ suggestions, callId, onDismiss }: { suggestions: Doc
                     {/* Recommended Actions */}
                     {suggestions.recommended_actions?.length > 0 && (
                         <div style={{ background: 'rgba(24, 155, 130, 0.06)', border: '1px solid rgba(24, 155, 130, 0.2)', borderRadius: 12, padding: '12px 14px' }}>
-                            <div style={{ fontSize: 11, fontWeight: 700, color: 'var(--risk-low)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 8 }}>✅ Recommended Actions</div>
+                            <div style={{ fontSize: 11, fontWeight: 700, color: 'var(--risk-low-text)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 8 }}>✅ Recommended Actions</div>
                             {suggestions.recommended_actions.map((a, i) => (
                                 <div key={i} style={{ fontSize: 12.5, color: 'var(--text-secondary)', marginBottom: 4 }}>• {a}</div>
                             ))}
@@ -194,8 +194,8 @@ function DoctorReportCard({ suggestions, callId, onDismiss }: { suggestions: Doc
                     </div>
                 ) : (
                     <div style={{ background: 'rgba(24, 155, 130, 0.06)', border: '1px solid rgba(24, 155, 130, 0.15)', borderRadius: 10, padding: '8px 14px', display: 'flex', alignItems: 'center', gap: 6 }}>
-                        <CheckCircle size={13} color="var(--risk-low)" />
-                        <span style={{ fontSize: 12, color: 'var(--risk-low)' }}>No red flags identified</span>
+                        <CheckCircle size={13} color="var(--risk-low-text)" />
+                        <span style={{ fontSize: 12, color: 'var(--risk-low-text)' }}>No red flags identified</span>
                     </div>
                 )}
 
@@ -328,7 +328,7 @@ function PreCallModal({
                                     <FileText size={14} color="var(--accent-primary)" />
                                     <span style={{ fontSize: 12.5, color: 'var(--text-secondary)' }}>{pdfFile.name}</span>
                                     {uploading && <span style={{ fontSize: 11, color: 'var(--accent-primary)' }}>Extracting...</span>}
-                                    {!uploading && reportText && <CheckCircle size={13} color="var(--risk-low)" />}
+                                    {!uploading && reportText && <CheckCircle size={13} color="var(--risk-low-text)" />}
                                 </div>
                                 <button onClick={() => { setPdfFile(null); setReportText(''); }} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-muted)' }}>
                                     <X size={14} />
@@ -483,7 +483,7 @@ function CallHistoryItem({ call }: { call: AiDoctorCallSummary }) {
                     <div style={{ textAlign: 'left' }}>
                         <div style={{ fontSize: 13.5, fontWeight: 700, color: 'var(--text-primary)' }}>
                             AI Doctor Consultation
-                            {call.doctorSuggestions && <span style={{ marginLeft: 8, fontSize: 10, padding: '2px 8px', borderRadius: 9999, background: 'rgba(24, 155, 130, 0.15)', color: 'var(--risk-low)', fontWeight: 700 }}>REPORT READY</span>}
+                            {call.doctorSuggestions && <span style={{ marginLeft: 8, fontSize: 10, padding: '2px 8px', borderRadius: 9999, background: 'rgba(24, 155, 130, 0.15)', color: 'var(--risk-low-text)', fontWeight: 700 }}>REPORT READY</span>}
                         </div>
                         <div style={{ display: 'flex', gap: 12, marginTop: 3 }}>
                             <span style={{ fontSize: 11, color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: 4 }}><Calendar size={10} />{fmtDate(call.startedAt)}</span>
@@ -492,7 +492,7 @@ function CallHistoryItem({ call }: { call: AiDoctorCallSummary }) {
                     </div>
                 </div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                    <span style={{ fontSize: 10, padding: '3px 10px', borderRadius: 9999, fontWeight: 700, background: 'rgba(24, 155, 130, 0.12)', color: 'var(--risk-low)' }}>{call.status}</span>
+                    <span style={{ fontSize: 10, padding: '3px 10px', borderRadius: 9999, fontWeight: 700, background: 'rgba(24, 155, 130, 0.12)', color: 'var(--risk-low-text)' }}>{call.status}</span>
                     {expanded ? <ChevronUp size={15} color="var(--text-muted)" /> : <ChevronDown size={15} color="var(--text-muted)" />}
                 </div>
             </button>
@@ -889,7 +889,7 @@ export default function AiDoctorPage() {
                                 </div>
                                 <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                                     <span style={{ width: 8, height: 8, borderRadius: '50%', background: 'var(--risk-low)', animation: 'ping 1.2s ease infinite', display: 'inline-block' }} />
-                                    <span style={{ color: 'var(--risk-low)', fontSize: 13, fontWeight: 700 }}>LIVE</span>
+                                    <span style={{ color: 'var(--risk-low-text)', fontSize: 13, fontWeight: 700 }}>LIVE</span>
                                     <span style={{ color: 'var(--text-muted)', fontSize: 13, fontFamily: 'monospace', marginLeft: 6 }}>{mins}:{secs}</span>
                                 </div>
                                 <div style={{ display: 'flex', gap: 10 }}>
@@ -947,8 +947,8 @@ export default function AiDoctorPage() {
                                 </div>
                                 {callStatus === 'ended' ? (
                                     <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 16 }}>
-                                        <CheckCircle size={16} color="var(--risk-low)" />
-                                        <span style={{ fontSize: 13, color: 'var(--risk-low)', fontWeight: 600 }}>Consultation saved — check My Consultations tab</span>
+                                        <CheckCircle size={16} color="var(--risk-low-text)" />
+                                        <span style={{ fontSize: 13, color: 'var(--risk-low-text)', fontWeight: 600 }}>Consultation saved — check My Consultations tab</span>
                                     </div>
                                 ) : (
                                     <div style={{ padding: '12px 16px', background: 'rgba(13, 92, 126, 0.08)', border: '1px solid rgba(13, 92, 126, 0.2)', borderRadius: 12, marginBottom: 18, display: 'flex', gap: 10 }}>
@@ -963,7 +963,7 @@ export default function AiDoctorPage() {
                                 )}
                                 {usage && usage.count >= usage.cap ? (
                                     <div style={{ padding: '12px 16px', background: 'rgba(209, 63, 74, 0.08)', border: '1px solid rgba(209, 63, 74, 0.25)', borderRadius: 12, marginBottom: 10 }}>
-                                        <span style={{ fontSize: 12.5, fontWeight: 700, color: 'var(--risk-high)' }}>
+                                        <span style={{ fontSize: 12.5, fontWeight: 700, color: 'var(--risk-high-text)' }}>
                                             Daily consultation limit reached ({usage.cap}/{usage.cap}). Please try again tomorrow.
                                         </span>
                                     </div>

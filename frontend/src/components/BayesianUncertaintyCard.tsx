@@ -131,7 +131,7 @@ export default function BayesianUncertaintyCard({ patientData }: Props) {
                         <div style={{ fontSize: 11, color: 'var(--text-muted)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em' }}>
                             Epistemic Uncertainty (Entropy)
                         </div>
-                        <div className="font-mono" style={{ fontSize: 24, fontWeight: 800, color: 'var(--risk-medium)', marginTop: 4 }}>
+                        <div className="font-mono" style={{ fontSize: 24, fontWeight: 800, color: 'var(--risk-medium-text)', marginTop: 4 }}>
                             ±{result.credible_interval_95.margin_pct}% <span style={{ fontSize: 12, color: 'var(--text-muted)' }}>margin</span>
                         </div>
                         <div style={{ fontSize: 11, color: 'var(--text-secondary)', marginTop: 4 }}>
@@ -151,7 +151,7 @@ export default function BayesianUncertaintyCard({ patientData }: Props) {
                             {bestTest ? bestTest.name : 'All Key Tests Completed'}
                         </div>
                         {bestTest && (
-                            <div style={{ fontSize: 11, color: 'var(--risk-low)', marginTop: 4, fontWeight: 700 }}>
+                            <div style={{ fontSize: 11, color: 'var(--risk-low-text)', marginTop: 4, fontWeight: 700 }}>
                                 📉 Reduces Uncertainty by {bestTest.expected_entropy_reduction_pct}%
                             </div>
                         )}
@@ -248,7 +248,7 @@ export default function BayesianUncertaintyCard({ patientData }: Props) {
 
                                     <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
                                         <div style={{ textAlign: 'right' }}>
-                                            <div style={{ fontSize: 12, fontWeight: 800, color: 'var(--risk-low)' }}>
+                                            <div style={{ fontSize: 12, fontWeight: 800, color: 'var(--risk-low-text)' }}>
                                                 -{test.expected_entropy_reduction_pct}% Uncertainty
                                             </div>
                                             <div style={{ fontSize: 10, color: 'var(--text-muted)' }}>

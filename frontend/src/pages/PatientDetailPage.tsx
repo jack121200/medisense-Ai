@@ -253,7 +253,7 @@ export default function PatientDetailPage() {
                             {patient.currentRiskLevel}
                         </span>
                         {patient.alerts?.length > 0 && (
-                            <span style={{ display: 'flex', alignItems: 'center', gap: 4, color: 'var(--risk-critical)', fontSize: 12, fontWeight: 600 }}>
+                            <span style={{ display: 'flex', alignItems: 'center', gap: 4, color: 'var(--risk-critical-text)', fontSize: 12, fontWeight: 600 }}>
                                 <Bell size={13} /> {patient.alerts.length} Alert{patient.alerts.length !== 1 ? 's' : ''}
                             </span>
                         )}
@@ -455,7 +455,7 @@ export default function PatientDetailPage() {
                                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                                     <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
                                         <div style={{ width: 36, height: 36, borderRadius: 10, background: 'rgba(24, 155, 130, 0.1)', border: '1px solid rgba(24, 155, 130, 0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                                            <RefreshCw size={16} color="var(--accent-green)" />
+                                            <RefreshCw size={16} color="var(--accent-green-text)" />
                                         </div>
                                         <div>
                                             <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-primary)' }}>Readmission Risk</div>
@@ -473,7 +473,7 @@ export default function PatientDetailPage() {
                                                 </div>
                                             </div>
                                         )}
-                                        <button onClick={runPrediction} disabled={predicting} className="btn-ghost" style={{ fontSize: 12, padding: '6px 14px', color: 'var(--accent-green)', borderColor: 'rgba(24, 155, 130, 0.2)' }}>
+                                        <button onClick={runPrediction} disabled={predicting} className="btn-ghost" style={{ fontSize: 12, padding: '6px 14px', color: 'var(--accent-green-text)', borderColor: 'rgba(24, 155, 130, 0.2)' }}>
                                             {predicting ? <RefreshCw size={13} style={{ animation: 'spin 0.8s linear infinite' }} /> : <Brain size={13} />}
                                             {predicting ? 'Running...' : pred ? 'Re-run' : 'Run Now'}
                                         </button>
@@ -521,11 +521,11 @@ export default function PatientDetailPage() {
                     {/* Active Alerts */}
                     {patient.alerts?.length > 0 && (
                         <div style={{ background: 'var(--surface-1)', border: '1px solid rgba(209, 63, 74, 0.3)', borderRadius: 16, padding: '20px 24px' }}>
-                            <h3 style={{ fontSize: 15, fontWeight: 600, color: 'var(--risk-critical)', marginBottom: 12 }}>🚨 Active Alerts</h3>
+                            <h3 style={{ fontSize: 15, fontWeight: 600, color: 'var(--risk-critical-text)', marginBottom: 12 }}>🚨 Active Alerts</h3>
                             {patient.alerts.map((a: any) => (
                                 <div key={a.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '10px 14px', background: 'rgba(209, 63, 74, 0.05)', borderRadius: 8, marginBottom: 8 }}>
                                     <div>
-                                        <span style={{ fontSize: 12, fontWeight: 600, color: 'var(--risk-critical)' }}>[{a.severity}] {a.type}</span>
+                                        <span style={{ fontSize: 12, fontWeight: 600, color: 'var(--risk-critical-text)' }}>[{a.severity}] {a.type}</span>
                                         <div style={{ fontSize: 13, color: 'var(--text-secondary)', marginTop: 2 }}>{a.message}</div>
                                     </div>
                                     <div style={{ fontSize: 11, color: 'var(--text-muted)', flexShrink: 0, marginLeft: 12 }}>
@@ -624,7 +624,7 @@ export default function PatientDetailPage() {
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                             <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
                                 <div style={{ width: 44, height: 44, borderRadius: 12, background: 'rgba(24, 155, 130, 0.1)', border: '1px solid rgba(24, 155, 130, 0.25)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                                    <RefreshCw size={20} color="var(--accent-green)" />
+                                    <RefreshCw size={20} color="var(--accent-green-text)" />
                                 </div>
                                 <div>
                                     <div style={{ fontSize: 15, fontWeight: 700, color: 'var(--text-primary)' }}>Readmission Risk</div>
@@ -763,13 +763,13 @@ export default function PatientDetailPage() {
                             {/* Abnormal values */}
                             {abnormal.length > 0 && (
                                 <div style={{ background: 'var(--surface-1)', border: '1px solid var(--surface-border)', borderRadius: 14, padding: '14px 16px' }}>
-                                    <div style={{ fontSize: 12, fontWeight: 700, color: 'var(--risk-high)', marginBottom: 10, display: 'flex', alignItems: 'center', gap: 6 }}>
+                                    <div style={{ fontSize: 12, fontWeight: 700, color: 'var(--risk-high-text)', marginBottom: 10, display: 'flex', alignItems: 'center', gap: 6 }}>
                                         <AlertTriangle size={13} /> Abnormal Values ({abnormal.length})
                                     </div>
                                     <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
                                         {abnormal.map(f => {
                                             const c = f.status === 'HIGH'
-                                                ? { color: 'var(--risk-high)', bg: 'rgba(232, 131, 58, 0.10)', label: '↑ HIGH' }
+                                                ? { color: 'var(--risk-high-text)', bg: 'rgba(232, 131, 58, 0.10)', label: '↑ HIGH' }
                                                 : { color: 'var(--accent-primary)', bg: 'rgba(13, 92, 126, 0.08)', label: '↓ LOW' };
                                             return (
                                                 <div key={f.name} style={{ background: c.bg, border: `1px solid ${c.color}30`, borderRadius: 10, padding: '10px 14px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -793,7 +793,7 @@ export default function PatientDetailPage() {
                                 <div style={{ background: 'var(--surface-1)', border: '1px solid var(--surface-border)', borderRadius: 14, padding: '12px 16px' }}>
                                     <button onClick={() => setShowNormal(s => !s)} style={{ background: 'none', border: 'none', cursor: 'pointer', width: '100%', display: 'flex', justifyContent: 'space-between', color: 'var(--text-secondary)', padding: 0 }}>
                                         <span style={{ fontSize: 12, fontWeight: 700, display: 'flex', alignItems: 'center', gap: 6 }}>
-                                            <CheckCircle2 size={13} color="var(--accent-green)" /> Normal Values ({normalFindings.length})
+                                            <CheckCircle2 size={13} color="var(--accent-green-text)" /> Normal Values ({normalFindings.length})
                                         </span>
                                         {showNormal ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
                                     </button>
@@ -802,7 +802,7 @@ export default function PatientDetailPage() {
                                             {normalFindings.map(f => (
                                                 <div key={f.name} style={{ display: 'flex', justifyContent: 'space-between', padding: '7px 10px', background: 'rgba(24, 155, 130, 0.04)', borderRadius: 8 }}>
                                                     <span style={{ fontSize: 12.5, color: 'var(--text-secondary)' }}>{f.name}</span>
-                                                    <span className="font-mono" style={{ fontSize: 13, fontWeight: 700, color: 'var(--accent-green)' }}>{f.value} {f.unit}</span>
+                                                    <span className="font-mono" style={{ fontSize: 13, fontWeight: 700, color: 'var(--accent-green-text)' }}>{f.value} {f.unit}</span>
                                                 </div>
                                             ))}
                                         </div>

@@ -122,10 +122,10 @@ export default function DashboardPage() {
 
     const kpis = [
         { label: 'Total Patients', value: totalPats.toLocaleString() || '—', icon: Users, color: 'var(--accent-primary)', change: '+registered in system', trend: undefined },
-        { label: 'Critical Risk', value: dashboard?.criticalCount || '0', icon: AlertTriangle, color: 'var(--risk-critical)', change: 'Need immediate attention', trend: dashboard?.criticalCount || 0 },
-        { label: 'High Risk', value: dashboard?.highRiskCount || '0', icon: Shield, color: 'var(--risk-high)', change: 'Monitor closely' },
-        { label: "Today's Admissions", value: dashboard?.admissionsToday || '0', icon: Activity, color: 'var(--accent-green)', change: 'New patients today', trend: dashboard?.admissionsToday },
-        { label: 'Unresolved Alerts', value: dashboard?.unresolvedAlerts || '0', icon: Bell, color: 'var(--risk-medium)', change: 'Require action' },
+        { label: 'Critical Risk', value: dashboard?.criticalCount || '0', icon: AlertTriangle, color: 'var(--risk-critical-text)', change: 'Need immediate attention', trend: dashboard?.criticalCount || 0 },
+        { label: 'High Risk', value: dashboard?.highRiskCount || '0', icon: Shield, color: 'var(--risk-high-text)', change: 'Monitor closely' },
+        { label: "Today's Admissions", value: dashboard?.admissionsToday || '0', icon: Activity, color: 'var(--accent-green-text)', change: 'New patients today', trend: dashboard?.admissionsToday },
+        { label: 'Unresolved Alerts', value: dashboard?.unresolvedAlerts || '0', icon: Bell, color: 'var(--risk-medium-text)', change: 'Require action' },
         { label: 'Pending Appointments', value: pendingAppts || '0', icon: Calendar, color: 'var(--accent-primary)', change: 'Awaiting approval' },
     ];
 
@@ -162,8 +162,8 @@ export default function DashboardPage() {
                 {[
                     { label: '❤️ Heart Risk AI', sub: 'Predict heart disease risk', to: '/ml-predictions', color: 'var(--accent-primary)' },
                     { label: '🩸 CBC Analyzer', sub: 'Analyze blood report', to: '/report-analyzer', color: 'var(--accent-primary-hover)' },
-                    { label: '👥 Patients', sub: 'Browse patient registry', to: '/patients', color: 'var(--risk-medium)' },
-                    { label: '🚨 View Alerts', sub: 'Review open alerts', to: '/alerts', color: 'var(--risk-low)' },
+                    { label: '👥 Patients', sub: 'Browse patient registry', to: '/patients', color: 'var(--risk-medium-text)' },
+                    { label: '🚨 View Alerts', sub: 'Review open alerts', to: '/alerts', color: 'var(--risk-low-text)' },
                 ].map(a => (
                     <Link key={a.to} to={a.to} style={{
                         display: 'flex', flexDirection: 'column', gap: 4, background: `${a.color}08`,

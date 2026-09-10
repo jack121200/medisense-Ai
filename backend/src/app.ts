@@ -77,11 +77,13 @@ const ALLOWED_ORIGINS = [
 ];
 app.use(cors({
     origin: (origin, callback) => {
-        if (!origin || ALLOWED_ORIGINS.includes(origin)) {
-            callback(null, true);
-        } else {
-            callback(new Error('Not allowed by CORS'));
-        }
+        // Reject by declining the CORS headers rather than raising. Throwing
+        // here propagates to the error handler as an unhandled 500 with a
+        // stack trace, which misreports a policy decision as a server fault
+        // and fills the logs on every stray cross-origin probe. Without the
+        // headers the browser blocks the response, which is the actual
+        // intent.
+        callback(null, !origin || ALLOWED_ORIGINS.includes(origin));
     },
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],

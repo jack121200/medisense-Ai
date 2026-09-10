@@ -77,7 +77,7 @@ export default function Topbar({ onOpenNotifications }: TopbarProps) {
                         width: 6, height: 6, borderRadius: '50%',
                         background: 'var(--accent-green)',
                     }} className="live-dot" />
-                    <span style={{ fontSize: 10.5, fontWeight: 700, color: 'var(--accent-green)', letterSpacing: '0.06em' }}>
+                    <span style={{ fontSize: 10.5, fontWeight: 700, color: 'var(--accent-green-text)', letterSpacing: '0.06em' }}>
                         LIVE
                     </span>
                 </div>

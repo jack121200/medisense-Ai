@@ -40,19 +40,19 @@ export default function BillingPage() {
     return (
         <div style={{ padding: '32px 40px', maxWidth: 1100, margin: '0 auto' }}>
             <div style={{ marginBottom: 28 }}>
-                <div style={{ fontSize: 11, color: 'var(--risk-low)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 6 }}>RECEPTIONIST / ADMIN</div>
+                <div style={{ fontSize: 11, color: 'var(--risk-low-text)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 6 }}>RECEPTIONIST / ADMIN</div>
                 <h1 style={{ fontSize: 28, fontWeight: 900, color: 'var(--text-primary)' }}>Billing & Payments</h1>
             </div>
 
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 16, marginBottom: 28 }}>
                 <div style={{ background: 'var(--surface-1)', border: '1px solid rgba(24, 155, 130, 0.2)', borderRadius: 16, padding: '20px 22px' }}>
                     <div style={{ fontSize: 10, color: 'var(--text-muted)', marginBottom: 4 }}>TODAY'S REVENUE</div>
-                    <div style={{ fontSize: 28, fontWeight: 900, color: 'var(--risk-low)', fontFamily: 'monospace' }}>₹{revenue.revenue.toLocaleString()}</div>
+                    <div style={{ fontSize: 28, fontWeight: 900, color: 'var(--risk-low-text)', fontFamily: 'monospace' }}>₹{revenue.revenue.toLocaleString()}</div>
                     <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 4 }}>{revenue.paidCount} payments today</div>
                 </div>
                 <div style={{ background: 'var(--surface-1)', border: '1px solid rgba(217, 165, 32, 0.2)', borderRadius: 16, padding: '20px 22px' }}>
                     <div style={{ fontSize: 10, color: 'var(--text-muted)', marginBottom: 4 }}>PENDING COLLECTION</div>
-                    <div style={{ fontSize: 28, fontWeight: 900, color: 'var(--risk-medium)', fontFamily: 'monospace' }}>₹{unpaidTotal.toLocaleString()}</div>
+                    <div style={{ fontSize: 28, fontWeight: 900, color: 'var(--risk-medium-text)', fontFamily: 'monospace' }}>₹{unpaidTotal.toLocaleString()}</div>
                     <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 4 }}>{invoices.filter((i: any) => !i.isPaid).length} unpaid bills</div>
                 </div>
                 <div style={{ background: 'var(--surface-1)', border: '1px solid rgba(13, 92, 126, 0.2)', borderRadius: 16, padding: '20px 22px' }}>
@@ -70,7 +70,7 @@ export default function BillingPage() {
 
             <div style={{ background: 'var(--surface-1)', border: '1px solid var(--surface-border)', borderRadius: 20, overflow: 'hidden' }}>
                 <div style={{ padding: '16px 24px', borderBottom: '1px solid var(--surface-border)', display: 'flex', gap: 10, alignItems: 'center' }}>
-                    <Receipt size={16} style={{ color: 'var(--risk-low)' }} />
+                    <Receipt size={16} style={{ color: 'var(--risk-low-text)' }} />
                     <span style={{ fontWeight: 800, color: 'var(--text-primary)' }}>Invoices ({filtered.length})</span>
                 </div>
                 {loading ? <div style={{ padding: 40, textAlign: 'center', color: 'var(--text-muted)', fontSize: 13 }}>Loading...</div>
@@ -91,7 +91,7 @@ export default function BillingPage() {
                                 <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
                                     <span style={{ fontSize: 18, fontWeight: 900, color: 'var(--text-primary)', fontFamily: 'monospace' }}>₹{inv.totalAmount?.toLocaleString()}</span>
                                     {inv.isPaid
-                                        ? <span style={{ fontSize: 11, fontWeight: 700, color: 'var(--risk-low)', background: '#00FF8715', padding: '4px 12px', borderRadius: 20, border: '1px solid #00FF8730', display: 'flex', alignItems: 'center', gap: 4 }}><CheckCircle size={11} /> PAID</span>
+                                        ? <span style={{ fontSize: 11, fontWeight: 700, color: 'var(--risk-low-text)', background: '#00FF8715', padding: '4px 12px', borderRadius: 20, border: '1px solid #00FF8730', display: 'flex', alignItems: 'center', gap: 4 }}><CheckCircle size={11} /> PAID</span>
                                         : <button onClick={() => { setSelected(inv); setPayMethod('CASH'); }} style={{ padding: '8px 18px', background: 'linear-gradient(135deg, var(--accent-primary), #0096AA)', border: 'none', borderRadius: 10, color: 'var(--bg-primary)', fontWeight: 800, fontSize: 12, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6 }}><CreditCard size={12} /> Collect Payment</button>
                                     }
                                 </div>

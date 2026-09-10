@@ -130,8 +130,8 @@ export default function DoctorDashboardPage() {
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: 16, marginBottom: 32 }}>
                 {[
                     { label: "Today's Queue", val: queueCount, color: 'var(--accent-primary)', icon: <Calendar size={18} /> },
-                    { label: 'In Progress', val: inProgressToday, color: 'var(--risk-medium)', icon: <Activity size={18} /> },
-                    { label: 'Completed Today', val: completedToday, color: 'var(--risk-low)', icon: <CheckCircle size={18} /> },
+                    { label: 'In Progress', val: inProgressToday, color: 'var(--risk-medium-text)', icon: <Activity size={18} /> },
+                    { label: 'Completed Today', val: completedToday, color: 'var(--risk-low-text)', icon: <CheckCircle size={18} /> },
                     { label: 'Pending Appts', val: appointments.length, color: 'var(--accent-magenta)', icon: <FileText size={18} /> },
                 ].map(s => (
                     <div key={s.label} style={{
@@ -238,7 +238,7 @@ export default function DoctorDashboardPage() {
                     {consultations.length > 0 && (
                         <div style={{ background: 'var(--surface-1)', border: '1px solid var(--surface-border)', borderRadius: 20, overflow: 'hidden' }}>
                             <div style={{ padding: '20px 24px', borderBottom: '1px solid var(--surface-border)', display: 'flex', alignItems: 'center', gap: 10 }}>
-                                <Stethoscope size={16} style={{ color: 'var(--risk-low)' }} />
+                                <Stethoscope size={16} style={{ color: 'var(--risk-low-text)' }} />
                                 <span style={{ fontWeight: 800, fontSize: 15, color: 'var(--text-primary)' }}>Today's Consultations</span>
                                 <span style={{ marginLeft: 'auto', fontSize: 12, color: 'var(--text-muted)' }}>{consultations.length} total</span>
                             </div>

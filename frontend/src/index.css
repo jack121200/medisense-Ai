@@ -69,6 +69,19 @@
   --risk-low-bg:      rgba(24, 155, 130, 0.10);
   --mint-bg:          rgba(222, 251, 200, 0.55);
 
+
+  /* ── TEXT-ON-TINT VARIANTS ──
+     Coloured text on a light tint of the same hue is the app's most common
+     badge pattern, and the vivid hues fail WCAG AA at small sizes against
+     their own tint (gold measured 2.05:1). These are the same hues darkened
+     until they clear 4.5:1 on a 12% tint. Fills and borders keep the vivid
+     values; only text uses these. */
+  --risk-low-text:      #137965;
+  --risk-medium-text:   #7E5F12;
+  --risk-high-text:     #A05A28;
+  --risk-critical-text: #BC3943;
+  --accent-green-text:  #137965;
+
   /* ── TEXT ── */
   --text-primary:   #0B2B3B;
   --text-secondary: #4C6B7C;
@@ -266,12 +279,12 @@ h1, h2, h3, h4, h5, h6 {
 }
 .risk-badge.critical {
   background: var(--risk-critical-bg);
-  color: var(--risk-critical);
+  color: var(--risk-critical-text);
   border-color: var(--risk-critical-border);
 }
-.risk-badge.high    { background: var(--risk-high-bg);   color: var(--risk-high); }
-.risk-badge.medium  { background: var(--risk-medium-bg); color: var(--risk-medium); }
-.risk-badge.low     { background: var(--risk-low-bg);    color: var(--risk-low); }
+.risk-badge.high    { background: var(--risk-high-bg);   color: var(--risk-high-text); }
+.risk-badge.medium  { background: var(--risk-medium-bg); color: var(--risk-medium-text); }
+.risk-badge.low     { background: var(--risk-low-bg);    color: var(--risk-low-text); }
 
 /* ══════════════════════════════════════════════════
    ACCURACY METER COMPONENTS

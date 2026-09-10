@@ -4,10 +4,10 @@ import { Calendar, CheckCircle, XCircle, Clock, RefreshCw } from 'lucide-react';
 import toast from 'react-hot-toast';
 
 const STATUS_COLORS: Record<string, { color: string; bg: string; label: string }> = {
-    PENDING: { color: 'var(--risk-medium)', bg: '#FFD16615', label: '⏳ Pending' },
-    APPROVED: { color: 'var(--risk-low)', bg: '#00FF8715', label: '✅ Approved' },
-    REJECTED: { color: 'var(--risk-critical)', bg: '#FF2D5515', label: '❌ Rejected' },
-    COUNTER_OFFERED: { color: 'var(--risk-high)', bg: '#FF6B3515', label: '↩ Counter Offered' },
+    PENDING: { color: 'var(--risk-medium-text)', bg: '#FFD16615', label: '⏳ Pending' },
+    APPROVED: { color: 'var(--risk-low-text)', bg: '#00FF8715', label: '✅ Approved' },
+    REJECTED: { color: 'var(--risk-critical-text)', bg: '#FF2D5515', label: '❌ Rejected' },
+    COUNTER_OFFERED: { color: 'var(--risk-high-text)', bg: '#FF6B3515', label: '↩ Counter Offered' },
     ACCEPTED: { color: 'var(--accent-primary)', bg: '#00E5FF15', label: '✅ Patient Accepted' },
     DECLINED: { color: 'var(--text-muted)', bg: '#aaa15', label: 'Patient Declined' },
     CANCELLED: { color: 'var(--text-muted)', bg: '#aaa15', label: 'Cancelled' },
@@ -107,9 +107,9 @@ export default function ReceptionistRequestsPage() {
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 14, marginBottom: 24 }}>
                 {[
                     { label: 'Total Requests', val: requests.length, color: 'var(--accent-primary)' },
-                    { label: 'Pending Review', val: pendingCount, color: 'var(--risk-medium)' },
-                    { label: 'Approved', val: requests.filter(r => r.status === 'APPROVED' || r.status === 'ACCEPTED').length, color: 'var(--risk-low)' },
-                    { label: 'Rejected', val: requests.filter(r => r.status === 'REJECTED' || r.status === 'DECLINED').length, color: 'var(--risk-critical)' },
+                    { label: 'Pending Review', val: pendingCount, color: 'var(--risk-medium-text)' },
+                    { label: 'Approved', val: requests.filter(r => r.status === 'APPROVED' || r.status === 'ACCEPTED').length, color: 'var(--risk-low-text)' },
+                    { label: 'Rejected', val: requests.filter(r => r.status === 'REJECTED' || r.status === 'DECLINED').length, color: 'var(--risk-critical-text)' },
                 ].map(s => (
                     <div key={s.label} style={{ background: 'var(--surface-1)', border: `1px solid ${s.color}22`, borderRadius: 14, padding: '18px 20px', position: 'relative', overflow: 'hidden' }}>
                         <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 2, background: s.color, opacity: 0.7 }} />
@@ -178,7 +178,7 @@ export default function ReceptionistRequestsPage() {
 
                                     {/* Approved info */}
                                     {req.status === 'APPROVED' && req.scheduledDate && (
-                                        <div style={{ padding: '10px 14px', background: 'rgba(24, 155, 130, 0.06)', border: '1px solid rgba(24, 155, 130, 0.15)', borderRadius: 10, fontSize: 13, color: 'var(--risk-low)', marginTop: 6 }}>
+                                        <div style={{ padding: '10px 14px', background: 'rgba(24, 155, 130, 0.06)', border: '1px solid rgba(24, 155, 130, 0.15)', borderRadius: 10, fontSize: 13, color: 'var(--risk-low-text)', marginTop: 6 }}>
                                             ✅ Confirmed: {new Date(req.scheduledDate).toLocaleDateString('en-IN', { weekday: 'short', day: 'numeric', month: 'short' })} at {req.scheduledTime}
                                         </div>
                                     )}
@@ -187,11 +187,11 @@ export default function ReceptionistRequestsPage() {
                                     {req.status === 'PENDING' && (
                                         <div style={{ display: 'flex', gap: 8, marginTop: 12 }}>
                                             <button onClick={() => { setApproving(req.id); setApproveForm({ scheduledDate: req.requestedDate?.split('T')[0] || '', scheduledTime: '10:00' }); }}
-                                                style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '8px 16px', background: 'rgba(24, 155, 130, 0.1)', border: '1px solid rgba(24, 155, 130, 0.25)', borderRadius: 8, color: 'var(--risk-low)', fontWeight: 700, fontSize: 12, cursor: 'pointer' }}>
+                                                style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '8px 16px', background: 'rgba(24, 155, 130, 0.1)', border: '1px solid rgba(24, 155, 130, 0.25)', borderRadius: 8, color: 'var(--risk-low-text)', fontWeight: 700, fontSize: 12, cursor: 'pointer' }}>
                                                 <CheckCircle size={13} /> Approve & Schedule
                                             </button>
                                             <button onClick={() => { setRejecting(req.id); setRejectForm({ rejectReason: '', counterDate: '', counterTime: '' }); }}
-                                                style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '8px 16px', background: 'rgba(232, 131, 58, 0.1)', border: '1px solid rgba(232, 131, 58, 0.25)', borderRadius: 8, color: 'var(--risk-high)', fontWeight: 700, fontSize: 12, cursor: 'pointer' }}>
+                                                style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '8px 16px', background: 'rgba(232, 131, 58, 0.1)', border: '1px solid rgba(232, 131, 58, 0.25)', borderRadius: 8, color: 'var(--risk-high-text)', fontWeight: 700, fontSize: 12, cursor: 'pointer' }}>
                                                 <XCircle size={13} /> Reject / Counter-offer
                                             </button>
                                         </div>
@@ -240,7 +240,7 @@ export default function ReceptionistRequestsPage() {
                             <input type="text" style={inputStyle} value={rejectForm.rejectReason} onChange={e => setRejectForm(f => ({ ...f, rejectReason: e.target.value }))} placeholder="Doctor unavailable at requested time..." />
                         </div>
                         <div style={{ padding: '14px 16px', background: 'rgba(232, 131, 58, 0.07)', border: '1px solid rgba(232, 131, 58, 0.15)', borderRadius: 12, marginBottom: 16 }}>
-                            <div style={{ fontSize: 12, fontWeight: 700, color: 'var(--risk-high)', marginBottom: 10 }}>↩ Suggest Alternative (optional)</div>
+                            <div style={{ fontSize: 12, fontWeight: 700, color: 'var(--risk-high-text)', marginBottom: 10 }}>↩ Suggest Alternative (optional)</div>
                             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
                                 <div>
                                     <label style={{ display: 'block', fontSize: 11, color: 'var(--text-secondary)', marginBottom: 6 }}>Alternative Date</label>

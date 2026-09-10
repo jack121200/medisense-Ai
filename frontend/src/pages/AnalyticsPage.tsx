@@ -243,8 +243,8 @@ export default function AnalyticsPage() {
                             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 16, marginBottom: 20 }}>
                                 {[
                                     { label: 'Total Records', value: bigdata.total_records?.toLocaleString(), color: 'var(--accent-primary)' },
-                                    { label: 'ICU Utilization', value: `${bigdata.icu_utilization_rate}%`, color: 'var(--risk-high)' },
-                                    { label: 'Readmission Rate', value: `${bigdata.overall_readmission_rate}%`, color: 'var(--risk-medium)' },
+                                    { label: 'ICU Utilization', value: `${bigdata.icu_utilization_rate}%`, color: 'var(--risk-high-text)' },
+                                    { label: 'Readmission Rate', value: `${bigdata.overall_readmission_rate}%`, color: 'var(--risk-medium-text)' },
                                 ].map(kpi => (
                                     <div key={kpi.label} style={{
                                         background: 'var(--surface-1)', border: '1px solid var(--surface-border)',

@@ -88,12 +88,16 @@ const ROLE_LABELS: Record<string, string> = {
     NURSE: 'Nurse',
     ANALYST: 'Analyst',
 };
-// Role accents drawn from the warm palette in index.css — each role gets a
-// distinguishable hue, but all of them sit in the same warm family so the
-// shell never fights the page content.
+// One distinguishable hue per role, all drawn from the palette in index.css
+// so the shell never fights the page content.
+//
+// Used as text on a ~7-10% tint of themselves (role badge, active nav item),
+// so these are the darkened text-safe variants rather than the vivid palette
+// values — vivid gold measured 2.05:1 against its own tint, well under the
+// 4.5:1 AA floor for small text.
 const ROLE_COLORS: Record<string, string> = {
-    RECEPTIONIST: '#D9A520', DOCTOR: '#0D5C7E', LAB_TECHNICIAN: '#E8833A',
-    PATIENT: '#189B82', ADMIN: '#7C6AB4', SUPER_ADMIN: '#7C6AB4',
+    RECEPTIONIST: '#7E5F12', DOCTOR: '#0D5C7E', LAB_TECHNICIAN: '#A05A28',
+    PATIENT: '#137965', ADMIN: '#6A5A9C', SUPER_ADMIN: '#6A5A9C',
 };
 
 export default function Sidebar() {

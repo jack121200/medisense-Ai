@@ -128,7 +128,7 @@ export default function NotificationDrawer({ open, onClose }: NotificationDrawer
 
                     {/* Critical Alerts */}
                     <div style={{ marginBottom: 24 }}>
-                        <SectionTitle icon={AlertTriangle} label="Critical Alerts" count={criticalAlerts.length} color="var(--risk-critical)" />
+                        <SectionTitle icon={AlertTriangle} label="Critical Alerts" count={criticalAlerts.length} color="var(--risk-critical-text)" />
                         {loading ? (
                             <div style={{ color: 'var(--text-muted)', fontSize: 13, textAlign: 'center', padding: 20 }}>Loading alerts...</div>
                         ) : criticalAlerts.length === 0 ? (
@@ -137,7 +137,7 @@ export default function NotificationDrawer({ open, onClose }: NotificationDrawer
                                 borderRadius: 12, padding: '14px 16px', fontSize: 13,
                                 color: 'var(--text-secondary)', display: 'flex', alignItems: 'center', gap: 8,
                             }}>
-                                <CheckCheck size={15} color="var(--accent-green)" /> No critical alerts right now
+                                <CheckCheck size={15} color="var(--accent-green-text)" /> No critical alerts right now
                             </div>
                         ) : (
                             <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
@@ -211,7 +211,7 @@ export default function NotificationDrawer({ open, onClose }: NotificationDrawer
                     {/* Tomorrow's Appointments */}
                     {tomorrowAppts.length > 0 && (
                         <div style={{ marginBottom: 24 }}>
-                            <SectionTitle icon={Calendar} label="Tomorrow's Appointments" count={tomorrowAppts.length} color="var(--risk-medium)" />
+                            <SectionTitle icon={Calendar} label="Tomorrow's Appointments" count={tomorrowAppts.length} color="var(--risk-medium-text)" />
                             <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
                                 {tomorrowAppts.slice(0, 3).map(appt => (
                                     <div key={appt.id} style={{
@@ -223,7 +223,7 @@ export default function NotificationDrawer({ open, onClose }: NotificationDrawer
                                             background: 'rgba(217, 165, 32, 0.10)', borderRadius: 8, padding: '6px 8px',
                                             textAlign: 'center', minWidth: 46,
                                         }}>
-                                            <div className="font-mono" style={{ fontSize: 14, fontWeight: 800, color: 'var(--risk-medium)' }}>{appt.time}</div>
+                                            <div className="font-mono" style={{ fontSize: 14, fontWeight: 800, color: 'var(--risk-medium-text)' }}>{appt.time}</div>
                                         </div>
                                         <div>
                                             <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-primary)' }}>{appt.patientName}</div>
@@ -243,9 +243,9 @@ export default function NotificationDrawer({ open, onClose }: NotificationDrawer
                             borderRadius: 12, padding: '14px 16px',
                         }}>
                             {[
-                                { label: 'Risk Classifier', status: 'Active', color: 'var(--accent-green)' },
-                                { label: 'Readmission Model', status: 'Active', color: 'var(--accent-green)' },
-                                { label: 'LOS Predictor', status: 'Active', color: 'var(--accent-green)' },
+                                { label: 'Risk Classifier', status: 'Active', color: 'var(--accent-green-text)' },
+                                { label: 'Readmission Model', status: 'Active', color: 'var(--accent-green-text)' },
+                                { label: 'LOS Predictor', status: 'Active', color: 'var(--accent-green-text)' },
                                 { label: 'Anomaly Detection', status: 'Streaming', color: 'var(--accent-primary)' },
                             ].map(m => (
                                 <div key={m.label} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '5px 0' }}>

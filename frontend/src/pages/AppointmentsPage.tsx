@@ -14,10 +14,10 @@ import { format, isToday, isTomorrow, parseISO } from 'date-fns';
 // ─── Shared config ──────────────────────────────────────────────────────────
 
 const STATUS_COLORS: Record<string, { color: string; bg: string; label: string }> = {
-    PENDING: { color: 'var(--risk-medium)', bg: '#FFD16615', label: '⏳ Pending' },
-    APPROVED: { color: 'var(--risk-low)', bg: '#00FF8715', label: '✅ Approved' },
-    REJECTED: { color: 'var(--risk-critical)', bg: '#FF2D5515', label: '❌ Rejected' },
-    COUNTER_OFFERED: { color: 'var(--risk-high)', bg: '#FF6B3515', label: '↩ Counter Offered' },
+    PENDING: { color: 'var(--risk-medium-text)', bg: '#FFD16615', label: '⏳ Pending' },
+    APPROVED: { color: 'var(--risk-low-text)', bg: '#00FF8715', label: '✅ Approved' },
+    REJECTED: { color: 'var(--risk-critical-text)', bg: '#FF2D5515', label: '❌ Rejected' },
+    COUNTER_OFFERED: { color: 'var(--risk-high-text)', bg: '#FF6B3515', label: '↩ Counter Offered' },
     ACCEPTED: { color: 'var(--accent-primary)', bg: '#00E5FF15', label: '✅ Patient Accepted' },
     DECLINED: { color: 'var(--text-muted)', bg: '#aaa15', label: 'Patient Declined' },
     CANCELLED: { color: 'var(--text-muted)', bg: '#aaa15', label: 'Cancelled' },
@@ -113,7 +113,7 @@ function RejectModal({ reqId, onClose, onDone }: { reqId: string; onClose: () =>
                 <label style={{ display: 'block', fontSize: 11, color: 'var(--text-muted)', fontWeight: 700, marginBottom: 6, textTransform: 'uppercase' }}>Reason (optional)</label>
                 <input type="text" className="form-input" value={reason} onChange={e => setReason(e.target.value)} placeholder="Doctor unavailable..." style={{ marginBottom: 16 }} />
                 <div style={{ padding: '14px 16px', background: 'rgba(232, 131, 58, 0.06)', border: '1px solid rgba(232, 131, 58, 0.15)', borderRadius: 12, marginBottom: 20 }}>
-                    <div style={{ fontSize: 11.5, fontWeight: 700, color: 'var(--risk-high)', marginBottom: 10 }}>↩ Suggest Alternative (optional)</div>
+                    <div style={{ fontSize: 11.5, fontWeight: 700, color: 'var(--risk-high-text)', marginBottom: 10 }}>↩ Suggest Alternative (optional)</div>
                     <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
                         <div>
                             <label style={{ display: 'block', fontSize: 10.5, color: 'var(--text-muted)', marginBottom: 5 }}>Date</label>
@@ -166,9 +166,9 @@ function RequestsTab() {
 
     const stats = [
         { label: 'Total', val: requests.length, color: 'var(--accent-primary)' },
-        { label: 'Pending', val: pendingCount, color: 'var(--risk-medium)' },
-        { label: 'Approved', val: requests.filter(r => r.status === 'APPROVED' || r.status === 'ACCEPTED').length, color: 'var(--risk-low)' },
-        { label: 'Rejected', val: requests.filter(r => r.status === 'REJECTED' || r.status === 'DECLINED').length, color: 'var(--risk-critical)' },
+        { label: 'Pending', val: pendingCount, color: 'var(--risk-medium-text)' },
+        { label: 'Approved', val: requests.filter(r => r.status === 'APPROVED' || r.status === 'ACCEPTED').length, color: 'var(--risk-low-text)' },
+        { label: 'Rejected', val: requests.filter(r => r.status === 'REJECTED' || r.status === 'DECLINED').length, color: 'var(--risk-critical-text)' },
     ];
 
     return (
@@ -238,18 +238,18 @@ function RequestsTab() {
                                 {req.reason && <span style={{ fontStyle: 'italic' }}>"{req.reason?.slice(0, 60)}"</span>}
                             </div>
                             {req.status === 'APPROVED' && req.scheduledDate && (
-                                <div style={{ padding: '8px 12px', background: 'rgba(24, 155, 130, 0.06)', border: '1px solid rgba(24, 155, 130, 0.15)', borderRadius: 8, fontSize: 12.5, color: 'var(--risk-low)', marginTop: 8 }}>
+                                <div style={{ padding: '8px 12px', background: 'rgba(24, 155, 130, 0.06)', border: '1px solid rgba(24, 155, 130, 0.15)', borderRadius: 8, fontSize: 12.5, color: 'var(--risk-low-text)', marginTop: 8 }}>
                                     ✅ Confirmed: {new Date(req.scheduledDate).toLocaleDateString('en-IN', { weekday: 'short', day: 'numeric', month: 'short' })} at {req.scheduledTime}
                                 </div>
                             )}
                             {req.status === 'PENDING' && (
                                 <div style={{ display: 'flex', gap: 8 }}>
                                     <button onClick={() => { setApproving(req.id); setApprovingReq(req); }}
-                                        style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '7px 16px', background: 'rgba(24, 155, 130, 0.08)', border: '1px solid rgba(24, 155, 130, 0.2)', borderRadius: 8, color: 'var(--risk-low)', fontWeight: 700, fontSize: 12, cursor: 'pointer' }}>
+                                        style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '7px 16px', background: 'rgba(24, 155, 130, 0.08)', border: '1px solid rgba(24, 155, 130, 0.2)', borderRadius: 8, color: 'var(--risk-low-text)', fontWeight: 700, fontSize: 12, cursor: 'pointer' }}>
                                         <CheckCircle size={12} /> Approve & Schedule
                                     </button>
                                     <button onClick={() => setRejecting(req.id)}
-                                        style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '7px 16px', background: 'rgba(232, 131, 58, 0.08)', border: '1px solid rgba(232, 131, 58, 0.2)', borderRadius: 8, color: 'var(--risk-high)', fontWeight: 700, fontSize: 12, cursor: 'pointer' }}>
+                                        style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '7px 16px', background: 'rgba(232, 131, 58, 0.08)', border: '1px solid rgba(232, 131, 58, 0.2)', borderRadius: 8, color: 'var(--risk-high-text)', fontWeight: 700, fontSize: 12, cursor: 'pointer' }}>
                                         <XCircle size={12} /> Reject / Counter
                                     </button>
                                 </div>
@@ -354,7 +354,7 @@ function BookTab() {
                         {/* Patient */}
                         <div>
                             <label style={{ display: 'block', fontSize: 11, fontWeight: 700, color: 'var(--text-muted)', marginBottom: 6, textTransform: 'uppercase', letterSpacing: '0.08em' }}>
-                                Patient <span style={{ color: 'var(--risk-critical)' }}>*</span>
+                                Patient <span style={{ color: 'var(--risk-critical-text)' }}>*</span>
                             </label>
                             <select className="form-input" value={form.patientId} onChange={e => {
                                 const p = patients.find((x: any) => x.id === e.target.value);
@@ -369,7 +369,7 @@ function BookTab() {
                         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
                             <div>
                                 <label style={{ display: 'block', fontSize: 11, fontWeight: 700, color: 'var(--text-muted)', marginBottom: 6, textTransform: 'uppercase', letterSpacing: '0.08em' }}>
-                                    Doctor <span style={{ color: 'var(--risk-critical)' }}>*</span>
+                                    Doctor <span style={{ color: 'var(--risk-critical-text)' }}>*</span>
                                 </label>
                                 {doctors.length > 0 ? (
                                     <select className="form-input" value={form.doctorId} onChange={e => {
@@ -393,11 +393,11 @@ function BookTab() {
                         {/* Date + Time */}
                         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
                             <div>
-                                <label style={{ display: 'block', fontSize: 11, fontWeight: 700, color: 'var(--text-muted)', marginBottom: 6, textTransform: 'uppercase', letterSpacing: '0.08em' }}>Date <span style={{ color: 'var(--risk-critical)' }}>*</span></label>
+                                <label style={{ display: 'block', fontSize: 11, fontWeight: 700, color: 'var(--text-muted)', marginBottom: 6, textTransform: 'uppercase', letterSpacing: '0.08em' }}>Date <span style={{ color: 'var(--risk-critical-text)' }}>*</span></label>
                                 <input type="date" className="form-input" value={form.date} min={new Date().toISOString().slice(0, 10)} onChange={e => setForm(f => ({ ...f, date: e.target.value }))} required />
                             </div>
                             <div>
-                                <label style={{ display: 'block', fontSize: 11, fontWeight: 700, color: 'var(--text-muted)', marginBottom: 6, textTransform: 'uppercase', letterSpacing: '0.08em' }}>Time <span style={{ color: 'var(--risk-critical)' }}>*</span></label>
+                                <label style={{ display: 'block', fontSize: 11, fontWeight: 700, color: 'var(--text-muted)', marginBottom: 6, textTransform: 'uppercase', letterSpacing: '0.08em' }}>Time <span style={{ color: 'var(--risk-critical-text)' }}>*</span></label>
                                 <select className="form-input" value={form.time} onChange={e => setForm(f => ({ ...f, time: e.target.value }))}>
                                     {TIMES.map(t => <option key={t}>{t}</option>)}
                                 </select>
@@ -417,7 +417,7 @@ function BookTab() {
                         </div>
 
                         <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '9px 12px', background: 'rgba(24, 155, 130, 0.04)', border: '1px solid rgba(24, 155, 130, 0.12)', borderRadius: 9, fontSize: 12, color: 'var(--text-secondary)' }}>
-                            <MessageSquare size={13} color="var(--accent-green)" />
+                            <MessageSquare size={13} color="var(--accent-green-text)" />
                             Patient will get an in-app notification if they have a portal account.
                         </div>
                         <button type="submit" disabled={saving} className="btn-primary" style={{ justifyContent: 'center' }}>
@@ -445,7 +445,7 @@ function BookTab() {
                                 <div style={{ fontSize: 12, color: 'var(--text-muted)', marginTop: 2 }}>Dr. {b.doctorName} · {b.doctorDept}</div>
                                 <div style={{ fontSize: 11.5, color: 'var(--text-muted)', marginTop: 4 }}>📅 {b.date} · ⏰ {b.time} · {b.reason}</div>
                             </div>
-                            <span style={{ fontSize: 10, fontWeight: 700, padding: '2px 9px', borderRadius: 20, color: 'var(--risk-low)', background: 'rgba(24, 155, 130, 0.1)', border: '1px solid rgba(24, 155, 130, 0.2)' }}>BOOKED</span>
+                            <span style={{ fontSize: 10, fontWeight: 700, padding: '2px 9px', borderRadius: 20, color: 'var(--risk-low-text)', background: 'rgba(24, 155, 130, 0.1)', border: '1px solid rgba(24, 155, 130, 0.2)' }}>BOOKED</span>
                         </div>
                     </div>
                 ))}

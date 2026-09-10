@@ -252,7 +252,7 @@ export default function DoctorPatientDetail() {
                 {/* Medical History */}
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
                     <div style={{ background: 'var(--surface-1)', border: '1px solid var(--surface-border)', borderRadius: 18, padding: 24 }}>
-                        <div style={{ fontSize: 11, fontWeight: 700, color: 'var(--risk-high)', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 14 }}>
+                        <div style={{ fontSize: 11, fontWeight: 700, color: 'var(--risk-high-text)', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 14 }}>
                             🏥 Medical History
                         </div>
                         {comorbidities.length > 0 ? (
@@ -271,8 +271,8 @@ export default function DoctorPatientDetail() {
                         )}
                         {patient.allergies && (
                             <div style={{ marginBottom: 10 }}>
-                                <div style={{ fontSize: 10, color: 'var(--risk-medium)', fontWeight: 700, textTransform: 'uppercase', marginBottom: 4 }}>Allergies ⚠️</div>
-                                <div style={{ fontSize: 12.5, color: 'var(--risk-medium)', lineHeight: 1.6 }}>{patient.allergies}</div>
+                                <div style={{ fontSize: 10, color: 'var(--risk-medium-text)', fontWeight: 700, textTransform: 'uppercase', marginBottom: 4 }}>Allergies ⚠️</div>
+                                <div style={{ fontSize: 12.5, color: 'var(--risk-medium-text)', lineHeight: 1.6 }}>{patient.allergies}</div>
                             </div>
                         )}
                         {patient.currentMedications && (

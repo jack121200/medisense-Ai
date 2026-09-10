@@ -4,9 +4,9 @@ type RiskLevel = 'critical' | 'high' | 'medium' | 'low';
 type StatusTone = 'success' | 'warning' | 'danger' | 'info' | 'neutral';
 
 const STATUS_COLORS: Record<StatusTone, { color: string; bg: string }> = {
-    success: { color: 'var(--risk-low)', bg: 'var(--risk-low-bg)' },
-    warning: { color: 'var(--risk-medium)', bg: 'var(--risk-medium-bg)' },
-    danger: { color: 'var(--risk-critical)', bg: 'var(--risk-critical-bg)' },
+    success: { color: 'var(--risk-low-text)', bg: 'var(--risk-low-bg)' },
+    warning: { color: 'var(--risk-medium-text)', bg: 'var(--risk-medium-bg)' },
+    danger: { color: 'var(--risk-critical-text)', bg: 'var(--risk-critical-bg)' },
     info: { color: 'var(--accent-primary)', bg: 'var(--accent-glow)' },
     neutral: { color: 'var(--text-secondary)', bg: 'rgba(13, 92, 126, 0.08)' },
 };

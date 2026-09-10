@@ -117,7 +117,7 @@ export default function LiveWaveformMonitor() {
                         border: '1px solid rgba(209, 63, 74, 0.3)',
                         display: 'flex', alignItems: 'center', justifyContent: 'center'
                     }}>
-                        <Activity size={22} color="var(--risk-critical)" />
+                        <Activity size={22} color="var(--risk-critical-text)" />
                     </div>
                     <div>
                         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
@@ -126,7 +126,7 @@ export default function LiveWaveformMonitor() {
                             </h2>
                             <span style={{
                                 fontSize: 10, fontWeight: 800, padding: '2px 8px', borderRadius: 12,
-                                background: 'rgba(209, 63, 74, 0.15)', color: 'var(--risk-critical)', border: '1px solid rgba(209, 63, 74, 0.3)'
+                                background: 'rgba(209, 63, 74, 0.15)', color: 'var(--risk-critical-text)', border: '1px solid rgba(209, 63, 74, 0.3)'
                             }}>
                                 UNIT IV & VI — DEEP AUTOENCODER
                             </span>
@@ -224,7 +224,7 @@ export default function LiveWaveformMonitor() {
                         REAL-TIME ECG WAVEFORM & TEMPORAL ATTENTION HEATMAP OVERLAY
                     </div>
                     {result?.is_anomaly && (
-                        <span style={{ fontSize: 11, fontWeight: 800, color: 'var(--risk-critical)', background: 'rgba(209, 63, 74, 0.15)', padding: '2px 8px', borderRadius: 8, border: '1px solid rgba(209, 63, 74, 0.3)' }}>
+                        <span style={{ fontSize: 11, fontWeight: 800, color: 'var(--risk-critical-text)', background: 'rgba(209, 63, 74, 0.15)', padding: '2px 8px', borderRadius: 8, border: '1px solid rgba(209, 63, 74, 0.3)' }}>
                             🚨 ANOMALOUS SEGMENT HIGHLIGHTED IN RED
                         </span>
                     )}

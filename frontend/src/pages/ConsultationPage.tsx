@@ -258,7 +258,7 @@ export default function ConsultationPage() {
                 </div>
                 <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
                     {isCompleted ? (
-                        <span style={{ fontSize: 12, fontWeight: 700, color: 'var(--risk-low)', background: '#00FF8720', padding: '6px 14px', borderRadius: 20, border: '1px solid #00FF8730' }}>✓ COMPLETED</span>
+                        <span style={{ fontSize: 12, fontWeight: 700, color: 'var(--risk-low-text)', background: '#00FF8720', padding: '6px 14px', borderRadius: 20, border: '1px solid #00FF8730' }}>✓ COMPLETED</span>
                     ) : (
                         <button onClick={closeAndBill} disabled={closing} style={{
                             padding: '10px 20px', background: 'linear-gradient(135deg, var(--risk-low), #00A858)',
@@ -346,7 +346,7 @@ export default function ConsultationPage() {
                             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
                                 <div style={{ fontWeight: 700, fontSize: 14, color: 'var(--text-primary)' }}>Digital Prescription</div>
                                 {!isCompleted && (
-                                    <button onClick={() => setRxItems([...rxItems, { medicineName: '', dosage: '', frequency: '', duration: '' }])} style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '7px 14px', background: 'rgba(24, 155, 130, 0.1)', border: '1px solid rgba(24, 155, 130, 0.25)', borderRadius: 8, color: 'var(--risk-low)', fontSize: 12, fontWeight: 700, cursor: 'pointer' }}>
+                                    <button onClick={() => setRxItems([...rxItems, { medicineName: '', dosage: '', frequency: '', duration: '' }])} style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '7px 14px', background: 'rgba(24, 155, 130, 0.1)', border: '1px solid rgba(24, 155, 130, 0.25)', borderRadius: 8, color: 'var(--risk-low-text)', fontSize: 12, fontWeight: 700, cursor: 'pointer' }}>
                                         <Plus size={13} /> Add Medicine
                                     </button>
                                 )}
@@ -373,7 +373,7 @@ export default function ConsultationPage() {
                                         <input value={item.duration} disabled={isCompleted} onChange={e => { const n = [...rxItems]; n[idx].duration = e.target.value; setRxItems(n); }} placeholder="5 days" className="form-input" />
                                     </div>
                                     {!isCompleted && (
-                                        <button onClick={() => setRxItems(rxItems.filter((_, i) => i !== idx))} style={{ marginTop: 24, padding: 8, background: 'rgba(209, 63, 74, 0.1)', border: '1px solid rgba(209, 63, 74, 0.2)', borderRadius: 8, color: 'var(--risk-critical)', cursor: 'pointer' }}>
+                                        <button onClick={() => setRxItems(rxItems.filter((_, i) => i !== idx))} style={{ marginTop: 24, padding: 8, background: 'rgba(209, 63, 74, 0.1)', border: '1px solid rgba(209, 63, 74, 0.2)', borderRadius: 8, color: 'var(--risk-critical-text)', cursor: 'pointer' }}>
                                             <Trash2 size={13} />
                                         </button>
                                     )}
@@ -498,7 +498,7 @@ export default function ConsultationPage() {
                         <div style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 14 }}>Patient Profile</div>
                         {[
                             { label: 'Blood Group', val: p?.bloodGroup?.replace('_', ' ') },
-                            { label: 'Risk Level', val: p?.currentRiskLevel, color: 'var(--risk-critical)' },
+                            { label: 'Risk Level', val: p?.currentRiskLevel, color: 'var(--risk-critical-text)' },
                             { label: 'Diabetes', val: p?.hasDiabetes ? 'Yes' : 'No' },
                             { label: 'Hypertension', val: p?.hasHypertension ? 'Yes' : 'No' },
                             { label: 'Heart Disease', val: p?.hasHeartDisease ? 'Yes' : 'No' },

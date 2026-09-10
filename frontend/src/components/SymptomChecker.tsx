@@ -167,7 +167,7 @@ export default function SymptomChecker() {
                         </span>
                     ))}
                     <button onClick={() => { setSelected([]); setResult(null); setQuery(''); }}
-                        style={{ padding: '5px 10px', background: 'transparent', border: '1px solid rgba(209, 63, 74, 0.25)', borderRadius: 20, fontSize: 11, color: 'var(--risk-critical)', cursor: 'pointer', fontWeight: 600 }}>
+                        style={{ padding: '5px 10px', background: 'transparent', border: '1px solid rgba(209, 63, 74, 0.25)', borderRadius: 20, fontSize: 11, color: 'var(--risk-critical-text)', cursor: 'pointer', fontWeight: 600 }}>
                         Clear all
                     </button>
                 </div>
@@ -222,7 +222,7 @@ export default function SymptomChecker() {
 
                     {result.unrecognized.length > 0 && (
                         <div style={{ marginTop: 12, padding: '8px 12px', background: 'rgba(217, 165, 32, 0.08)', border: '1px solid rgba(217, 165, 32, 0.2)', borderRadius: 10, display: 'flex', gap: 8, alignItems: 'flex-start' }}>
-                            <AlertCircle size={13} style={{ color: 'var(--risk-medium)', marginTop: 1, flexShrink: 0 }} />
+                            <AlertCircle size={13} style={{ color: 'var(--risk-medium-text)', marginTop: 1, flexShrink: 0 }} />
                             <span style={{ fontSize: 11, color: 'var(--text-secondary)' }}>
                                 Unrecognized: {result.unrecognized.join(', ')}
                             </span>

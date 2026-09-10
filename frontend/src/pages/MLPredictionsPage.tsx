@@ -586,8 +586,8 @@ import LiveWaveformMonitor from '../components/LiveWaveformMonitor';
 
 const TABS = [
     { id: 'bayesian',label: '🔮 Bayesian Engine',      icon: Brain,    color: 'var(--accent-primary)' },
-    { id: 'fuzzy',   label: '🎛️ Fuzzy Dosing Engine', icon: Heart,    color: 'var(--risk-medium)' },
-    { id: 'deep',    label: '⚡ Deep Waveform Monitor',icon: Activity, color: 'var(--risk-critical)' },
+    { id: 'fuzzy',   label: '🎛️ Fuzzy Dosing Engine', icon: Heart,    color: 'var(--risk-medium-text)' },
+    { id: 'deep',    label: '⚡ Deep Waveform Monitor',icon: Activity, color: 'var(--risk-critical-text)' },
     { id: 'lipid',   label: '🫀 Lipid Profile',      icon: Heart,    color: 'var(--accent-primary)' },
     { id: 'cbc',     label: '🩸 CBC Analyzer',        icon: Droplets, color: 'var(--accent-primary-hover)' },
     { id: 'symptom', label: '🧠 Symptom Checker',     icon: Brain,    color: 'var(--vitals-bp)' },
@@ -600,8 +600,8 @@ export default function MLPredictionsPage() {
 
     const patientTabs = [
         { id: 'bayesian',label: '🔮 Bayesian Uncertainty', color: 'var(--accent-primary)' },
-        { id: 'fuzzy',   label: '🎛️ Fuzzy Drug Dosing',    color: 'var(--risk-medium)' },
-        { id: 'deep',    label: '⚡ Waveform Monitor',     color: 'var(--risk-critical)' },
+        { id: 'fuzzy',   label: '🎛️ Fuzzy Drug Dosing',    color: 'var(--risk-medium-text)' },
+        { id: 'deep',    label: '⚡ Waveform Monitor',     color: 'var(--risk-critical-text)' },
         { id: 'lipid',   label: '🫀 Lipid Profile',        color: 'var(--accent-primary)' },
         { id: 'cbc',     label: '🩸 CBC Report',            color: 'var(--accent-primary-hover)' },
         { id: 'symptom', label: '🧠 Symptom Checker',      color: 'var(--vitals-bp)' },

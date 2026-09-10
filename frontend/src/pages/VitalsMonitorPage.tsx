@@ -7,7 +7,7 @@ import { useVitalsStore } from '../store/vitalsStore';
 import { format } from 'date-fns';
 
 const VITALS_CONFIG = [
-    { key: 'HR', label: 'Heart Rate', unit: 'bpm', color: 'var(--risk-critical)', criticalLow: 40, criticalHigh: 130, icon: '❤️' },
+    { key: 'HR', label: 'Heart Rate', unit: 'bpm', color: 'var(--risk-critical-text)', criticalLow: 40, criticalHigh: 130, icon: '❤️' },
     { key: 'SpO2', label: 'SpO₂', unit: '%', color: 'var(--accent-primary)', criticalLow: 88, criticalHigh: 101, icon: '🫁' },
     { key: 'SBP', label: 'Systolic BP', unit: 'mmHg', color: 'var(--vitals-bp)', criticalLow: 70, criticalHigh: 180, icon: '🩸' },
     { key: 'Temp', label: 'Temperature', unit: '°C', color: 'var(--vitals-temp)', criticalLow: 35, criticalHigh: 39.5, icon: '🌡️' },
@@ -86,7 +86,7 @@ export default function VitalsMonitorPage() {
                         display: 'flex', alignItems: 'center', gap: 5, padding: '4px 10px',
                         background: 'rgba(24, 155, 130, 0.08)', borderRadius: 9999,
                         border: '1px solid rgba(24, 155, 130, 0.20)',
-                        fontSize: 11, fontWeight: 700, color: 'var(--accent-green)', marginLeft: 4,
+                        fontSize: 11, fontWeight: 700, color: 'var(--accent-green-text)', marginLeft: 4,
                     }}>
                         <div className="live-dot" style={{ width: 6, height: 6, borderRadius: '50%', background: 'var(--accent-green)' }} />
                         STREAMING
@@ -190,7 +190,7 @@ export default function VitalsMonitorPage() {
                                 <div style={{
                                     display: 'flex', alignItems: 'center', gap: 6, padding: '5px 12px',
                                     background: 'rgba(209, 63, 74, 0.10)', borderRadius: 9999,
-                                    border: '1px solid rgba(209, 63, 74, 0.25)', fontSize: 11, fontWeight: 700, color: 'var(--risk-critical)',
+                                    border: '1px solid rgba(209, 63, 74, 0.25)', fontSize: 11, fontWeight: 700, color: 'var(--risk-critical-text)',
                                 }} className="pulse-critical">
                                     <AlertTriangle size={12} /> ANOMALY DETECTED
                                 </div>
@@ -274,7 +274,7 @@ export default function VitalsMonitorPage() {
                     borderRadius: 18, padding: '22px 24px', marginTop: 24,
                 }}>
                     <div style={{ position: 'relative', top: 0, left: 0, right: 0, height: 2, background: 'var(--risk-critical)', borderRadius: '18px 18px 0 0', opacity: 0.6 }} />
-                    <h3 style={{ fontSize: 14.5, fontWeight: 700, marginBottom: 14, display: 'flex', alignItems: 'center', gap: 8, color: 'var(--risk-critical)' }}>
+                    <h3 style={{ fontSize: 14.5, fontWeight: 700, marginBottom: 14, display: 'flex', alignItems: 'center', gap: 8, color: 'var(--risk-critical-text)' }}>
                         <AlertTriangle size={16} /> Recent Vitals Anomaly Alerts
                     </h3>
                     <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>

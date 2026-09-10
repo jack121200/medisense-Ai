@@ -9,8 +9,8 @@ import { format } from 'date-fns';
 const ROLE_COLORS: Record<string, { color: string; bg: string }> = {
     ADMIN: { color: '#FF2CF5', bg: 'rgba(255,44,245,0.10)' },
     DOCTOR: { color: 'var(--accent-primary)', bg: 'rgba(13, 92, 126, 0.10)' },
-    NURSE: { color: 'var(--risk-low)', bg: 'rgba(24, 155, 130, 0.10)' },
-    ANALYST: { color: 'var(--risk-medium)', bg: 'rgba(217, 165, 32, 0.10)' },
+    NURSE: { color: 'var(--risk-low-text)', bg: 'rgba(24, 155, 130, 0.10)' },
+    ANALYST: { color: 'var(--risk-medium-text)', bg: 'rgba(217, 165, 32, 0.10)' },
 };
 
 export default function UsersPage() {

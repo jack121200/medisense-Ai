@@ -18,7 +18,7 @@ function ComorbidityTag({ label }: { label: string }) {
     return (
         <span style={{
             fontSize: 11, padding: '2px 9px', borderRadius: 20,
-            background: 'rgba(232, 131, 58, 0.1)', color: 'var(--risk-high)',
+            background: 'rgba(232, 131, 58, 0.1)', color: 'var(--risk-high-text)',
             border: '1px solid rgba(232, 131, 58, 0.25)', fontWeight: 600,
         }}>{label}</span>
     );

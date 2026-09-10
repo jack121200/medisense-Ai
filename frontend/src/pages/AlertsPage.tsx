@@ -6,9 +6,9 @@ import { useAlertStore } from '../store/alertStore';
 import toast from 'react-hot-toast';
 
 const SEVERITY_CONFIG: Record<string, { color: string; bg: string; border: string; icon: any }> = {
-    CRITICAL: { color: 'var(--risk-critical)', bg: 'rgba(209, 63, 74, 0.08)', border: 'rgba(209, 63, 74, 0.25)', icon: AlertTriangle },
-    WARNING: { color: 'var(--risk-medium)', bg: 'rgba(217, 165, 32, 0.08)', border: 'rgba(217, 165, 32, 0.20)', icon: AlertTriangle },
-    HIGH: { color: 'var(--risk-high)', bg: 'rgba(232, 131, 58, 0.08)', border: 'rgba(232, 131, 58, 0.20)', icon: AlertTriangle },
+    CRITICAL: { color: 'var(--risk-critical-text)', bg: 'rgba(209, 63, 74, 0.08)', border: 'rgba(209, 63, 74, 0.25)', icon: AlertTriangle },
+    WARNING: { color: 'var(--risk-medium-text)', bg: 'rgba(217, 165, 32, 0.08)', border: 'rgba(217, 165, 32, 0.20)', icon: AlertTriangle },
+    HIGH: { color: 'var(--risk-high-text)', bg: 'rgba(232, 131, 58, 0.08)', border: 'rgba(232, 131, 58, 0.20)', icon: AlertTriangle },
     INFO: { color: 'var(--accent-primary)', bg: 'rgba(13, 92, 126, 0.06)', border: 'rgba(13, 92, 126, 0.15)', icon: Info },
 };
 
@@ -67,7 +67,7 @@ export default function AlertsPage() {
                                 display: 'flex', alignItems: 'center', gap: 5, padding: '4px 12px',
                                 background: 'rgba(209, 63, 74, 0.10)', borderRadius: 9999,
                                 border: '1px solid rgba(209, 63, 74, 0.30)', fontSize: 12, fontWeight: 800,
-                                color: 'var(--risk-critical)',
+                                color: 'var(--risk-critical-text)',
                             }} className="pulse-critical">
                                 🚨 {criticalCount} CRITICAL
                             </div>
@@ -207,7 +207,7 @@ export default function AlertsPage() {
                                             {formatDistanceToNow(new Date(a.createdAt), { addSuffix: true })}
                                         </span>
                                         {a.isResolved && (
-                                            <span style={{ color: 'var(--accent-green)', fontWeight: 700, fontSize: 11 }}>
+                                            <span style={{ color: 'var(--accent-green-text)', fontWeight: 700, fontSize: 11 }}>
                                                 ✓ Resolved
                                             </span>
                                         )}

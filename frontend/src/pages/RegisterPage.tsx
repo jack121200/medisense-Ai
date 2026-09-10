@@ -12,7 +12,7 @@ const ROLES = [
         label: 'Patient',
         icon: '🫀',
         desc: 'Book appointments, view cardiac reports, manage your heart health records',
-        color: 'var(--risk-low)',
+        color: 'var(--risk-low-text)',
         endpoint: '/auth/patient-register',
     },
     {
@@ -28,7 +28,7 @@ const ROLES = [
         label: 'Receptionist',
         icon: '📋',
         desc: 'Manage appointments, handle patient intake and scheduling',
-        color: 'var(--risk-medium)',
+        color: 'var(--risk-medium-text)',
         endpoint: '/auth/register',
     },
     {
@@ -384,7 +384,7 @@ export default function RegisterPage() {
                                     ✓ By registering, you agree to provide accurate medical information. Your data is secured and only accessible to authorized medical staff.
                                 </p>
                             </div>
-                            {error && <div style={{ marginBottom: 14, padding: '10px 14px', background: 'rgba(209, 63, 74, 0.1)', border: '1px solid rgba(209, 63, 74, 0.25)', borderRadius: 8, fontSize: 13, color: 'var(--risk-high)' }}>⚠️ {error}</div>}
+                            {error && <div style={{ marginBottom: 14, padding: '10px 14px', background: 'rgba(209, 63, 74, 0.1)', border: '1px solid rgba(209, 63, 74, 0.25)', borderRadius: 8, fontSize: 13, color: 'var(--risk-high-text)' }}>⚠️ {error}</div>}
                             <button type="submit" disabled={submitting} style={{ width: '100%', padding: '14px', borderRadius: 10, border: 'none', cursor: submitting ? 'not-allowed' : 'pointer', background: submitting ? `${accentColor}50` : `linear-gradient(135deg, ${accentColor}, ${accentColor}cc)`, color: '#fff', fontSize: 15, fontWeight: 700, opacity: submitting ? 0.7 : 1 }}>
                                 {submitting ? '⏳ Creating account...' : `✅ Create ${roleObj?.label} Account`}
                             </button>
@@ -394,13 +394,13 @@ export default function RegisterPage() {
                     {/* ── FINAL SUBMIT for non-patient ── */}
                     {step === 2 && !isPatient && (
                         <form onSubmit={handleSubmit} style={{ marginTop: 0 }}>
-                            {error && <div style={{ marginBottom: 14, padding: '10px 14px', background: 'rgba(209, 63, 74, 0.1)', border: '1px solid rgba(209, 63, 74, 0.25)', borderRadius: 8, fontSize: 13, color: 'var(--risk-high)' }}>⚠️ {error}</div>}
+                            {error && <div style={{ marginBottom: 14, padding: '10px 14px', background: 'rgba(209, 63, 74, 0.1)', border: '1px solid rgba(209, 63, 74, 0.25)', borderRadius: 8, fontSize: 13, color: 'var(--risk-high-text)' }}>⚠️ {error}</div>}
                         </form>
                     )}
 
                     {/* Error for non-final steps */}
                     {error && step < (isPatient ? 3 : 2) && (
-                        <div style={{ marginTop: 12, padding: '10px 14px', background: 'rgba(209, 63, 74, 0.1)', border: '1px solid rgba(209, 63, 74, 0.25)', borderRadius: 8, fontSize: 13, color: 'var(--risk-high)' }}>⚠️ {error}</div>
+                        <div style={{ marginTop: 12, padding: '10px 14px', background: 'rgba(209, 63, 74, 0.1)', border: '1px solid rgba(209, 63, 74, 0.25)', borderRadius: 8, fontSize: 13, color: 'var(--risk-high-text)' }}>⚠️ {error}</div>
                     )}
 
                     {/* Navigation buttons */}

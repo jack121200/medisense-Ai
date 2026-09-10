@@ -249,7 +249,7 @@ const LoginPage = () => {
                             </div>
 
                             {error && (
-                                <div style={{ marginBottom: 16, padding: '10px 14px', background: 'rgba(209, 63, 74, 0.1)', border: '1px solid rgba(209, 63, 74, 0.25)', borderRadius: 8, fontSize: 13, color: 'var(--risk-high)' }}>
+                                <div style={{ marginBottom: 16, padding: '10px 14px', background: 'rgba(209, 63, 74, 0.1)', border: '1px solid rgba(209, 63, 74, 0.25)', borderRadius: 8, fontSize: 13, color: 'var(--risk-high-text)' }}>
                                     ⚠️ {error}
                                 </div>
                             )}

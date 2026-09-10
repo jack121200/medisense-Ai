@@ -34,10 +34,10 @@ const TIME_SLOTS = [
 ];
 
 const STATUS_COLORS: Record<string, { color: string; bg: string; label: string }> = {
-    PENDING: { color: 'var(--risk-medium)', bg: '#FFD16615', label: 'Pending Review' },
-    APPROVED: { color: 'var(--risk-low)', bg: '#00FF8715', label: 'Approved ✓' },
-    REJECTED: { color: 'var(--risk-critical)', bg: '#FF2D5515', label: 'Rejected' },
-    COUNTER_OFFERED: { color: 'var(--risk-high)', bg: '#FF6B3515', label: 'Alternative Offered' },
+    PENDING: { color: 'var(--risk-medium-text)', bg: '#FFD16615', label: 'Pending Review' },
+    APPROVED: { color: 'var(--risk-low-text)', bg: '#00FF8715', label: 'Approved ✓' },
+    REJECTED: { color: 'var(--risk-critical-text)', bg: '#FF2D5515', label: 'Rejected' },
+    COUNTER_OFFERED: { color: 'var(--risk-high-text)', bg: '#FF6B3515', label: 'Alternative Offered' },
     ACCEPTED: { color: 'var(--accent-primary)', bg: '#00E5FF15', label: 'Accepted by Patient' },
     DECLINED: { color: 'var(--text-muted)', bg: '#aaa15', label: 'Declined' },
     CANCELLED: { color: 'var(--text-muted)', bg: '#aaa15', label: 'Cancelled' },
@@ -267,7 +267,7 @@ export default function PatientPortalPage() {
                                         <div style={{ width: 44, height: 44, borderRadius: 12, background: 'linear-gradient(135deg, var(--risk-low), var(--accent-green-dim))', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 20, flexShrink: 0 }}>🩺</div>
                                         <div>
                                             <div style={{ fontWeight: 700, color: 'var(--text-primary)', fontSize: 14 }}>Dr. {doc.firstName} {doc.lastName}</div>
-                                            <div style={{ fontSize: 12, color: 'var(--risk-low)', marginTop: 2 }}>{doc.specialization}</div>
+                                            <div style={{ fontSize: 12, color: 'var(--risk-low-text)', marginTop: 2 }}>{doc.specialization}</div>
                                             <div style={{ fontSize: 12, color: 'var(--text-muted)', marginTop: 1 }}>Consultation Fee: ₹{doc.consultationFee?.toLocaleString()}</div>
                                         </div>
                                     </div>
@@ -337,7 +337,7 @@ export default function PatientPortalPage() {
                     <div style={{ background: 'var(--surface-1)', border: '1px solid var(--surface-border)', borderRadius: 18, overflow: 'hidden' }}>
                         <div style={{ padding: '16px 24px', borderBottom: '1px solid var(--surface-border)', fontWeight: 800, color: 'var(--text-primary)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                             Appointment Requests
-                            <button onClick={() => setTab('book')} style={{ fontSize: 12, padding: '6px 14px', background: 'rgba(24, 155, 130, 0.1)', border: '1px solid rgba(24, 155, 130, 0.25)', borderRadius: 8, color: 'var(--risk-low)', fontWeight: 700, cursor: 'pointer' }}>
+                            <button onClick={() => setTab('book')} style={{ fontSize: 12, padding: '6px 14px', background: 'rgba(24, 155, 130, 0.1)', border: '1px solid rgba(24, 155, 130, 0.25)', borderRadius: 8, color: 'var(--risk-low-text)', fontWeight: 700, cursor: 'pointer' }}>
                                 + New Request
                             </button>
                         </div>
@@ -355,7 +355,7 @@ export default function PatientPortalPage() {
                                                 <div>
                                                     <div style={{ fontWeight: 700, color: 'var(--text-primary)', fontSize: 14, marginBottom: 4 }}>
                                                         Dr. {req.doctor?.firstName} {req.doctor?.lastName}
-                                                        <span style={{ fontSize: 12, color: 'var(--risk-low)', marginLeft: 8 }}>{req.doctor?.specialization}</span>
+                                                        <span style={{ fontSize: 12, color: 'var(--risk-low-text)', marginLeft: 8 }}>{req.doctor?.specialization}</span>
                                                     </div>
                                                     <div style={{ fontSize: 12, color: 'var(--text-muted)' }}>
                                                         Requested: {new Date(req.requestedDate).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })} · {TIME_SLOTS.find(t => t.value === req.timeSlot)?.label}
@@ -365,21 +365,21 @@ export default function PatientPortalPage() {
                                                 <span style={{ fontSize: 11, fontWeight: 700, color: sc.color, background: sc.bg, padding: '4px 12px', borderRadius: 20, whiteSpace: 'nowrap' }}>{sc.label}</span>
                                             </div>
                                             {req.status === 'APPROVED' && req.scheduledDate && (
-                                                <div style={{ padding: '10px 14px', background: 'rgba(24, 155, 130, 0.08)', border: '1px solid rgba(24, 155, 130, 0.2)', borderRadius: 10, fontSize: 13, color: 'var(--risk-low)' }}>
+                                                <div style={{ padding: '10px 14px', background: 'rgba(24, 155, 130, 0.08)', border: '1px solid rgba(24, 155, 130, 0.2)', borderRadius: 10, fontSize: 13, color: 'var(--risk-low-text)' }}>
                                                     ✅ Confirmed for {new Date(req.scheduledDate).toLocaleDateString('en-IN', { weekday: 'short', day: 'numeric', month: 'short' })} at {req.scheduledTime}
                                                 </div>
                                             )}
                                             {req.status === 'COUNTER_OFFERED' && (
                                                 <div style={{ padding: '12px 14px', background: 'rgba(232, 131, 58, 0.08)', border: '1px solid rgba(232, 131, 58, 0.2)', borderRadius: 10 }}>
-                                                    <div style={{ fontSize: 13, color: 'var(--risk-high)', marginBottom: 10 }}>
+                                                    <div style={{ fontSize: 13, color: 'var(--risk-high-text)', marginBottom: 10 }}>
                                                         ⏰ Alternative suggested: {req.counterDate ? new Date(req.counterDate).toLocaleDateString('en-IN', { weekday: 'short', day: 'numeric', month: 'short' }) : ''} {req.counterTime}
                                                         {req.rejectReason && <div style={{ fontSize: 12, color: 'var(--text-muted)', marginTop: 4 }}>Reason: {req.rejectReason}</div>}
                                                     </div>
                                                     <div style={{ display: 'flex', gap: 8 }}>
-                                                        <button onClick={() => respondToCounter(req.id, true)} style={{ padding: '8px 16px', background: 'rgba(24, 155, 130, 0.15)', border: '1px solid rgba(24, 155, 130, 0.3)', borderRadius: 8, color: 'var(--risk-low)', fontWeight: 700, fontSize: 12, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6 }}>
+                                                        <button onClick={() => respondToCounter(req.id, true)} style={{ padding: '8px 16px', background: 'rgba(24, 155, 130, 0.15)', border: '1px solid rgba(24, 155, 130, 0.3)', borderRadius: 8, color: 'var(--risk-low-text)', fontWeight: 700, fontSize: 12, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6 }}>
                                                             <CheckCircle size={12} /> Accept New Time
                                                         </button>
-                                                        <button onClick={() => respondToCounter(req.id, false)} style={{ padding: '8px 16px', background: 'rgba(209, 63, 74, 0.1)', border: '1px solid rgba(209, 63, 74, 0.25)', borderRadius: 8, color: 'var(--risk-critical)', fontWeight: 700, fontSize: 12, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6 }}>
+                                                        <button onClick={() => respondToCounter(req.id, false)} style={{ padding: '8px 16px', background: 'rgba(209, 63, 74, 0.1)', border: '1px solid rgba(209, 63, 74, 0.25)', borderRadius: 8, color: 'var(--risk-critical-text)', fontWeight: 700, fontSize: 12, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6 }}>
                                                             <XCircle size={12} /> Decline
                                                         </button>
                                                     </div>
@@ -412,7 +412,7 @@ export default function PatientPortalPage() {
             {tab === 'notifications' && (
                 <div style={{ background: 'var(--surface-1)', border: '1px solid var(--surface-border)', borderRadius: 18, overflow: 'hidden' }}>
                     <div style={{ padding: '16px 24px', borderBottom: '1px solid var(--surface-border)', fontWeight: 800, color: 'var(--text-primary)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                        Notifications {unreadCount > 0 && <span style={{ fontSize: 11, padding: '3px 10px', background: 'rgba(209, 63, 74, 0.2)', color: 'var(--risk-critical)', borderRadius: 12, fontWeight: 700 }}>{unreadCount} unread</span>}
+                        Notifications {unreadCount > 0 && <span style={{ fontSize: 11, padding: '3px 10px', background: 'rgba(209, 63, 74, 0.2)', color: 'var(--risk-critical-text)', borderRadius: 12, fontWeight: 700 }}>{unreadCount} unread</span>}
                         {unreadCount > 0 && <button onClick={markAllRead} style={{ fontSize: 12, padding: '6px 14px', background: 'transparent', border: '1px solid var(--surface-border-md)', borderRadius: 8, color: 'var(--text-secondary)', cursor: 'pointer' }}>Mark all read</button>}
                     </div>
                     {notifications.length === 0
@@ -518,7 +518,7 @@ export default function PatientPortalPage() {
                         <div style={{ width: 32, height: 32, borderRadius: 10, background: 'linear-gradient(135deg, #10b98122, #6366f122)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 16 }}>🤖</div>
                         <div>
                             <div style={{ fontWeight: 800, color: 'var(--text-primary)', fontSize: 14 }}>MediSense Health Assistant</div>
-                            <div style={{ fontSize: 11, color: 'var(--risk-low)' }}>● AI Online</div>
+                            <div style={{ fontSize: 11, color: 'var(--risk-low-text)' }}>● AI Online</div>
                         </div>
                     </div>
                     <div style={{ flex: 1, overflowY: 'auto', padding: '20px 24px', display: 'flex', flexDirection: 'column', gap: 14 }}>
