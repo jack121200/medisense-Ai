@@ -4,9 +4,11 @@ import {
     Mic, MicOff, PhoneOff, Phone, Clock, FileText,
     ChevronDown, ChevronUp, Activity, Stethoscope,
     AlertCircle, CheckCircle, Upload, X, AlertTriangle,
-    Zap, Calendar, User, Heart,
+    Zap, Calendar, User, Heart, Download,
 } from 'lucide-react';
 import toast from 'react-hot-toast';
+import { reportApi } from '../api/index';
+import { downloadBlob } from '../utils/downloadBlob';
 import {
     aiDoctorApi,
     AiDoctorCallSummary,
@@ -81,7 +83,31 @@ function PulsingOrb({ active }: { active: boolean }) {
 }
 
 // ── Doctor's Report Card ──────────────────────────────────────────────────────
-function DoctorReportCard({ suggestions, onDismiss }: { suggestions: DoctorSuggestions; onDismiss?: () => void }) {
+function DownloadReportButton({ callId }: { callId: string }) {
+    const [busy, setBusy] = useState(false);
+    return (
+        <button
+            onClick={async () => {
+                setBusy(true);
+                try {
+                    const res = await reportApi.downloadAiDoctorCallPDF(callId);
+                    downloadBlob(res.data, `consultation-${callId.slice(0, 8)}.pdf`);
+                } catch {
+                    toast.error('Could not generate the consultation PDF');
+                } finally {
+                    setBusy(false);
+                }
+            }}
+            disabled={busy}
+            className="btn-ghost"
+            style={{ fontSize: 12, padding: '7px 14px' }}
+        >
+            <Download size={13} /> {busy ? 'Preparing…' : 'Download PDF'}
+        </button>
+    );
+}
+
+function DoctorReportCard({ suggestions, callId, onDismiss }: { suggestions: DoctorSuggestions; callId?: string; onDismiss?: () => void }) {
     const urgency = URGENCY_CFG[suggestions.urgency] || URGENCY_CFG.ROUTINE;
     return (
         <div style={{
@@ -182,9 +208,12 @@ function DoctorReportCard({ suggestions, onDismiss }: { suggestions: DoctorSugge
                     </div>
                 </div>
 
-                <p style={{ fontSize: 11, color: 'var(--text-muted)', margin: 0, lineHeight: 1.6, fontStyle: 'italic' }}>
-                    * This report is AI-generated for informational purposes only and does not constitute a medical diagnosis or prescription. Please consult a qualified physician for medical advice.
-                </p>
+                <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 14, flexWrap: 'wrap' }}>
+                    <p style={{ fontSize: 11, color: 'var(--text-muted)', margin: 0, lineHeight: 1.6, fontStyle: 'italic', flex: 1, minWidth: 240 }}>
+                        * This report is AI-generated for informational purposes only and does not constitute a medical diagnosis or prescription. Please consult a qualified physician for medical advice.
+                    </p>
+                    {callId && <DownloadReportButton callId={callId} />}
+                </div>
             </div>
         </div>
     );
@@ -487,7 +516,7 @@ function CallHistoryItem({ call }: { call: AiDoctorCallSummary }) {
 
                             {/* Doctor's Report */}
                             {suggestions ? (
-                                <DoctorReportCard suggestions={suggestions} />
+                                <DoctorReportCard suggestions={suggestions} callId={call.id} />
                             ) : (
                                 <div style={{ fontSize: 12, color: 'var(--text-muted)', textAlign: 'center', padding: '8px 0', fontStyle: 'italic' }}>
                                     Doctor's report not available for this call.
@@ -541,6 +570,9 @@ export default function AiDoctorPage() {
     const [activeCallId, setActiveCallId] = useState<string | null>(null);
     const [activePatientId, setActivePatientId] = useState<string | null>(null);
     const [doctorReport, setDoctorReport] = useState<DoctorSuggestions | null>(null);
+    // Kept so a report restored from localStorage is still downloadable —
+    // the stored payload has always carried the call id, it was just dropped.
+    const [lastReportCallId, setLastReportCallId] = useState<string | null>(null);
     const [reportLoading, setReportLoading] = useState(false);
     const vapiRef = useRef<Vapi | null>(null);
     const timerRef = useRef<NodeJS.Timeout | null>(null);
@@ -570,6 +602,7 @@ export default function AiDoctorPage() {
                 const parsed = JSON.parse(stored);
                 if (parsed?.doctorSuggestions) {
                     setDoctorReport(parsed.doctorSuggestions);
+                    if (parsed.callId) setLastReportCallId(parsed.callId);
                 }
             }
         } catch { /* ignore */ }
@@ -605,6 +638,7 @@ export default function AiDoctorPage() {
                 if (suggestions?.summary) {
                     clearInterval(pollRef.current!);
                     setDoctorReport(suggestions);
+                    setLastReportCallId(callId);
                     setReportLoading(false);
                     // Save to localStorage
                     try { localStorage.setItem('medisense_last_report', JSON.stringify({ callId, doctorSuggestions: suggestions })); } catch { /* ignore */ }
@@ -965,7 +999,7 @@ export default function AiDoctorPage() {
                                 </div>
                             </div>
                         ) : doctorReport ? (
-                            <DoctorReportCard suggestions={doctorReport} onDismiss={() => setDoctorReport(null)} />
+                            <DoctorReportCard suggestions={doctorReport} callId={activeCallId ?? undefined} onDismiss={() => setDoctorReport(null)} />
                         ) : null
                     )}
 
@@ -973,7 +1007,7 @@ export default function AiDoctorPage() {
                     {callStatus === 'idle' && doctorReport && (
                         <div>
                             <div style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 12 }}>Last Consultation Report</div>
-                            <DoctorReportCard suggestions={doctorReport} onDismiss={() => {
+                            <DoctorReportCard suggestions={doctorReport} callId={lastReportCallId ?? undefined} onDismiss={() => {
                                 setDoctorReport(null);
                                 localStorage.removeItem('medisense_last_report');
                             }} />

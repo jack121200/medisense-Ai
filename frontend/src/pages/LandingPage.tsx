@@ -207,9 +207,9 @@ export default function LandingPage() {
             note: 'Unsupervised — cluster severity is recomputed each training run.',
         },
         {
-            name: 'ECG Anomaly Screen', algo: '1D-CNN autoencoder · MIT-BIH', color: SAGE,
-            metric: '0.75', metricLabel: 'ROC-AUC', bar: 75,
-            note: 'Honestly our weakest model: high precision but low recall, so it misses many abnormal beats. Screening aid only.',
+            name: 'ECG Beat Screen', algo: 'Supervised 1D-CNN · MIT-BIH', color: SAGE,
+            metric: '0.90', metricLabel: 'ROC-AUC', bar: 90,
+            note: 'Inter-patient: whole records held out, not random beats. 0.75 recall — still a screening aid, not a diagnostic test.',
         },
     ];
 

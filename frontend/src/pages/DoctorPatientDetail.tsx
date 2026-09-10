@@ -8,9 +8,11 @@ import { appointmentApi } from '../api/appointment.api';
 import { aiDoctorApi, AiDoctorCallSummary } from '../api/aiDoctorApi';
 import {
     ArrowLeft, Brain, RefreshCw, Stethoscope, Calendar, FileText,
-    Phone, Mail, Clock, AlertTriangle, Bot,
+    Phone, Mail, Clock, AlertTriangle, Bot, Download,
 } from 'lucide-react';
 import toast from 'react-hot-toast';
+import { reportApi } from '../api/index';
+import { downloadBlob } from '../utils/downloadBlob';
 
 function InfoRow({ label, value, highlight }: { label: string; value?: string | number | null; highlight?: boolean }) {
     if (!value && value !== 0) return null;

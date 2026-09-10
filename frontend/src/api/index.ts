@@ -28,4 +28,8 @@ export const vitalsApi = {
 export const reportApi = {
     generatePatientPDF: (patientId: string) =>
         api.post(`/reports/patient/${patientId}`, {}, { responseType: 'blob' }),
+
+    /** Consultation summary PDF for a single AI Doctor call. */
+    downloadAiDoctorCallPDF: (callId: string) =>
+        api.get(`/reports/ai-doctor-call/${callId}`, { responseType: 'blob' }),
 };
