@@ -45,17 +45,17 @@ export default function BillingPage() {
             </div>
 
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 16, marginBottom: 28 }}>
-                <div style={{ background: 'var(--surface-1)', border: '1px solid rgba(62, 142, 126, 0.2)', borderRadius: 16, padding: '20px 22px' }}>
+                <div style={{ background: 'var(--surface-1)', border: '1px solid rgba(24, 155, 130, 0.2)', borderRadius: 16, padding: '20px 22px' }}>
                     <div style={{ fontSize: 10, color: 'var(--text-muted)', marginBottom: 4 }}>TODAY'S REVENUE</div>
                     <div style={{ fontSize: 28, fontWeight: 900, color: 'var(--risk-low)', fontFamily: 'monospace' }}>₹{revenue.revenue.toLocaleString()}</div>
                     <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 4 }}>{revenue.paidCount} payments today</div>
                 </div>
-                <div style={{ background: 'var(--surface-1)', border: '1px solid rgba(184, 145, 47, 0.2)', borderRadius: 16, padding: '20px 22px' }}>
+                <div style={{ background: 'var(--surface-1)', border: '1px solid rgba(217, 165, 32, 0.2)', borderRadius: 16, padding: '20px 22px' }}>
                     <div style={{ fontSize: 10, color: 'var(--text-muted)', marginBottom: 4 }}>PENDING COLLECTION</div>
                     <div style={{ fontSize: 28, fontWeight: 900, color: 'var(--risk-medium)', fontFamily: 'monospace' }}>₹{unpaidTotal.toLocaleString()}</div>
                     <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 4 }}>{invoices.filter((i: any) => !i.isPaid).length} unpaid bills</div>
                 </div>
-                <div style={{ background: 'var(--surface-1)', border: '1px solid rgba(194, 91, 60, 0.2)', borderRadius: 16, padding: '20px 22px' }}>
+                <div style={{ background: 'var(--surface-1)', border: '1px solid rgba(13, 92, 126, 0.2)', borderRadius: 16, padding: '20px 22px' }}>
                     <div style={{ fontSize: 10, color: 'var(--text-muted)', marginBottom: 4 }}>TOTAL INVOICES</div>
                     <div style={{ fontSize: 28, fontWeight: 900, color: 'var(--accent-primary)', fontFamily: 'monospace' }}>{invoices.length}</div>
                     <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 4 }}>{invoices.filter((i: any) => i.isPaid).length} paid</div>
@@ -64,7 +64,7 @@ export default function BillingPage() {
 
             <div style={{ display: 'flex', gap: 8, marginBottom: 20 }}>
                 {(['all', 'unpaid', 'paid'] as const).map(f => (
-                    <button key={f} onClick={() => setFilter(f)} style={{ padding: '7px 18px', borderRadius: 20, fontSize: 12, fontWeight: 700, cursor: 'pointer', background: filter === f ? 'rgba(62, 142, 126, 0.15)' : 'var(--surface-2)', border: `1px solid ${filter === f ? 'rgba(62, 142, 126, 0.3)' : 'var(--surface-border)'}`, color: filter === f ? 'var(--risk-low)' : 'var(--surface-border-md)', textTransform: 'capitalize' }}>{f}</button>
+                    <button key={f} onClick={() => setFilter(f)} style={{ padding: '7px 18px', borderRadius: 20, fontSize: 12, fontWeight: 700, cursor: 'pointer', background: filter === f ? 'rgba(24, 155, 130, 0.15)' : 'var(--surface-2)', border: `1px solid ${filter === f ? 'rgba(24, 155, 130, 0.3)' : 'var(--surface-border)'}`, color: filter === f ? 'var(--risk-low)' : 'var(--surface-border-md)', textTransform: 'capitalize' }}>{f}</button>
                 ))}
             </div>
 
@@ -100,11 +100,11 @@ export default function BillingPage() {
             </div>
 
             {selected && (
-                <div style={{ position: 'fixed', inset: 0, background: 'rgba(90, 65, 45, 0.16)', backdropFilter: 'blur(8px)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000 }}>
+                <div style={{ position: 'fixed', inset: 0, background: 'rgba(13, 45, 62, 0.16)', backdropFilter: 'blur(8px)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000 }}>
                     <div style={{ background: 'var(--surface-2)', border: '1px solid var(--surface-border-md)', borderRadius: 20, padding: 32, width: 420 }}>
                         <h3 style={{ fontWeight: 900, fontSize: 18, color: 'var(--text-primary)', marginBottom: 4 }}>Collect Payment</h3>
                         <div style={{ fontSize: 12, color: 'var(--text-muted)', marginBottom: 24 }}>{selected.invoiceNumber} — {selected.patient?.firstName} {selected.patient?.lastName}</div>
-                        <div style={{ background: 'rgba(194, 91, 60, 0.06)', border: '1px solid rgba(194, 91, 60, 0.15)', borderRadius: 12, padding: 16, marginBottom: 20, textAlign: 'center' }}>
+                        <div style={{ background: 'rgba(13, 92, 126, 0.06)', border: '1px solid rgba(13, 92, 126, 0.15)', borderRadius: 12, padding: 16, marginBottom: 20, textAlign: 'center' }}>
                             <div style={{ fontSize: 11, color: 'var(--text-muted)', marginBottom: 4 }}>TOTAL AMOUNT</div>
                             <div style={{ fontSize: 32, fontWeight: 900, color: 'var(--accent-primary)' }}>₹{selected.totalAmount?.toLocaleString()}</div>
                         </div>
@@ -112,7 +112,7 @@ export default function BillingPage() {
                             <div style={{ fontSize: 11, color: 'var(--text-muted)', marginBottom: 10, fontWeight: 700 }}>PAYMENT METHOD</div>
                             <div style={{ display: 'flex', gap: 10 }}>
                                 {['CASH', 'UPI', 'CARD'].map(m => (
-                                    <button key={m} onClick={() => setPayMethod(m)} style={{ flex: 1, padding: '12px', borderRadius: 10, fontSize: 13, fontWeight: 700, cursor: 'pointer', background: payMethod === m ? 'rgba(194, 91, 60, 0.15)' : 'var(--surface-2)', border: `1px solid ${payMethod === m ? '#00E5FF44' : 'var(--surface-border-md)'}`, color: payMethod === m ? 'var(--accent-primary)' : 'var(--surface-border-md)' }}>{m}</button>
+                                    <button key={m} onClick={() => setPayMethod(m)} style={{ flex: 1, padding: '12px', borderRadius: 10, fontSize: 13, fontWeight: 700, cursor: 'pointer', background: payMethod === m ? 'rgba(13, 92, 126, 0.15)' : 'var(--surface-2)', border: `1px solid ${payMethod === m ? '#00E5FF44' : 'var(--surface-border-md)'}`, color: payMethod === m ? 'var(--accent-primary)' : 'var(--surface-border-md)' }}>{m}</button>
                                 ))}
                             </div>
                         </div>

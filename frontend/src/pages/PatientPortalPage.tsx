@@ -179,7 +179,7 @@ export default function PatientPortalPage() {
                         <div style={{ fontSize: 13, color: 'var(--text-muted)', marginTop: 4 }}>Your complete cardiac health dashboard</div>
                     </div>
                     {/* S2: Live sync indicator */}
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '8px 14px', background: syncState.isLive ? 'rgba(62, 142, 126, 0.08)' : 'var(--surface-2)', border: `1px solid ${syncState.isLive ? 'rgba(62, 142, 126, 0.2)' : 'var(--surface-border)'}`, borderRadius: 10 }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '8px 14px', background: syncState.isLive ? 'rgba(24, 155, 130, 0.08)' : 'var(--surface-2)', border: `1px solid ${syncState.isLive ? 'rgba(24, 155, 130, 0.2)' : 'var(--surface-border)'}`, borderRadius: 10 }}>
                         <div style={{ width: 7, height: 7, borderRadius: '50%', background: syncState.isLive ? 'var(--risk-low)' : 'var(--surface-3)', animation: syncState.isLive ? 'pulse 2s infinite' : 'none' }} />
                         <span style={{ fontSize: 11, fontWeight: 700, color: syncState.isLive ? 'var(--risk-low)' : 'var(--text-muted)' }}>
                             {syncState.isLive ? 'Live Updates Active' : 'Syncing...'}
@@ -191,13 +191,13 @@ export default function PatientPortalPage() {
 
             {/* ── AI Doctor Voice Assistant Banner ── */}
             <div style={{
-                background: 'linear-gradient(135deg, rgba(194, 91, 60, 0.18), rgba(162, 71, 44, 0.12))',
-                border: '1px solid rgba(194, 91, 60, 0.3)',
+                background: 'linear-gradient(135deg, rgba(13, 92, 126, 0.18), rgba(8, 69, 94, 0.12))',
+                border: '1px solid rgba(13, 92, 126, 0.3)',
                 borderRadius: 18, padding: '20px 24px', marginBottom: 24,
                 display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 16,
             }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
-                    <div style={{ width: 46, height: 46, borderRadius: 14, background: 'linear-gradient(135deg, var(--accent-primary), var(--accent-primary-dim))', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 22, color: '#fff', boxShadow: '0 4px 20px rgba(194, 91, 60, 0.35)' }}>
+                    <div style={{ width: 46, height: 46, borderRadius: 14, background: 'linear-gradient(135deg, var(--accent-primary), var(--accent-primary-dim))', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 22, color: '#fff', boxShadow: '0 4px 20px rgba(13, 92, 126, 0.35)' }}>
                         🎙️
                     </div>
                     <div>
@@ -216,7 +216,7 @@ export default function PatientPortalPage() {
                     padding: '11px 22px', borderRadius: 12, border: 'none',
                     background: 'linear-gradient(135deg, var(--accent-primary), var(--accent-primary-dim))',
                     color: '#fff', fontWeight: 800, fontSize: 13.5, cursor: 'pointer',
-                    boxShadow: '0 4px 18px rgba(194, 91, 60, 0.35)', display: 'flex', alignItems: 'center', gap: 8,
+                    boxShadow: '0 4px 18px rgba(13, 92, 126, 0.35)', display: 'flex', alignItems: 'center', gap: 8,
                 }}>
                     Start Voice Consultation ➔
                 </button>
@@ -228,7 +228,7 @@ export default function PatientPortalPage() {
                     <button key={t.key} onClick={() => setTab(t.key as any)} style={{
                         display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 7, padding: '9px 14px',
                         borderRadius: 10, border: 'none', cursor: 'pointer', fontSize: 12.5, fontWeight: 700, position: 'relative',
-                        background: tab === t.key ? (t.key === 'book' ? 'rgba(62, 142, 126, 0.15)' : 'rgba(194, 91, 60, 0.12)') : 'transparent',
+                        background: tab === t.key ? (t.key === 'book' ? 'rgba(24, 155, 130, 0.15)' : 'rgba(13, 92, 126, 0.12)') : 'transparent',
                         color: tab === t.key ? (t.key === 'book' ? 'var(--risk-low)' : 'var(--accent-primary)') : 'var(--text-secondary)',
                         transition: 'all 0.15s',
                     }}>
@@ -260,7 +260,7 @@ export default function PatientPortalPage() {
                                     onClick={() => setBookForm(f => ({ ...f, doctorId: doc.id }))}
                                     style={{
                                         padding: '16px 18px', borderRadius: 14, border: `2px solid ${bookForm.doctorId === doc.id ? 'var(--risk-low)' : 'var(--surface-border)'}`,
-                                        background: bookForm.doctorId === doc.id ? 'rgba(62, 142, 126, 0.1)' : 'var(--surface-2)',
+                                        background: bookForm.doctorId === doc.id ? 'rgba(24, 155, 130, 0.1)' : 'var(--surface-2)',
                                         cursor: 'pointer', transition: 'all 0.15s',
                                     }}>
                                     <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
@@ -297,7 +297,7 @@ export default function PatientPortalPage() {
                                         type="button"
                                         style={{
                                             padding: '10px 8px', borderRadius: 10, border: `2px solid ${bookForm.timeSlot === slot.value ? 'var(--risk-low)' : 'var(--surface-border)'}`,
-                                            background: bookForm.timeSlot === slot.value ? 'rgba(62, 142, 126, 0.1)' : 'var(--surface-2)',
+                                            background: bookForm.timeSlot === slot.value ? 'rgba(24, 155, 130, 0.1)' : 'var(--surface-2)',
                                             cursor: 'pointer', textAlign: 'center', transition: 'all 0.15s',
                                         }}>
                                         <div style={{ fontSize: 16 }}>{slot.icon}</div>
@@ -324,7 +324,7 @@ export default function PatientPortalPage() {
                     <button
                         onClick={submitBooking}
                         disabled={booking}
-                        style={{ padding: '14px 32px', background: booking ? 'rgba(62, 142, 126, 0.4)' : 'linear-gradient(135deg, var(--risk-low), var(--accent-green-dim))', border: 'none', borderRadius: 12, color: 'var(--text-primary)', fontWeight: 700, fontSize: 15, cursor: booking ? 'not-allowed' : 'pointer', opacity: booking ? 0.7 : 1 }}>
+                        style={{ padding: '14px 32px', background: booking ? 'rgba(24, 155, 130, 0.4)' : 'linear-gradient(135deg, var(--risk-low), var(--accent-green-dim))', border: 'none', borderRadius: 12, color: 'var(--text-primary)', fontWeight: 700, fontSize: 15, cursor: booking ? 'not-allowed' : 'pointer', opacity: booking ? 0.7 : 1 }}>
                         {booking ? '⏳ Sending request...' : '📅 Send Appointment Request'}
                     </button>
                 </div>
@@ -337,7 +337,7 @@ export default function PatientPortalPage() {
                     <div style={{ background: 'var(--surface-1)', border: '1px solid var(--surface-border)', borderRadius: 18, overflow: 'hidden' }}>
                         <div style={{ padding: '16px 24px', borderBottom: '1px solid var(--surface-border)', fontWeight: 800, color: 'var(--text-primary)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                             Appointment Requests
-                            <button onClick={() => setTab('book')} style={{ fontSize: 12, padding: '6px 14px', background: 'rgba(62, 142, 126, 0.1)', border: '1px solid rgba(62, 142, 126, 0.25)', borderRadius: 8, color: 'var(--risk-low)', fontWeight: 700, cursor: 'pointer' }}>
+                            <button onClick={() => setTab('book')} style={{ fontSize: 12, padding: '6px 14px', background: 'rgba(24, 155, 130, 0.1)', border: '1px solid rgba(24, 155, 130, 0.25)', borderRadius: 8, color: 'var(--risk-low)', fontWeight: 700, cursor: 'pointer' }}>
                                 + New Request
                             </button>
                         </div>
@@ -365,21 +365,21 @@ export default function PatientPortalPage() {
                                                 <span style={{ fontSize: 11, fontWeight: 700, color: sc.color, background: sc.bg, padding: '4px 12px', borderRadius: 20, whiteSpace: 'nowrap' }}>{sc.label}</span>
                                             </div>
                                             {req.status === 'APPROVED' && req.scheduledDate && (
-                                                <div style={{ padding: '10px 14px', background: 'rgba(62, 142, 126, 0.08)', border: '1px solid rgba(62, 142, 126, 0.2)', borderRadius: 10, fontSize: 13, color: 'var(--risk-low)' }}>
+                                                <div style={{ padding: '10px 14px', background: 'rgba(24, 155, 130, 0.08)', border: '1px solid rgba(24, 155, 130, 0.2)', borderRadius: 10, fontSize: 13, color: 'var(--risk-low)' }}>
                                                     ✅ Confirmed for {new Date(req.scheduledDate).toLocaleDateString('en-IN', { weekday: 'short', day: 'numeric', month: 'short' })} at {req.scheduledTime}
                                                 </div>
                                             )}
                                             {req.status === 'COUNTER_OFFERED' && (
-                                                <div style={{ padding: '12px 14px', background: 'rgba(204, 107, 61, 0.08)', border: '1px solid rgba(204, 107, 61, 0.2)', borderRadius: 10 }}>
+                                                <div style={{ padding: '12px 14px', background: 'rgba(232, 131, 58, 0.08)', border: '1px solid rgba(232, 131, 58, 0.2)', borderRadius: 10 }}>
                                                     <div style={{ fontSize: 13, color: 'var(--risk-high)', marginBottom: 10 }}>
                                                         ⏰ Alternative suggested: {req.counterDate ? new Date(req.counterDate).toLocaleDateString('en-IN', { weekday: 'short', day: 'numeric', month: 'short' }) : ''} {req.counterTime}
                                                         {req.rejectReason && <div style={{ fontSize: 12, color: 'var(--text-muted)', marginTop: 4 }}>Reason: {req.rejectReason}</div>}
                                                     </div>
                                                     <div style={{ display: 'flex', gap: 8 }}>
-                                                        <button onClick={() => respondToCounter(req.id, true)} style={{ padding: '8px 16px', background: 'rgba(62, 142, 126, 0.15)', border: '1px solid rgba(62, 142, 126, 0.3)', borderRadius: 8, color: 'var(--risk-low)', fontWeight: 700, fontSize: 12, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6 }}>
+                                                        <button onClick={() => respondToCounter(req.id, true)} style={{ padding: '8px 16px', background: 'rgba(24, 155, 130, 0.15)', border: '1px solid rgba(24, 155, 130, 0.3)', borderRadius: 8, color: 'var(--risk-low)', fontWeight: 700, fontSize: 12, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6 }}>
                                                             <CheckCircle size={12} /> Accept New Time
                                                         </button>
-                                                        <button onClick={() => respondToCounter(req.id, false)} style={{ padding: '8px 16px', background: 'rgba(179, 64, 46, 0.1)', border: '1px solid rgba(179, 64, 46, 0.25)', borderRadius: 8, color: 'var(--risk-critical)', fontWeight: 700, fontSize: 12, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6 }}>
+                                                        <button onClick={() => respondToCounter(req.id, false)} style={{ padding: '8px 16px', background: 'rgba(209, 63, 74, 0.1)', border: '1px solid rgba(209, 63, 74, 0.25)', borderRadius: 8, color: 'var(--risk-critical)', fontWeight: 700, fontSize: 12, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6 }}>
                                                             <XCircle size={12} /> Decline
                                                         </button>
                                                     </div>
@@ -412,7 +412,7 @@ export default function PatientPortalPage() {
             {tab === 'notifications' && (
                 <div style={{ background: 'var(--surface-1)', border: '1px solid var(--surface-border)', borderRadius: 18, overflow: 'hidden' }}>
                     <div style={{ padding: '16px 24px', borderBottom: '1px solid var(--surface-border)', fontWeight: 800, color: 'var(--text-primary)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                        Notifications {unreadCount > 0 && <span style={{ fontSize: 11, padding: '3px 10px', background: 'rgba(179, 64, 46, 0.2)', color: 'var(--risk-critical)', borderRadius: 12, fontWeight: 700 }}>{unreadCount} unread</span>}
+                        Notifications {unreadCount > 0 && <span style={{ fontSize: 11, padding: '3px 10px', background: 'rgba(209, 63, 74, 0.2)', color: 'var(--risk-critical)', borderRadius: 12, fontWeight: 700 }}>{unreadCount} unread</span>}
                         {unreadCount > 0 && <button onClick={markAllRead} style={{ fontSize: 12, padding: '6px 14px', background: 'transparent', border: '1px solid var(--surface-border-md)', borderRadius: 8, color: 'var(--text-secondary)', cursor: 'pointer' }}>Mark all read</button>}
                     </div>
                     {notifications.length === 0
@@ -421,7 +421,7 @@ export default function PatientPortalPage() {
                         </div>
                         : notifications.map((n: any) => (
                             <div key={n.id} onClick={() => !n.isRead && markNotifRead(n.id)}
-                                style={{ padding: '16px 24px', borderBottom: '1px solid var(--surface-border)', cursor: !n.isRead ? 'pointer' : 'default', background: !n.isRead ? 'rgba(194, 91, 60, 0.03)' : 'transparent' }}>
+                                style={{ padding: '16px 24px', borderBottom: '1px solid var(--surface-border)', cursor: !n.isRead ? 'pointer' : 'default', background: !n.isRead ? 'rgba(13, 92, 126, 0.03)' : 'transparent' }}>
                                 <div style={{ display: 'flex', alignItems: 'flex-start', gap: 12 }}>
                                     {!n.isRead && <div style={{ width: 8, height: 8, borderRadius: '50%', background: 'var(--accent-primary)', marginTop: 5, flexShrink: 0 }} />}
                                     <div style={{ flex: 1 }}>
@@ -453,7 +453,7 @@ export default function PatientPortalPage() {
                                     </div>
                                     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: 10 }}>
                                         {c.prescription.items?.map((item: any) => (
-                                            <div key={item.id} style={{ background: 'rgba(194, 91, 60, 0.05)', border: '1px solid rgba(194, 91, 60, 0.15)', borderRadius: 12, padding: '12px 14px' }}>
+                                            <div key={item.id} style={{ background: 'rgba(13, 92, 126, 0.05)', border: '1px solid rgba(13, 92, 126, 0.15)', borderRadius: 12, padding: '12px 14px' }}>
                                                 <div style={{ fontWeight: 700, color: 'var(--text-primary)', fontSize: 13 }}>{item.medicineName}</div>
                                                 <div style={{ fontSize: 11, color: 'var(--accent-primary)', marginTop: 3 }}>{item.dosage}</div>
                                                 <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 2 }}>{item.frequency}{item.duration ? ` — ${item.duration}` : ''}</div>

@@ -115,12 +115,12 @@ function HypothesisTab() {
                 )}
                 {loading && (
                     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: 300, gap: 12 }}>
-                        <div style={{ width: 40, height: 40, borderRadius: '50%', border: `3px solid rgba(142, 107, 168, 0.15)`, borderTopColor: C.lavender, animation: 'spin 0.8s linear infinite' }} />
+                        <div style={{ width: 40, height: 40, borderRadius: '50%', border: `3px solid rgba(124, 106, 180, 0.15)`, borderTopColor: C.lavender, animation: 'spin 0.8s linear infinite' }} />
                         <div style={{ fontSize: 13, color: 'var(--text-muted)' }}>Running {q?.test === 'chi2' ? 'Chi-Square' : 'T-Test'}...</div>
                     </div>
                 )}
                 {error && (
-                    <div style={{ padding: 20, background: 'rgba(194, 91, 60, 0.08)', border: `1px solid ${C.crimson}30`, borderRadius: 14, display: 'flex', gap: 12, alignItems: 'flex-start' }}>
+                    <div style={{ padding: 20, background: 'rgba(13, 92, 126, 0.08)', border: `1px solid ${C.crimson}30`, borderRadius: 14, display: 'flex', gap: 12, alignItems: 'flex-start' }}>
                         <AlertCircle size={18} color={C.crimson} style={{ flexShrink: 0, marginTop: 2 }} />
                         <div style={{ fontSize: 13, color: 'var(--text-secondary)', lineHeight: 1.6 }}>{error}</div>
                     </div>
@@ -209,13 +209,13 @@ function BigDataTab() {
 
     if (loading) return (
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: 300, flexDirection: 'column', gap: 12 }}>
-            <div style={{ width: 40, height: 40, borderRadius: '50%', border: `3px solid rgba(194, 91, 60, 0.15)`, borderTopColor: C.crimson, animation: 'spin 0.8s linear infinite' }} />
+            <div style={{ width: 40, height: 40, borderRadius: '50%', border: `3px solid rgba(13, 92, 126, 0.15)`, borderTopColor: C.crimson, animation: 'spin 0.8s linear infinite' }} />
             <div style={{ fontSize: 13, color: 'var(--text-muted)' }}>Loading population analytics...</div>
         </div>
     );
 
     if (error) return (
-        <div style={{ padding: 20, background: 'rgba(194, 91, 60, 0.08)', border: `1px solid ${C.crimson}30`, borderRadius: 14, fontSize: 13, color: 'var(--text-secondary)' }}>
+        <div style={{ padding: 20, background: 'rgba(13, 92, 126, 0.08)', border: `1px solid ${C.crimson}30`, borderRadius: 14, fontSize: 13, color: 'var(--text-secondary)' }}>
             ⚠️ {error}
         </div>
     );

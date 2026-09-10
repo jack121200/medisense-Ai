@@ -238,7 +238,7 @@ export default function LandingPage() {
         padding: '14px 32px', borderRadius: 12, border: 'none',
         background: 'linear-gradient(135deg, var(--accent-primary), var(--accent-primary-dim))',
         color: '#fff', fontWeight: 800, fontSize: 15, cursor: 'pointer',
-        boxShadow: '0 6px 20px rgba(194, 91, 60, 0.28)', transition: 'all 0.2s',
+        boxShadow: '0 6px 20px rgba(13, 92, 126, 0.28)', transition: 'all 0.2s',
     };
     const btnSecondary: React.CSSProperties = {
         padding: '14px 32px', borderRadius: 12,
@@ -275,10 +275,10 @@ export default function LandingPage() {
 
             {/* ── HERO ── */}
             <section style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', textAlign: 'center', padding: '150px clamp(20px, 5vw, 40px) 90px', position: 'relative', overflow: 'hidden' }}>
-                <div style={{ position: 'absolute', top: '5%', left: '8%', width: 620, height: 620, maxWidth: '100%', borderRadius: '50%', background: 'radial-gradient(circle, rgba(194,91,60,0.10) 0%, transparent 66%)', pointerEvents: 'none' }} />
-                <div style={{ position: 'absolute', bottom: '2%', right: '6%', width: 460, height: 460, maxWidth: '100%', borderRadius: '50%', background: 'radial-gradient(circle, rgba(62,142,126,0.10) 0%, transparent 66%)', pointerEvents: 'none' }} />
+                <div style={{ position: 'absolute', top: '5%', left: '8%', width: 620, height: 620, maxWidth: '100%', borderRadius: '50%', background: 'radial-gradient(circle, rgba(13, 92, 126, 0.10) 0%, transparent 66%)', pointerEvents: 'none' }} />
+                <div style={{ position: 'absolute', bottom: '2%', right: '6%', width: 460, height: 460, maxWidth: '100%', borderRadius: '50%', background: 'radial-gradient(circle, rgba(24, 155, 130, 0.10) 0%, transparent 66%)', pointerEvents: 'none' }} />
 
-                <div style={{ display: 'inline-flex', alignItems: 'center', gap: 9, padding: '7px 16px', borderRadius: 9999, background: 'var(--surface-0)', border: '1px solid var(--surface-border-md)', fontSize: 11.5, fontWeight: 700, color: 'var(--accent-primary)', marginBottom: 32, letterSpacing: '0.04em', boxShadow: 'var(--shadow-sm)', animation: 'fadeUp 0.4s ease-out both' }}>
+                <div style={{ display: 'inline-flex', alignItems: 'center', gap: 9, padding: '7px 16px', borderRadius: 9999, background: 'var(--mint-bg)', border: '1px solid rgba(24, 155, 130, 0.30)', fontSize: 11.5, fontWeight: 700, color: 'var(--accent-magenta-dim)', marginBottom: 32, letterSpacing: '0.04em', boxShadow: 'var(--shadow-sm)', animation: 'fadeUp 0.4s ease-out both' }}>
                     <span style={{ width: 7, height: 7, borderRadius: '50%', background: 'var(--risk-low)' }} className="live-dot" />
                     AI-ASSISTED HEALTHCARE PLATFORM
                 </div>
@@ -397,7 +397,7 @@ export default function LandingPage() {
 
             {/* ── CTA ── */}
             <section style={{ padding: 'clamp(70px, 10vw, 100px) clamp(20px, 5vw, 40px)', textAlign: 'center', position: 'relative', overflow: 'hidden' }}>
-                <div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%,-50%)', width: 860, maxWidth: '100%', height: 420, borderRadius: '50%', background: 'radial-gradient(circle, rgba(194,91,60,0.10) 0%, transparent 66%)', pointerEvents: 'none' }} />
+                <div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%,-50%)', width: 860, maxWidth: '100%', height: 420, borderRadius: '50%', background: 'radial-gradient(circle, rgba(13, 92, 126, 0.10) 0%, transparent 66%)', pointerEvents: 'none' }} />
                 <h2 style={{ fontSize: 'clamp(30px, 4.6vw, 54px)', fontWeight: 900, letterSpacing: '-0.02em', marginBottom: 20, textWrap: 'balance', position: 'relative' }}>
                     Start with a conversation
                 </h2>

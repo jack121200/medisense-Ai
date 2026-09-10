@@ -62,7 +62,7 @@ export default function VitalsMonitorPage() {
             <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '60vh', flexDirection: 'column', gap: 16 }}>
                 <div style={{
                     width: 48, height: 48, borderRadius: '50%',
-                    border: '3px solid rgba(194, 91, 60, 0.15)',
+                    border: '3px solid rgba(13, 92, 126, 0.15)',
                     borderTopColor: 'var(--accent-primary)',
                     animation: 'spin 0.8s linear infinite',
                 }} />
@@ -84,8 +84,8 @@ export default function VitalsMonitorPage() {
                     </h1>
                     <div style={{
                         display: 'flex', alignItems: 'center', gap: 5, padding: '4px 10px',
-                        background: 'rgba(62, 142, 126, 0.08)', borderRadius: 9999,
-                        border: '1px solid rgba(62, 142, 126, 0.20)',
+                        background: 'rgba(24, 155, 130, 0.08)', borderRadius: 9999,
+                        border: '1px solid rgba(24, 155, 130, 0.20)',
                         fontSize: 11, fontWeight: 700, color: 'var(--accent-green)', marginLeft: 4,
                     }}>
                         <div className="live-dot" style={{ width: 6, height: 6, borderRadius: '50%', background: 'var(--accent-green)' }} />
@@ -119,7 +119,7 @@ export default function VitalsMonitorPage() {
                                 style={{
                                     padding: '12px 14px', cursor: 'pointer',
                                     borderBottom: '1px solid var(--surface-border)',
-                                    background: isSelected ? 'rgba(194, 91, 60, 0.06)' : 'transparent',
+                                    background: isSelected ? 'rgba(13, 92, 126, 0.06)' : 'transparent',
                                     borderLeft: `3px solid ${isSelected ? 'var(--accent-primary)' : 'transparent'}`,
                                     transition: 'all 0.15s',
                                     position: 'relative',
@@ -189,8 +189,8 @@ export default function VitalsMonitorPage() {
                             {latestForSelected?.isAnomaly && (
                                 <div style={{
                                     display: 'flex', alignItems: 'center', gap: 6, padding: '5px 12px',
-                                    background: 'rgba(179, 64, 46, 0.10)', borderRadius: 9999,
-                                    border: '1px solid rgba(179, 64, 46, 0.25)', fontSize: 11, fontWeight: 700, color: 'var(--risk-critical)',
+                                    background: 'rgba(209, 63, 74, 0.10)', borderRadius: 9999,
+                                    border: '1px solid rgba(209, 63, 74, 0.25)', fontSize: 11, fontWeight: 700, color: 'var(--risk-critical)',
                                 }} className="pulse-critical">
                                     <AlertTriangle size={12} /> ANOMALY DETECTED
                                 </div>
@@ -270,7 +270,7 @@ export default function VitalsMonitorPage() {
             {/* Alerts section */}
             {alerts.length > 0 && (
                 <div style={{
-                    background: 'var(--surface-1)', border: '1px solid rgba(179, 64, 46, 0.20)',
+                    background: 'var(--surface-1)', border: '1px solid rgba(209, 63, 74, 0.20)',
                     borderRadius: 18, padding: '22px 24px', marginTop: 24,
                 }}>
                     <div style={{ position: 'relative', top: 0, left: 0, right: 0, height: 2, background: 'var(--risk-critical)', borderRadius: '18px 18px 0 0', opacity: 0.6 }} />
@@ -288,7 +288,7 @@ export default function VitalsMonitorPage() {
                                 <div style={{
                                     width: 8, height: 8, borderRadius: '50%', flexShrink: 0,
                                     background: a.severity === 'CRITICAL' ? 'var(--risk-critical)' : 'var(--risk-medium)',
-                                    ...(a.severity === 'CRITICAL' ? { boxShadow: '0 0 8px rgba(179, 64, 46, 0.6)' } : {}),
+                                    ...(a.severity === 'CRITICAL' ? { boxShadow: '0 0 8px rgba(209, 63, 74, 0.6)' } : {}),
                                 }} />
                                 <span style={{ fontSize: 12, fontWeight: 700, color: a.severity === 'CRITICAL' ? 'var(--risk-critical)' : 'var(--risk-medium)' }}>
                                     [{a.severity}]

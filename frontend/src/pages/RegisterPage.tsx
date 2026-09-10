@@ -336,7 +336,7 @@ export default function RegisterPage() {
                     {/* ── STEP 2 (DOCTOR): Static Cardiologist Info ── */}
                     {step === 2 && isDoctor && (
                         <div>
-                            <div style={{ padding: '20px', background: 'rgba(194, 91, 60, 0.07)', border: '1px solid rgba(194, 91, 60, 0.2)', borderRadius: 14, marginBottom: 16, textAlign: 'center' }}>
+                            <div style={{ padding: '20px', background: 'rgba(13, 92, 126, 0.07)', border: '1px solid rgba(13, 92, 126, 0.2)', borderRadius: 14, marginBottom: 16, textAlign: 'center' }}>
                                 <div style={{ fontSize: 40, marginBottom: 8 }}>🫀</div>
                                 <div style={{ fontSize: 18, fontWeight: 900, color: 'var(--accent-primary)', marginBottom: 6 }}>Cardiologist</div>
                                 <div style={{ fontSize: 13, color: 'var(--text-secondary)', lineHeight: 1.7 }}>
@@ -379,12 +379,12 @@ export default function RegisterPage() {
                                 <div><label style={labelStyle}>Contact Phone</label><input style={inputStyle} value={form.emergencyContactPhone} onChange={e => update('emergencyContactPhone', e.target.value)} placeholder="+91 98765 43210" /></div>
                                 <div><label style={labelStyle}>Relationship</label><input style={inputStyle} value={form.emergencyContactRel} onChange={e => update('emergencyContactRel', e.target.value)} placeholder="Mother, Spouse..." /></div>
                             </div>
-                            <div style={{ padding: '14px', background: 'rgba(62, 142, 126, 0.07)', border: '1px solid rgba(62, 142, 126, 0.2)', borderRadius: 10, marginBottom: 18 }}>
+                            <div style={{ padding: '14px', background: 'rgba(24, 155, 130, 0.07)', border: '1px solid rgba(24, 155, 130, 0.2)', borderRadius: 10, marginBottom: 18 }}>
                                 <p style={{ fontSize: 12.5, color: 'var(--text-secondary)', margin: 0, lineHeight: 1.6 }}>
                                     ✓ By registering, you agree to provide accurate medical information. Your data is secured and only accessible to authorized medical staff.
                                 </p>
                             </div>
-                            {error && <div style={{ marginBottom: 14, padding: '10px 14px', background: 'rgba(179, 64, 46, 0.1)', border: '1px solid rgba(179, 64, 46, 0.25)', borderRadius: 8, fontSize: 13, color: 'var(--risk-high)' }}>⚠️ {error}</div>}
+                            {error && <div style={{ marginBottom: 14, padding: '10px 14px', background: 'rgba(209, 63, 74, 0.1)', border: '1px solid rgba(209, 63, 74, 0.25)', borderRadius: 8, fontSize: 13, color: 'var(--risk-high)' }}>⚠️ {error}</div>}
                             <button type="submit" disabled={submitting} style={{ width: '100%', padding: '14px', borderRadius: 10, border: 'none', cursor: submitting ? 'not-allowed' : 'pointer', background: submitting ? `${accentColor}50` : `linear-gradient(135deg, ${accentColor}, ${accentColor}cc)`, color: '#fff', fontSize: 15, fontWeight: 700, opacity: submitting ? 0.7 : 1 }}>
                                 {submitting ? '⏳ Creating account...' : `✅ Create ${roleObj?.label} Account`}
                             </button>
@@ -394,13 +394,13 @@ export default function RegisterPage() {
                     {/* ── FINAL SUBMIT for non-patient ── */}
                     {step === 2 && !isPatient && (
                         <form onSubmit={handleSubmit} style={{ marginTop: 0 }}>
-                            {error && <div style={{ marginBottom: 14, padding: '10px 14px', background: 'rgba(179, 64, 46, 0.1)', border: '1px solid rgba(179, 64, 46, 0.25)', borderRadius: 8, fontSize: 13, color: 'var(--risk-high)' }}>⚠️ {error}</div>}
+                            {error && <div style={{ marginBottom: 14, padding: '10px 14px', background: 'rgba(209, 63, 74, 0.1)', border: '1px solid rgba(209, 63, 74, 0.25)', borderRadius: 8, fontSize: 13, color: 'var(--risk-high)' }}>⚠️ {error}</div>}
                         </form>
                     )}
 
                     {/* Error for non-final steps */}
                     {error && step < (isPatient ? 3 : 2) && (
-                        <div style={{ marginTop: 12, padding: '10px 14px', background: 'rgba(179, 64, 46, 0.1)', border: '1px solid rgba(179, 64, 46, 0.25)', borderRadius: 8, fontSize: 13, color: 'var(--risk-high)' }}>⚠️ {error}</div>
+                        <div style={{ marginTop: 12, padding: '10px 14px', background: 'rgba(209, 63, 74, 0.1)', border: '1px solid rgba(209, 63, 74, 0.25)', borderRadius: 8, fontSize: 13, color: 'var(--risk-high)' }}>⚠️ {error}</div>
                     )}
 
                     {/* Navigation buttons */}

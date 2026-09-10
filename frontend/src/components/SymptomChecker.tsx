@@ -110,7 +110,7 @@ export default function SymptomChecker() {
     const s: React.CSSProperties = { fontFamily: '"Inter", system-ui, sans-serif' };
 
     return (
-        <div style={{ background: 'var(--surface-1)', border: '1px solid rgba(194, 91, 60, 0.2)', borderRadius: 20, padding: 24, ...s }}>
+        <div style={{ background: 'var(--surface-1)', border: '1px solid rgba(13, 92, 126, 0.2)', borderRadius: 20, padding: 24, ...s }}>
             {/* Header */}
             <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 20 }}>
                 <div style={{ width: 36, height: 36, borderRadius: 10, background: 'linear-gradient(135deg, var(--accent-primary), var(--accent-magenta))', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
@@ -148,7 +148,7 @@ export default function SymptomChecker() {
                         {filtered.map(sym => (
                             <div key={sym} onClick={() => addSymptom(sym)}
                                 style={{ padding: '10px 14px', cursor: 'pointer', fontSize: 13, color: 'var(--text-primary)', borderBottom: '1px solid var(--surface-border)' }}
-                                onMouseEnter={e => (e.currentTarget.style.background = 'rgba(194, 91, 60, 0.12)')}
+                                onMouseEnter={e => (e.currentTarget.style.background = 'rgba(13, 92, 126, 0.12)')}
                                 onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}>
                                 {formatLabel(sym)}
                             </div>
@@ -161,13 +161,13 @@ export default function SymptomChecker() {
             {selected.length > 0 && (
                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: 7, marginBottom: 16 }}>
                     {selected.map(sym => (
-                        <span key={sym} style={{ display: 'inline-flex', alignItems: 'center', gap: 6, padding: '5px 10px', background: 'rgba(194, 91, 60, 0.15)', border: '1px solid rgba(194, 91, 60, 0.3)', borderRadius: 20, fontSize: 12, color: 'var(--accent-primary-hover)', fontWeight: 600 }}>
+                        <span key={sym} style={{ display: 'inline-flex', alignItems: 'center', gap: 6, padding: '5px 10px', background: 'rgba(13, 92, 126, 0.15)', border: '1px solid rgba(13, 92, 126, 0.3)', borderRadius: 20, fontSize: 12, color: 'var(--accent-primary-hover)', fontWeight: 600 }}>
                             {formatLabel(sym)}
                             <button onClick={() => removeSymptom(sym)} style={{ background: 'none', border: 'none', color: 'var(--accent-primary-hover)', cursor: 'pointer', display: 'flex', padding: 0 }}><X size={11} /></button>
                         </span>
                     ))}
                     <button onClick={() => { setSelected([]); setResult(null); setQuery(''); }}
-                        style={{ padding: '5px 10px', background: 'transparent', border: '1px solid rgba(179, 64, 46, 0.25)', borderRadius: 20, fontSize: 11, color: 'var(--risk-critical)', cursor: 'pointer', fontWeight: 600 }}>
+                        style={{ padding: '5px 10px', background: 'transparent', border: '1px solid rgba(209, 63, 74, 0.25)', borderRadius: 20, fontSize: 11, color: 'var(--risk-critical)', cursor: 'pointer', fontWeight: 600 }}>
                         Clear all
                     </button>
                 </div>
@@ -179,7 +179,7 @@ export default function SymptomChecker() {
                 disabled={loading || selected.length < 2 || !modelReady}
                 style={{
                     width: '100%', padding: '12px 0', borderRadius: 12, border: 'none', cursor: (loading || selected.length < 2 || !modelReady) ? 'not-allowed' : 'pointer',
-                    background: (selected.length >= 2 && !loading && modelReady) ? 'linear-gradient(135deg, var(--accent-primary), var(--accent-magenta))' : 'rgba(194, 91, 60, 0.2)',
+                    background: (selected.length >= 2 && !loading && modelReady) ? 'linear-gradient(135deg, var(--accent-primary), var(--accent-magenta))' : 'rgba(13, 92, 126, 0.2)',
                     color: 'var(--text-primary)', fontWeight: 800, fontSize: 14, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
                     opacity: (selected.length >= 2 && !loading && modelReady) ? 1 : 0.5, transition: 'all 0.15s',
                 }}>
@@ -221,7 +221,7 @@ export default function SymptomChecker() {
                     )}
 
                     {result.unrecognized.length > 0 && (
-                        <div style={{ marginTop: 12, padding: '8px 12px', background: 'rgba(184, 145, 47, 0.08)', border: '1px solid rgba(184, 145, 47, 0.2)', borderRadius: 10, display: 'flex', gap: 8, alignItems: 'flex-start' }}>
+                        <div style={{ marginTop: 12, padding: '8px 12px', background: 'rgba(217, 165, 32, 0.08)', border: '1px solid rgba(217, 165, 32, 0.2)', borderRadius: 10, display: 'flex', gap: 8, alignItems: 'flex-start' }}>
                             <AlertCircle size={13} style={{ color: 'var(--risk-medium)', marginTop: 1, flexShrink: 0 }} />
                             <span style={{ fontSize: 11, color: 'var(--text-secondary)' }}>
                                 Unrecognized: {result.unrecognized.join(', ')}

@@ -80,7 +80,7 @@ function Field({ label, value, onChange, placeholder = '', unit = '' }: {
                 placeholder={placeholder}
                 style={{
                     padding: '9px 12px',
-                    background: focused ? 'rgba(194, 91, 60, 0.06)' : 'var(--surface-2)',
+                    background: focused ? 'rgba(13, 92, 126, 0.06)' : 'var(--surface-2)',
                     border: `1px solid ${focused ? `${C.lipid}60` : 'var(--surface-border)'}`,
                     borderRadius: 9, color: 'var(--text-primary)', fontSize: 13.5,
                     outline: 'none', fontFamily: 'inherit',
@@ -206,7 +206,7 @@ export default function LipidProfileTab() {
         };
         return (
             <tr style={{ borderBottom: '1px solid var(--surface-border)' }}
-                onMouseEnter={e => (e.currentTarget.style.background = 'rgba(194, 91, 60, 0.04)')}
+                onMouseEnter={e => (e.currentTarget.style.background = 'rgba(13, 92, 126, 0.04)')}
                 onMouseLeave={e => (e.currentTarget.style.background = '')}>
                 <td style={{ padding: '11px 16px', fontWeight: 700, color: 'var(--text-primary)', fontSize: 13 }}>{labels[paramKey] || paramKey}</td>
                 <td style={{ padding: '11px 16px', fontFamily: 'monospace', color: col, fontWeight: 800, fontSize: 14 }}>{p.value}</td>
@@ -355,7 +355,7 @@ export default function LipidProfileTab() {
             <div style={{ overflowX: 'auto' }}>
                 <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13 }}>
                     <thead>
-                        <tr style={{ background: 'rgba(194, 91, 60, 0.04)' }}>
+                        <tr style={{ background: 'rgba(13, 92, 126, 0.04)' }}>
                             {['Parameter', 'Value', 'Unit', 'Reference Range', 'Status'].map(h => (
                                 <th key={h} style={{ padding: '10px 16px', textAlign: 'left', color: 'var(--text-muted)', fontWeight: 700, fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.06em', borderBottom: `1px solid ${C.border}` }}>{h}</th>
                             ))}

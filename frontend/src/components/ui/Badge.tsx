@@ -8,7 +8,7 @@ const STATUS_COLORS: Record<StatusTone, { color: string; bg: string }> = {
     warning: { color: 'var(--risk-medium)', bg: 'var(--risk-medium-bg)' },
     danger: { color: 'var(--risk-critical)', bg: 'var(--risk-critical-bg)' },
     info: { color: 'var(--accent-primary)', bg: 'var(--accent-glow)' },
-    neutral: { color: 'var(--text-secondary)', bg: 'rgba(122, 92, 66, 0.08)' },
+    neutral: { color: 'var(--text-secondary)', bg: 'rgba(13, 92, 126, 0.08)' },
 };
 
 /** Clinical risk badge — reuses the existing .risk-badge classes. */

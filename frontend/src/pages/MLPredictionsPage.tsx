@@ -147,7 +147,7 @@ function HeartRiskTab() {
                 </div>
 
                 {inputMode === 'pdf' ? (
-                    <div style={{ border: '2px dashed rgba(194, 91, 60, 0.3)', borderRadius: 14, padding: 40, textAlign: 'center' }}>
+                    <div style={{ border: '2px dashed rgba(13, 92, 126, 0.3)', borderRadius: 14, padding: 40, textAlign: 'center' }}>
                         <input ref={fileRef} type="file" accept=".pdf,.docx" style={{ display: 'none' }}
                             onChange={e => e.target.files?.[0] && handlePdfUpload(e.target.files[0])} />
                         <div style={{ fontSize: 36, marginBottom: 12 }}>📄</div>
@@ -320,7 +320,7 @@ function CBCTab() {
                 </div>
 
                 {inputMode === 'pdf' ? (
-                    <div style={{ border: '2px dashed rgba(220, 116, 84, 0.3)', borderRadius: 14, padding: 40, textAlign: 'center' }}>
+                    <div style={{ border: '2px dashed rgba(18, 121, 163, 0.3)', borderRadius: 14, padding: 40, textAlign: 'center' }}>
                         <input ref={cbcFileRef} type="file" accept=".pdf" style={{ display: 'none' }}
                             onChange={e => e.target.files?.[0] && handleCbcPdf(e.target.files[0])} />
                         <div style={{ fontSize: 36, marginBottom: 12 }}>🧪</div>
@@ -510,7 +510,7 @@ function SymptomTab() {
                 </div>
 
                 {inputMode === 'pdf' ? (
-                    <div style={{ border: '2px dashed rgba(142, 107, 168, 0.3)', borderRadius: 14, padding: 40, textAlign: 'center', marginBottom: 0 }}>
+                    <div style={{ border: '2px dashed rgba(124, 106, 180, 0.3)', borderRadius: 14, padding: 40, textAlign: 'center', marginBottom: 0 }}>
                         <input ref={symFileRef} type="file" accept=".pdf,.docx" style={{ display: 'none' }}
                             onChange={e => e.target.files?.[0] && handleSymptomFile(e.target.files[0])} />
                         <div style={{ fontSize: 36, marginBottom: 12 }}>🧠</div>

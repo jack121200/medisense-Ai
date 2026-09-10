@@ -63,7 +63,7 @@ export default function BayesianUncertaintyCard({ patientData }: Props) {
     return (
         <div style={{
             background: 'var(--surface-1)',
-            border: '1px solid rgba(194, 91, 60, 0.2)',
+            border: '1px solid rgba(13, 92, 126, 0.2)',
             borderRadius: 20,
             padding: 24,
             marginBottom: 24,
@@ -74,8 +74,8 @@ export default function BayesianUncertaintyCard({ patientData }: Props) {
                 <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
                     <div style={{
                         width: 44, height: 44, borderRadius: 14,
-                        background: 'linear-gradient(135deg, rgba(194, 91, 60, 0.2), rgba(194, 91, 60, 0.05))',
-                        border: '1px solid rgba(194, 91, 60, 0.3)',
+                        background: 'linear-gradient(135deg, rgba(13, 92, 126, 0.2), rgba(13, 92, 126, 0.05))',
+                        border: '1px solid rgba(13, 92, 126, 0.3)',
                         display: 'flex', alignItems: 'center', justifyContent: 'center'
                     }}>
                         <Network size={22} color="var(--accent-primary)" />
@@ -87,7 +87,7 @@ export default function BayesianUncertaintyCard({ patientData }: Props) {
                             </h2>
                             <span style={{
                                 fontSize: 10, fontWeight: 800, padding: '2px 8px', borderRadius: 12,
-                                background: 'rgba(194, 91, 60, 0.15)', color: 'var(--accent-primary)', border: '1px solid rgba(194, 91, 60, 0.3)'
+                                background: 'rgba(13, 92, 126, 0.15)', color: 'var(--accent-primary)', border: '1px solid rgba(13, 92, 126, 0.3)'
                             }}>
                                 UNIT I — BAYESIAN DAG
                             </span>
@@ -141,7 +141,7 @@ export default function BayesianUncertaintyCard({ patientData }: Props) {
 
                     {/* Stat 3: Next Best Diagnostic Test (VOI) */}
                     <div style={{
-                        background: 'rgba(194, 91, 60, 0.06)', border: '1px solid rgba(194, 91, 60, 0.25)',
+                        background: 'rgba(13, 92, 126, 0.06)', border: '1px solid rgba(13, 92, 126, 0.25)',
                         borderRadius: 14, padding: 18
                     }}>
                         <div style={{ fontSize: 11, color: 'var(--accent-primary)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em' }}>
@@ -209,7 +209,7 @@ export default function BayesianUncertaintyCard({ patientData }: Props) {
             {/* Value of Information (VOI) Diagnostic Test Ranking Table */}
             {result?.all_voi_rankings?.length > 0 && (
                 <div style={{
-                    background: 'rgba(90, 65, 45, 0.10)', border: '1px solid var(--surface-border)',
+                    background: 'rgba(13, 45, 62, 0.10)', border: '1px solid var(--surface-border)',
                     borderRadius: 14, padding: 16
                 }}>
                     <div style={{ fontSize: 13, fontWeight: 800, color: 'var(--text-primary)', marginBottom: 10, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -224,8 +224,8 @@ export default function BayesianUncertaintyCard({ patientData }: Props) {
                                 <div key={test.id} style={{
                                     display: 'flex', alignItems: 'center', justifyContent: 'space-between',
                                     padding: '12px 14px', borderRadius: 10,
-                                    background: idx === 0 && !isCompleted ? 'rgba(194, 91, 60, 0.08)' : 'var(--surface-2)',
-                                    border: idx === 0 && !isCompleted ? '1px solid rgba(194, 91, 60, 0.25)' : '1px solid var(--surface-border)',
+                                    background: idx === 0 && !isCompleted ? 'rgba(13, 92, 126, 0.08)' : 'var(--surface-2)',
+                                    border: idx === 0 && !isCompleted ? '1px solid rgba(13, 92, 126, 0.25)' : '1px solid var(--surface-border)',
                                     opacity: isCompleted ? 0.5 : 1,
                                 }}>
                                     <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>

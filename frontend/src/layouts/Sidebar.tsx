@@ -92,8 +92,8 @@ const ROLE_LABELS: Record<string, string> = {
 // distinguishable hue, but all of them sit in the same warm family so the
 // shell never fights the page content.
 const ROLE_COLORS: Record<string, string> = {
-    RECEPTIONIST: '#B8912F', DOCTOR: '#C25B3C', LAB_TECHNICIAN: '#CC6B3D',
-    PATIENT: '#3E8E7E', ADMIN: '#8E6BA8', SUPER_ADMIN: '#8E6BA8',
+    RECEPTIONIST: '#D9A520', DOCTOR: '#0D5C7E', LAB_TECHNICIAN: '#E8833A',
+    PATIENT: '#189B82', ADMIN: '#7C6AB4', SUPER_ADMIN: '#7C6AB4',
 };
 
 export default function Sidebar() {

@@ -232,7 +232,7 @@ export default function ConsultationPage() {
         <button onClick={() => setActiveTab(key)} style={{
             display: 'flex', alignItems: 'center', gap: 8, padding: '10px 18px',
             borderRadius: 10, border: 'none', cursor: 'pointer', fontSize: 13, fontWeight: 700,
-            background: activeTab === key ? 'rgba(194, 91, 60, 0.15)' : 'transparent',
+            background: activeTab === key ? 'rgba(13, 92, 126, 0.15)' : 'transparent',
             color: activeTab === key ? 'var(--accent-primary)' : 'var(--text-secondary)',
             transition: 'all 0.15s',
         }}>
@@ -290,7 +290,7 @@ export default function ConsultationPage() {
                                     {SYMPTOM_OPTIONS.map(s => (
                                         <button key={s} onClick={() => !isCompleted && toggleSymptom(s)} style={{
                                             padding: '6px 14px', borderRadius: 20, fontSize: 12.5, fontWeight: 600, cursor: 'pointer',
-                                            background: symptoms.includes(s) ? 'rgba(194, 91, 60, 0.15)' : 'var(--surface-2)',
+                                            background: symptoms.includes(s) ? 'rgba(13, 92, 126, 0.15)' : 'var(--surface-2)',
                                             border: `1px solid ${symptoms.includes(s) ? '#00E5FF44' : 'var(--surface-border-md)'}`,
                                             color: symptoms.includes(s) ? 'var(--accent-primary)' : 'var(--text-secondary)',
                                             transition: 'all 0.15s',
@@ -332,7 +332,7 @@ export default function ConsultationPage() {
                                 <textarea value={notes} onChange={e => setNotes(e.target.value)} disabled={isCompleted} rows={3} placeholder="Clinical notes..." className="form-input" style={{ marginBottom: 16, resize: 'vertical' }} />
                                 <input value={diagnosis} onChange={e => setDiagnosis(e.target.value)} disabled={isCompleted} placeholder="Final diagnosis..." className="form-input" style={{ marginBottom: 16 }} />
                                 {!isCompleted && (
-                                    <button onClick={saveSymptoms} style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '10px 20px', background: 'rgba(194, 91, 60, 0.1)', border: '1px solid rgba(194, 91, 60, 0.25)', borderRadius: 10, color: 'var(--accent-primary)', fontWeight: 700, fontSize: 13, cursor: 'pointer' }}>
+                                    <button onClick={saveSymptoms} style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '10px 20px', background: 'rgba(13, 92, 126, 0.1)', border: '1px solid rgba(13, 92, 126, 0.25)', borderRadius: 10, color: 'var(--accent-primary)', fontWeight: 700, fontSize: 13, cursor: 'pointer' }}>
                                         <Save size={14} /> Save
                                     </button>
                                 )}
@@ -346,7 +346,7 @@ export default function ConsultationPage() {
                             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
                                 <div style={{ fontWeight: 700, fontSize: 14, color: 'var(--text-primary)' }}>Digital Prescription</div>
                                 {!isCompleted && (
-                                    <button onClick={() => setRxItems([...rxItems, { medicineName: '', dosage: '', frequency: '', duration: '' }])} style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '7px 14px', background: 'rgba(62, 142, 126, 0.1)', border: '1px solid rgba(62, 142, 126, 0.25)', borderRadius: 8, color: 'var(--risk-low)', fontSize: 12, fontWeight: 700, cursor: 'pointer' }}>
+                                    <button onClick={() => setRxItems([...rxItems, { medicineName: '', dosage: '', frequency: '', duration: '' }])} style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '7px 14px', background: 'rgba(24, 155, 130, 0.1)', border: '1px solid rgba(24, 155, 130, 0.25)', borderRadius: 8, color: 'var(--risk-low)', fontSize: 12, fontWeight: 700, cursor: 'pointer' }}>
                                         <Plus size={13} /> Add Medicine
                                     </button>
                                 )}
@@ -373,7 +373,7 @@ export default function ConsultationPage() {
                                         <input value={item.duration} disabled={isCompleted} onChange={e => { const n = [...rxItems]; n[idx].duration = e.target.value; setRxItems(n); }} placeholder="5 days" className="form-input" />
                                     </div>
                                     {!isCompleted && (
-                                        <button onClick={() => setRxItems(rxItems.filter((_, i) => i !== idx))} style={{ marginTop: 24, padding: 8, background: 'rgba(179, 64, 46, 0.1)', border: '1px solid rgba(179, 64, 46, 0.2)', borderRadius: 8, color: 'var(--risk-critical)', cursor: 'pointer' }}>
+                                        <button onClick={() => setRxItems(rxItems.filter((_, i) => i !== idx))} style={{ marginTop: 24, padding: 8, background: 'rgba(209, 63, 74, 0.1)', border: '1px solid rgba(209, 63, 74, 0.2)', borderRadius: 8, color: 'var(--risk-critical)', cursor: 'pointer' }}>
                                             <Trash2 size={13} />
                                         </button>
                                     )}
@@ -386,7 +386,7 @@ export default function ConsultationPage() {
                                     {savingRx ? 'Saving...' : 'Save Prescription'}
                                 </button>
                             )}
-                            <button onClick={downloadPrescriptionPDF} style={{ padding: '11px 18px', background: 'rgba(194, 91, 60, 0.08)', border: '1px solid rgba(194, 91, 60, 0.25)', borderRadius: 10, color: 'var(--accent-primary)', fontWeight: 700, fontSize: 13, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 8 }}>
+                            <button onClick={downloadPrescriptionPDF} style={{ padding: '11px 18px', background: 'rgba(13, 92, 126, 0.08)', border: '1px solid rgba(13, 92, 126, 0.25)', borderRadius: 10, color: 'var(--accent-primary)', fontWeight: 700, fontSize: 13, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 8 }}>
                                 <Download size={14} /> Download PDF
                             </button>
                         </div>
@@ -401,8 +401,8 @@ export default function ConsultationPage() {
                                     {LAB_TEST_OPTIONS.map(t => (
                                         <label key={t.value} style={{
                                             display: 'flex', alignItems: 'center', gap: 12, padding: '12px 16px',
-                                            background: labTests.includes(t.value) ? 'rgba(204, 107, 61, 0.1)' : 'var(--surface-2)',
-                                            border: `1px solid ${labTests.includes(t.value) ? 'rgba(204, 107, 61, 0.3)' : 'var(--surface-border)'}`,
+                                            background: labTests.includes(t.value) ? 'rgba(232, 131, 58, 0.1)' : 'var(--surface-2)',
+                                            border: `1px solid ${labTests.includes(t.value) ? 'rgba(232, 131, 58, 0.3)' : 'var(--surface-border)'}`,
                                             borderRadius: 12, cursor: 'pointer',
                                         }}>
                                             <input type="checkbox" checked={labTests.includes(t.value)} disabled={isCompleted}

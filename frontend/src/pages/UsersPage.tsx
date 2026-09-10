@@ -8,9 +8,9 @@ import { format } from 'date-fns';
 
 const ROLE_COLORS: Record<string, { color: string; bg: string }> = {
     ADMIN: { color: '#FF2CF5', bg: 'rgba(255,44,245,0.10)' },
-    DOCTOR: { color: 'var(--accent-primary)', bg: 'rgba(194, 91, 60, 0.10)' },
-    NURSE: { color: 'var(--risk-low)', bg: 'rgba(62, 142, 126, 0.10)' },
-    ANALYST: { color: 'var(--risk-medium)', bg: 'rgba(184, 145, 47, 0.10)' },
+    DOCTOR: { color: 'var(--accent-primary)', bg: 'rgba(13, 92, 126, 0.10)' },
+    NURSE: { color: 'var(--risk-low)', bg: 'rgba(24, 155, 130, 0.10)' },
+    ANALYST: { color: 'var(--risk-medium)', bg: 'rgba(217, 165, 32, 0.10)' },
 };
 
 export default function UsersPage() {
@@ -71,7 +71,7 @@ export default function UsersPage() {
             {showAdd && (
                 <div style={{
                     background: 'var(--surface-1)',
-                    border: '1px solid rgba(194, 91, 60, 0.20)',
+                    border: '1px solid rgba(13, 92, 126, 0.20)',
                     borderRadius: 18, padding: '24px 28px', marginBottom: 20,
                     position: 'relative', overflow: 'hidden',
                 }}>
@@ -117,7 +117,7 @@ export default function UsersPage() {
                     <div style={{ display: 'flex', justifyContent: 'center', padding: 60 }}>
                         <div style={{
                             width: 36, height: 36, borderRadius: '50%',
-                            border: '3px solid rgba(194, 91, 60, 0.15)',
+                            border: '3px solid rgba(13, 92, 126, 0.15)',
                             borderTopColor: 'var(--accent-primary)',
                             animation: 'spin 0.8s linear infinite',
                         }} />
@@ -167,9 +167,9 @@ export default function UsersPage() {
                                         <td>
                                             <span style={{
                                                 fontSize: 11, padding: '3px 10px', borderRadius: 9999, fontWeight: 700,
-                                                background: u.isActive ? 'rgba(62, 142, 126, 0.10)' : 'rgba(179, 64, 46, 0.10)',
+                                                background: u.isActive ? 'rgba(24, 155, 130, 0.10)' : 'rgba(209, 63, 74, 0.10)',
                                                 color: u.isActive ? 'var(--accent-green)' : 'var(--risk-critical)',
-                                                border: `1px solid ${u.isActive ? 'rgba(62, 142, 126, 0.20)' : 'rgba(179, 64, 46, 0.20)'}`,
+                                                border: `1px solid ${u.isActive ? 'rgba(24, 155, 130, 0.20)' : 'rgba(209, 63, 74, 0.20)'}`,
                                             }}>
                                                 {u.isActive ? '● Active' : '○ Inactive'}
                                             </span>

@@ -32,7 +32,7 @@ function KpiCard({ kpi, delay }: { kpi: any; delay: number }) {
                 {kpi.trend !== undefined && (
                     <div style={{
                         display: 'flex', alignItems: 'center', gap: 4, padding: '3px 8px', borderRadius: 9999,
-                        background: kpi.trend > 0 ? 'rgba(62, 142, 126, 0.10)' : kpi.trend < 0 ? 'rgba(179, 64, 46, 0.10)' : 'var(--surface-2)',
+                        background: kpi.trend > 0 ? 'rgba(24, 155, 130, 0.10)' : kpi.trend < 0 ? 'rgba(209, 63, 74, 0.10)' : 'var(--surface-2)',
                         fontSize: 11, fontWeight: 700,
                         color: kpi.trend > 0 ? 'var(--accent-green)' : kpi.trend < 0 ? 'var(--risk-critical)' : 'var(--text-muted)',
                     }}>
@@ -105,7 +105,7 @@ export default function DashboardPage() {
 
     if (loading) return (
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '60vh', flexDirection: 'column', gap: 16 }}>
-            <div style={{ width: 48, height: 48, borderRadius: '50%', border: '3px solid rgba(194, 91, 60, 0.15)', borderTopColor: 'var(--accent-primary)', animation: 'spin 0.8s linear infinite' }} />
+            <div style={{ width: 48, height: 48, borderRadius: '50%', border: '3px solid rgba(13, 92, 126, 0.15)', borderTopColor: 'var(--accent-primary)', animation: 'spin 0.8s linear infinite' }} />
             <div style={{ color: 'var(--text-muted)', fontSize: 13, fontFamily: 'var(--font-mono)' }}>Loading system overview...</div>
         </div>
     );
@@ -143,7 +143,7 @@ export default function DashboardPage() {
                     </p>
                 </div>
                 <div style={{ display: 'flex', gap: 10 }}>
-                    <Link to="/patients/new" className="btn-ghost" style={{ textDecoration: 'none', color: 'var(--accent-primary)', borderColor: 'rgba(194, 91, 60, 0.2)', background: 'rgba(194, 91, 60, 0.04)' }}>
+                    <Link to="/patients/new" className="btn-ghost" style={{ textDecoration: 'none', color: 'var(--accent-primary)', borderColor: 'rgba(13, 92, 126, 0.2)', background: 'rgba(13, 92, 126, 0.04)' }}>
                         <Users size={14} /> New Patient
                     </Link>
                     <Link to="/appointments" className="btn-primary" style={{ textDecoration: 'none' }}>
@@ -302,7 +302,7 @@ export default function DashboardPage() {
 
             {/* ── Pending Appointments Row ── */}
             {apptRequests.length > 0 && (
-                <div style={{ background: 'var(--surface-1)', border: '1px solid rgba(194, 91, 60, 0.2)', borderRadius: 18, overflow: 'hidden' }}>
+                <div style={{ background: 'var(--surface-1)', border: '1px solid rgba(13, 92, 126, 0.2)', borderRadius: 18, overflow: 'hidden' }}>
                     <div style={{ padding: '16px 22px 10px', borderBottom: '1px solid var(--surface-border)' }}>
                         <SectionHeader title="📋 Pending Appointment Requests" sub={`${pendingAppts} awaiting review`} to="/appointments" toLabel="Manage All" />
                     </div>
@@ -321,7 +321,7 @@ export default function DashboardPage() {
                                     <span style={{
                                         fontSize: 10, fontWeight: 700, padding: '2px 8px', borderRadius: 20,
                                         color: r.status === 'PENDING' ? 'var(--risk-medium)' : 'var(--risk-low)',
-                                        background: r.status === 'PENDING' ? 'rgba(184, 145, 47, 0.1)' : 'rgba(62, 142, 126, 0.1)',
+                                        background: r.status === 'PENDING' ? 'rgba(217, 165, 32, 0.1)' : 'rgba(24, 155, 130, 0.1)',
                                     }}>{r.status}</span>
                                 </div>
                             </div>
