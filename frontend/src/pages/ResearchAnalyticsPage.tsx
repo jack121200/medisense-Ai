@@ -7,9 +7,9 @@ import { FlaskConical, BarChart3, ChevronRight, AlertCircle, CheckCircle, Info }
 import api from '../api/axiosInstance';
 
 const C = {
-    crimson: '#E63946', rose: '#FF6B6B', gold: '#FFD166',
-    teal: '#06D6A0', lavender: '#C77DFF', blue: '#3A86FF',
-    bg: 'rgba(255,255,255,0.025)', border: 'rgba(255,255,255,0.07)',
+    crimson: 'var(--accent-primary)', rose: 'var(--accent-primary-hover)', gold: 'var(--risk-medium)',
+    teal: 'var(--risk-low)', lavender: 'var(--vitals-bp)', blue: '#3A86FF',
+    bg: 'var(--surface-1)', border: 'var(--surface-border)',
 };
 
 // ── HYPOTHESIS TEST QUESTIONS ────────────────────────────────────────────────
@@ -88,16 +88,16 @@ function HypothesisTab() {
         <div style={{ display: 'grid', gridTemplateColumns: '340px 1fr', gap: 24 }}>
             {/* Question list */}
             <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-                <div style={{ fontSize: 12, fontWeight: 700, color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase', letterSpacing: '0.09em', marginBottom: 4 }}>Select a Question</div>
+                <div style={{ fontSize: 12, fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.09em', marginBottom: 4 }}>Select a Question</div>
                 {QUESTIONS.map(q => (
                     <button key={q.id} onClick={() => run(q.id)} style={{
                         padding: '14px 16px', borderRadius: 12, border: `1px solid ${selected === q.id ? `${C.lavender}50` : C.border}`,
                         background: selected === q.id ? `${C.lavender}10` : C.bg,
-                        color: selected === q.id ? C.lavender : 'rgba(255,255,255,0.65)',
+                        color: selected === q.id ? C.lavender : 'var(--text-secondary)',
                         cursor: 'pointer', textAlign: 'left', transition: 'all 0.15s',
                     }}>
                         <div style={{ fontWeight: 700, fontSize: 13, marginBottom: 5 }}>{q.label}</div>
-                        <div style={{ fontSize: 11.5, color: 'rgba(255,255,255,0.35)', lineHeight: 1.5 }}>{q.desc}</div>
+                        <div style={{ fontSize: 11.5, color: 'var(--text-muted)', lineHeight: 1.5 }}>{q.desc}</div>
                         <div style={{ marginTop: 8, fontSize: 10, fontWeight: 700, color: q.test === 'chi2' ? C.teal : C.gold, textTransform: 'uppercase', letterSpacing: '0.06em' }}>
                             {q.test === 'chi2' ? 'Chi-Square Test' : 'Independent T-Test'}
                         </div>
@@ -108,21 +108,21 @@ function HypothesisTab() {
             {/* Result panel */}
             <div>
                 {!selected && (
-                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: 300, gap: 12, color: 'rgba(255,255,255,0.3)' }}>
+                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: 300, gap: 12, color: 'var(--text-muted)' }}>
                         <FlaskConical size={40} opacity={0.2} />
                         <div style={{ fontSize: 13 }}>Select a question to run the statistical test</div>
                     </div>
                 )}
                 {loading && (
                     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: 300, gap: 12 }}>
-                        <div style={{ width: 40, height: 40, borderRadius: '50%', border: `3px solid rgba(199,125,255,0.15)`, borderTopColor: C.lavender, animation: 'spin 0.8s linear infinite' }} />
-                        <div style={{ fontSize: 13, color: 'rgba(255,255,255,0.4)' }}>Running {q?.test === 'chi2' ? 'Chi-Square' : 'T-Test'}...</div>
+                        <div style={{ width: 40, height: 40, borderRadius: '50%', border: `3px solid rgba(142, 107, 168, 0.15)`, borderTopColor: C.lavender, animation: 'spin 0.8s linear infinite' }} />
+                        <div style={{ fontSize: 13, color: 'var(--text-muted)' }}>Running {q?.test === 'chi2' ? 'Chi-Square' : 'T-Test'}...</div>
                     </div>
                 )}
                 {error && (
-                    <div style={{ padding: 20, background: 'rgba(230,57,70,0.08)', border: `1px solid ${C.crimson}30`, borderRadius: 14, display: 'flex', gap: 12, alignItems: 'flex-start' }}>
+                    <div style={{ padding: 20, background: 'rgba(194, 91, 60, 0.08)', border: `1px solid ${C.crimson}30`, borderRadius: 14, display: 'flex', gap: 12, alignItems: 'flex-start' }}>
                         <AlertCircle size={18} color={C.crimson} style={{ flexShrink: 0, marginTop: 2 }} />
-                        <div style={{ fontSize: 13, color: 'rgba(255,255,255,0.6)', lineHeight: 1.6 }}>{error}</div>
+                        <div style={{ fontSize: 13, color: 'var(--text-secondary)', lineHeight: 1.6 }}>{error}</div>
                     </div>
                 )}
                 {result && !loading && (
@@ -142,7 +142,7 @@ function HypothesisTab() {
                                 <div style={{ fontSize: 16, fontWeight: 900, color: result.significant ? C.crimson : C.teal, marginBottom: 6 }}>
                                     {result.verdict}
                                 </div>
-                                <div style={{ fontSize: 13, color: 'rgba(255,255,255,0.55)', lineHeight: 1.6 }}>{result.plain_english}</div>
+                                <div style={{ fontSize: 13, color: 'var(--text-secondary)', lineHeight: 1.6 }}>{result.plain_english}</div>
                             </div>
                         </div>
 
@@ -154,8 +154,8 @@ function HypothesisTab() {
                                 { label: 'p-value', value: result.p_value?.toFixed(4) },
                             ].map(s => (
                                 <div key={s.label} style={{ background: C.bg, border: `1px solid ${C.border}`, borderRadius: 12, padding: '14px 16px', textAlign: 'center' }}>
-                                    <div style={{ fontSize: 11, fontWeight: 700, color: 'rgba(255,255,255,0.35)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 8 }}>{s.label}</div>
-                                    <div style={{ fontSize: 22, fontWeight: 900, color: '#fff', fontFamily: 'monospace' }}>{s.value}</div>
+                                    <div style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 8 }}>{s.label}</div>
+                                    <div style={{ fontSize: 22, fontWeight: 900, color: 'var(--text-primary)', fontFamily: 'monospace' }}>{s.value}</div>
                                 </div>
                             ))}
                         </div>
@@ -163,13 +163,13 @@ function HypothesisTab() {
                         {/* Bar comparison */}
                         {result.chart_data && (
                             <div style={{ background: C.bg, border: `1px solid ${C.border}`, borderRadius: 14, padding: '18px 20px' }}>
-                                <div style={{ fontSize: 12, fontWeight: 700, color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 14 }}>Group Comparison</div>
+                                <div style={{ fontSize: 12, fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 14 }}>Group Comparison</div>
                                 <ResponsiveContainer width="100%" height={160}>
                                     <BarChart data={result.chart_data} layout="vertical" barCategoryGap={20}>
-                                        <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.04)" horizontal={false} />
-                                        <XAxis type="number" tick={{ fill: 'rgba(255,255,255,0.35)', fontSize: 11 }} axisLine={false} tickLine={false} />
-                                        <YAxis type="category" dataKey="name" tick={{ fill: 'rgba(255,255,255,0.55)', fontSize: 12 }} axisLine={false} tickLine={false} width={120} />
-                                        <Tooltip contentStyle={{ background: '#1a1a2a', border: `1px solid ${C.border}`, borderRadius: 10, fontSize: 12 }} />
+                                        <CartesianGrid strokeDasharray="3 3" stroke="var(--text-muted)" horizontal={false} />
+                                        <XAxis type="number" tick={{ fill: 'var(--text-muted)', fontSize: 11 }} axisLine={false} tickLine={false} />
+                                        <YAxis type="category" dataKey="name" tick={{ fill: 'var(--text-secondary)', fontSize: 12 }} axisLine={false} tickLine={false} width={120} />
+                                        <Tooltip contentStyle={{ background: 'var(--surface-0)', border: `1px solid ${C.border}`, borderRadius: 10, fontSize: 12 }} />
                                         <Bar dataKey="value" fill={C.lavender} radius={[0, 6, 6, 0]} />
                                     </BarChart>
                                 </ResponsiveContainer>
@@ -178,9 +178,9 @@ function HypothesisTab() {
 
                         {/* Test explanation */}
                         <div style={{ background: C.bg, border: `1px solid ${C.border}`, borderRadius: 12, padding: '12px 16px', display: 'flex', gap: 10, alignItems: 'flex-start' }}>
-                            <Info size={15} color="rgba(255,255,255,0.35)" style={{ flexShrink: 0, marginTop: 2 }} />
-                            <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.4)', lineHeight: 1.6 }}>
-                                <strong style={{ color: 'rgba(255,255,255,0.6)' }}>{result.test_used}:</strong> {result.test_explanation}
+                            <Info size={15} color="var(--text-muted)" style={{ flexShrink: 0, marginTop: 2 }} />
+                            <div style={{ fontSize: 12, color: 'var(--text-muted)', lineHeight: 1.6 }}>
+                                <strong style={{ color: 'var(--text-secondary)' }}>{result.test_used}:</strong> {result.test_explanation}
                                 {' '}<strong>p &lt; 0.05</strong> = statistically significant pattern. <strong>p ≥ 0.05</strong> = may be random variation.
                             </div>
                         </div>
@@ -192,7 +192,7 @@ function HypothesisTab() {
 }
 
 // ── BIG DATA ANALYTICS TAB ───────────────────────────────────────────────────
-const RISK_COLORS: Record<string, string> = { HIGH: C.crimson, MEDIUM: C.gold, LOW: C.teal, CRITICAL: '#FF2D55' };
+const RISK_COLORS: Record<string, string> = { HIGH: C.crimson, MEDIUM: C.gold, LOW: C.teal, CRITICAL: 'var(--risk-critical)' };
 const AGE_COLORS = [C.teal, C.gold, C.rose, C.crimson];
 
 function BigDataTab() {
@@ -209,13 +209,13 @@ function BigDataTab() {
 
     if (loading) return (
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: 300, flexDirection: 'column', gap: 12 }}>
-            <div style={{ width: 40, height: 40, borderRadius: '50%', border: `3px solid rgba(230,57,70,0.15)`, borderTopColor: C.crimson, animation: 'spin 0.8s linear infinite' }} />
-            <div style={{ fontSize: 13, color: 'rgba(255,255,255,0.4)' }}>Loading population analytics...</div>
+            <div style={{ width: 40, height: 40, borderRadius: '50%', border: `3px solid rgba(194, 91, 60, 0.15)`, borderTopColor: C.crimson, animation: 'spin 0.8s linear infinite' }} />
+            <div style={{ fontSize: 13, color: 'var(--text-muted)' }}>Loading population analytics...</div>
         </div>
     );
 
     if (error) return (
-        <div style={{ padding: 20, background: 'rgba(230,57,70,0.08)', border: `1px solid ${C.crimson}30`, borderRadius: 14, fontSize: 13, color: 'rgba(255,255,255,0.6)' }}>
+        <div style={{ padding: 20, background: 'rgba(194, 91, 60, 0.08)', border: `1px solid ${C.crimson}30`, borderRadius: 14, fontSize: 13, color: 'var(--text-secondary)' }}>
             ⚠️ {error}
         </div>
     );
@@ -239,7 +239,7 @@ function BigDataTab() {
                     { label: '% Low Risk', value: `${stats.pct_low?.toFixed(1) || 0}%`, color: C.teal },
                 ].map(kpi => (
                     <div key={kpi.label} style={{ background: C.bg, border: `1px solid ${kpi.color}20`, borderRadius: 14, padding: '18px 20px', textAlign: 'center' }}>
-                        <div style={{ fontSize: 11, fontWeight: 700, color: 'rgba(255,255,255,0.35)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 10 }}>{kpi.label}</div>
+                        <div style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 10 }}>{kpi.label}</div>
                         <div style={{ fontSize: 28, fontWeight: 900, color: kpi.color, fontFamily: 'monospace' }}>{kpi.value}</div>
                     </div>
                 ))}
@@ -249,13 +249,13 @@ function BigDataTab() {
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20 }}>
                 {/* Risk by age group */}
                 <div style={{ background: C.bg, border: `1px solid ${C.border}`, borderRadius: 16, padding: '18px 20px' }}>
-                    <div style={{ fontWeight: 800, fontSize: 14, color: '#fff', marginBottom: 16 }}>Risk Distribution by Age Group</div>
+                    <div style={{ fontWeight: 800, fontSize: 14, color: 'var(--text-primary)', marginBottom: 16 }}>Risk Distribution by Age Group</div>
                     <ResponsiveContainer width="100%" height={200}>
                         <BarChart data={ageRisk}>
-                            <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.04)" vertical={false} />
-                            <XAxis dataKey="age_group" tick={{ fill: 'rgba(255,255,255,0.4)', fontSize: 11 }} axisLine={false} tickLine={false} />
-                            <YAxis tick={{ fill: 'rgba(255,255,255,0.4)', fontSize: 11 }} axisLine={false} tickLine={false} unit="%" />
-                            <Tooltip contentStyle={{ background: '#1a1a2a', border: `1px solid ${C.border}`, borderRadius: 10, fontSize: 12 }} formatter={(v: any) => [`${v}%`]} />
+                            <CartesianGrid strokeDasharray="3 3" stroke="var(--text-muted)" vertical={false} />
+                            <XAxis dataKey="age_group" tick={{ fill: 'var(--text-muted)', fontSize: 11 }} axisLine={false} tickLine={false} />
+                            <YAxis tick={{ fill: 'var(--text-muted)', fontSize: 11 }} axisLine={false} tickLine={false} unit="%" />
+                            <Tooltip contentStyle={{ background: 'var(--surface-0)', border: `1px solid ${C.border}`, borderRadius: 10, fontSize: 12 }} formatter={(v: any) => [`${v}%`]} />
                             <Bar dataKey="medium_high_pct" name="Medium/High Risk %" radius={[4, 4, 0, 0]}>
                                 {ageRisk.map((_: any, i: number) => <Cell key={i} fill={AGE_COLORS[i % AGE_COLORS.length]} />)}
                             </Bar>
@@ -265,16 +265,16 @@ function BigDataTab() {
 
                 {/* Top 5 risk factors */}
                 <div style={{ background: C.bg, border: `1px solid ${C.border}`, borderRadius: 16, padding: '18px 20px' }}>
-                    <div style={{ fontWeight: 800, fontSize: 14, color: '#fff', marginBottom: 16 }}>Top 5 Risk Factors (Feature Importance)</div>
+                    <div style={{ fontWeight: 800, fontSize: 14, color: 'var(--text-primary)', marginBottom: 16 }}>Top 5 Risk Factors (Feature Importance)</div>
                     {topFactors.length === 0
-                        ? <div style={{ fontSize: 13, color: 'rgba(255,255,255,0.3)', padding: 20, textAlign: 'center' }}>Train heart model first to see feature importance</div>
+                        ? <div style={{ fontSize: 13, color: 'var(--text-muted)', padding: 20, textAlign: 'center' }}>Train heart model first to see feature importance</div>
                         : (
                             <ResponsiveContainer width="100%" height={200}>
                                 <BarChart data={topFactors} layout="vertical">
-                                    <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.04)" horizontal={false} />
-                                    <XAxis type="number" tick={{ fill: 'rgba(255,255,255,0.35)', fontSize: 11 }} axisLine={false} tickLine={false} unit="%" />
-                                    <YAxis type="category" dataKey="factor" tick={{ fill: 'rgba(255,255,255,0.55)', fontSize: 11 }} axisLine={false} tickLine={false} width={140} />
-                                    <Tooltip contentStyle={{ background: '#1a1a2a', border: `1px solid ${C.border}`, borderRadius: 10, fontSize: 12 }} formatter={(v: any) => [`${v}%`]} />
+                                    <CartesianGrid strokeDasharray="3 3" stroke="var(--text-muted)" horizontal={false} />
+                                    <XAxis type="number" tick={{ fill: 'var(--text-muted)', fontSize: 11 }} axisLine={false} tickLine={false} unit="%" />
+                                    <YAxis type="category" dataKey="factor" tick={{ fill: 'var(--text-secondary)', fontSize: 11 }} axisLine={false} tickLine={false} width={140} />
+                                    <Tooltip contentStyle={{ background: 'var(--surface-0)', border: `1px solid ${C.border}`, borderRadius: 10, fontSize: 12 }} formatter={(v: any) => [`${v}%`]} />
                                     <Bar dataKey="importance_pct" name="Importance" fill={C.crimson} radius={[0, 6, 6, 0]} />
                                 </BarChart>
                             </ResponsiveContainer>
@@ -287,17 +287,17 @@ function BigDataTab() {
             <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: 20 }}>
                 {/* CBC monthly anomaly flags */}
                 <div style={{ background: C.bg, border: `1px solid ${C.border}`, borderRadius: 16, padding: '18px 20px' }}>
-                    <div style={{ fontWeight: 800, fontSize: 14, color: '#fff', marginBottom: 4 }}>CBC Anomaly Flags — Monthly Trend</div>
-                    <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.3)', marginBottom: 16 }}>Reports with 2+ abnormal parameters per month</div>
+                    <div style={{ fontWeight: 800, fontSize: 14, color: 'var(--text-primary)', marginBottom: 4 }}>CBC Anomaly Flags — Monthly Trend</div>
+                    <div style={{ fontSize: 12, color: 'var(--text-muted)', marginBottom: 16 }}>Reports with 2+ abnormal parameters per month</div>
                     {cbcTrend.length === 0
-                        ? <div style={{ height: 150, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 13, color: 'rgba(255,255,255,0.25)' }}>No CBC records yet</div>
+                        ? <div style={{ height: 150, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 13, color: 'var(--text-muted)' }}>No CBC records yet</div>
                         : (
                             <ResponsiveContainer width="100%" height={150}>
                                 <BarChart data={cbcTrend}>
-                                    <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.04)" vertical={false} />
-                                    <XAxis dataKey="month" tick={{ fill: 'rgba(255,255,255,0.35)', fontSize: 11 }} axisLine={false} tickLine={false} />
-                                    <YAxis tick={{ fill: 'rgba(255,255,255,0.35)', fontSize: 11 }} axisLine={false} tickLine={false} />
-                                    <Tooltip contentStyle={{ background: '#1a1a2a', border: `1px solid ${C.border}`, borderRadius: 10, fontSize: 12 }} />
+                                    <CartesianGrid strokeDasharray="3 3" stroke="var(--text-muted)" vertical={false} />
+                                    <XAxis dataKey="month" tick={{ fill: 'var(--text-muted)', fontSize: 11 }} axisLine={false} tickLine={false} />
+                                    <YAxis tick={{ fill: 'var(--text-muted)', fontSize: 11 }} axisLine={false} tickLine={false} />
+                                    <Tooltip contentStyle={{ background: 'var(--surface-0)', border: `1px solid ${C.border}`, borderRadius: 10, fontSize: 12 }} />
                                     <Bar dataKey="flag_count" name="Flagged Reports" fill={C.rose} radius={[4, 4, 0, 0]} />
                                 </BarChart>
                             </ResponsiveContainer>
@@ -307,8 +307,8 @@ function BigDataTab() {
 
                 {/* Gender split of high-risk */}
                 <div style={{ background: C.bg, border: `1px solid ${C.border}`, borderRadius: 16, padding: '18px 20px' }}>
-                    <div style={{ fontWeight: 800, fontSize: 14, color: '#fff', marginBottom: 4 }}>High-Risk Gender Split</div>
-                    <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.3)', marginBottom: 16 }}>% Male vs Female among HIGH risk patients</div>
+                    <div style={{ fontWeight: 800, fontSize: 14, color: 'var(--text-primary)', marginBottom: 4 }}>High-Risk Gender Split</div>
+                    <div style={{ fontSize: 12, color: 'var(--text-muted)', marginBottom: 16 }}>% Male vs Female among HIGH risk patients</div>
                     <div style={{ display: 'flex', flexDirection: 'column', gap: 14, marginTop: 10 }}>
                         {[
                             { label: 'Male', pct: genderSplit.male_pct, color: C.blue },
@@ -316,16 +316,16 @@ function BigDataTab() {
                         ].map(g => (
                             <div key={g.label}>
                                 <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 13, marginBottom: 6 }}>
-                                    <span style={{ color: 'rgba(255,255,255,0.6)', fontWeight: 600 }}>{g.label}</span>
+                                    <span style={{ color: 'var(--text-secondary)', fontWeight: 600 }}>{g.label}</span>
                                     <span style={{ color: g.color, fontWeight: 800, fontFamily: 'monospace' }}>{g.pct?.toFixed(1) || 0}%</span>
                                 </div>
-                                <div style={{ height: 10, background: 'rgba(255,255,255,0.06)', borderRadius: 5, overflow: 'hidden' }}>
+                                <div style={{ height: 10, background: 'var(--surface-2)', borderRadius: 5, overflow: 'hidden' }}>
                                     <div style={{ width: `${g.pct || 0}%`, height: '100%', background: g.color, borderRadius: 5, transition: 'width 0.8s ease' }} />
                                 </div>
                             </div>
                         ))}
                     </div>
-                    <div style={{ marginTop: 16, fontSize: 11, color: 'rgba(255,255,255,0.25)' }}>
+                    <div style={{ marginTop: 16, fontSize: 11, color: 'var(--text-muted)' }}>
                         Aggregated across all patients. No individual data.
                     </div>
                 </div>
@@ -352,22 +352,22 @@ export default function ResearchAnalyticsPage() {
                 <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 8 }}>
                     <div style={{ width: 40, height: 40, borderRadius: 12, background: `linear-gradient(135deg, ${C.lavender}, #7B2FF7)`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 20 }}>🔬</div>
                     <div>
-                        <h1 style={{ fontSize: 22, fontWeight: 900, color: '#fff', letterSpacing: '-0.02em' }}>Research & Analytics</h1>
-                        <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.4)', marginTop: 2 }}>Population-level statistical analysis — aggregated, anonymized clinic-wide data</p>
+                        <h1 style={{ fontSize: 22, fontWeight: 900, color: 'var(--text-primary)', letterSpacing: '-0.02em' }}>Research & Analytics</h1>
+                        <p style={{ fontSize: 13, color: 'var(--text-muted)', marginTop: 2 }}>Population-level statistical analysis — aggregated, anonymized clinic-wide data</p>
                     </div>
                 </div>
-                <div style={{ padding: '8px 14px', background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.07)', borderRadius: 10, fontSize: 12, color: 'rgba(255,255,255,0.35)', display: 'inline-flex', alignItems: 'center', gap: 6 }}>
+                <div style={{ padding: '8px 14px', background: 'var(--surface-1)', border: '1px solid var(--surface-border)', borderRadius: 10, fontSize: 12, color: 'var(--text-muted)', display: 'inline-flex', alignItems: 'center', gap: 6 }}>
                     🔒 Doctor access only — No individual patient names or IDs are shown in this section
                 </div>
             </div>
 
             {/* Tabs */}
-            <div style={{ display: 'flex', gap: 6, marginBottom: 28, background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)', borderRadius: 14, padding: 6, width: 'fit-content' }}>
+            <div style={{ display: 'flex', gap: 6, marginBottom: 28, background: 'var(--surface-1)', border: '1px solid var(--surface-border)', borderRadius: 14, padding: 6, width: 'fit-content' }}>
                 {TABS.map(t => (
                     <button key={t.id} onClick={() => setTab(t.id)} style={{
                         padding: '10px 22px', borderRadius: 10, border: 'none', cursor: 'pointer',
                         background: tab === t.id ? `${C.lavender}18` : 'transparent',
-                        color: tab === t.id ? C.lavender : 'rgba(255,255,255,0.45)',
+                        color: tab === t.id ? C.lavender : 'var(--text-secondary)',
                         fontWeight: tab === t.id ? 800 : 600, fontSize: 13.5,
                         boxShadow: tab === t.id ? `0 0 0 1px ${C.lavender}35` : 'none',
                         transition: 'all 0.15s',
@@ -378,7 +378,7 @@ export default function ResearchAnalyticsPage() {
             </div>
 
             {/* Content */}
-            <div style={{ background: 'rgba(255,255,255,0.025)', border: '1px solid rgba(255,255,255,0.07)', borderRadius: 20, padding: 28 }}>
+            <div style={{ background: 'var(--surface-1)', border: '1px solid var(--surface-border)', borderRadius: 20, padding: 28 }}>
                 {tab === 'hypothesis' && <HypothesisTab />}
                 {tab === 'bigdata' && <BigDataTab />}
             </div>

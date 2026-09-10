@@ -63,7 +63,7 @@ export default function BayesianUncertaintyCard({ patientData }: Props) {
     return (
         <div style={{
             background: 'var(--surface-1)',
-            border: '1px solid rgba(0,229,255,0.2)',
+            border: '1px solid rgba(194, 91, 60, 0.2)',
             borderRadius: 20,
             padding: 24,
             marginBottom: 24,
@@ -74,20 +74,20 @@ export default function BayesianUncertaintyCard({ patientData }: Props) {
                 <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
                     <div style={{
                         width: 44, height: 44, borderRadius: 14,
-                        background: 'linear-gradient(135deg, rgba(0,229,255,0.2), rgba(0,180,216,0.05))',
-                        border: '1px solid rgba(0,229,255,0.3)',
+                        background: 'linear-gradient(135deg, rgba(194, 91, 60, 0.2), rgba(194, 91, 60, 0.05))',
+                        border: '1px solid rgba(194, 91, 60, 0.3)',
                         display: 'flex', alignItems: 'center', justifyContent: 'center'
                     }}>
-                        <Network size={22} color="#00E5FF" />
+                        <Network size={22} color="var(--accent-primary)" />
                     </div>
                     <div>
                         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                            <h2 style={{ fontSize: 18, fontWeight: 800, color: '#fff', margin: 0 }}>
+                            <h2 style={{ fontSize: 18, fontWeight: 800, color: 'var(--text-primary)', margin: 0 }}>
                                 Bayesian Decision & Epistemic Uncertainty Engine
                             </h2>
                             <span style={{
                                 fontSize: 10, fontWeight: 800, padding: '2px 8px', borderRadius: 12,
-                                background: 'rgba(0,229,255,0.15)', color: '#00E5FF', border: '1px solid rgba(0,229,255,0.3)'
+                                background: 'rgba(194, 91, 60, 0.15)', color: 'var(--accent-primary)', border: '1px solid rgba(194, 91, 60, 0.3)'
                             }}>
                                 UNIT I — BAYESIAN DAG
                             </span>
@@ -99,7 +99,7 @@ export default function BayesianUncertaintyCard({ patientData }: Props) {
                 </div>
 
                 <button onClick={() => runInference()} disabled={loading} className="btn-ghost" style={{ fontSize: 12 }}>
-                    <Sparkles size={14} color="#00E5FF" /> {loading ? 'Computing Bayes...' : 'Recalculate'}
+                    <Sparkles size={14} color="var(--accent-primary)" /> {loading ? 'Computing Bayes...' : 'Recalculate'}
                 </button>
             </div>
 
@@ -108,7 +108,7 @@ export default function BayesianUncertaintyCard({ patientData }: Props) {
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 16, marginBottom: 20 }}>
                     {/* Stat 1: Posterior Probability */}
                     <div style={{
-                        background: 'rgba(255,255,255,0.03)', border: `1px solid ${result.color}35`,
+                        background: 'var(--surface-1)', border: `1px solid ${result.color}35`,
                         borderRadius: 14, padding: 18, position: 'relative', overflow: 'hidden'
                     }}>
                         <div style={{ fontSize: 11, color: 'var(--text-muted)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em' }}>
@@ -125,33 +125,33 @@ export default function BayesianUncertaintyCard({ patientData }: Props) {
 
                     {/* Stat 2: Epistemic Uncertainty & Credible Interval */}
                     <div style={{
-                        background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.08)',
+                        background: 'var(--surface-1)', border: '1px solid var(--surface-border)',
                         borderRadius: 14, padding: 18
                     }}>
                         <div style={{ fontSize: 11, color: 'var(--text-muted)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em' }}>
                             Epistemic Uncertainty (Entropy)
                         </div>
-                        <div className="font-mono" style={{ fontSize: 24, fontWeight: 800, color: '#FFD166', marginTop: 4 }}>
+                        <div className="font-mono" style={{ fontSize: 24, fontWeight: 800, color: 'var(--risk-medium)', marginTop: 4 }}>
                             ±{result.credible_interval_95.margin_pct}% <span style={{ fontSize: 12, color: 'var(--text-muted)' }}>margin</span>
                         </div>
                         <div style={{ fontSize: 11, color: 'var(--text-secondary)', marginTop: 4 }}>
-                            95% Bayesian Interval: <strong style={{ color: '#fff' }}>[{result.credible_interval_95.lower_pct}% – {result.credible_interval_95.upper_pct}%]</strong>
+                            95% Bayesian Interval: <strong style={{ color: 'var(--text-primary)' }}>[{result.credible_interval_95.lower_pct}% – {result.credible_interval_95.upper_pct}%]</strong>
                         </div>
                     </div>
 
                     {/* Stat 3: Next Best Diagnostic Test (VOI) */}
                     <div style={{
-                        background: 'rgba(0,229,255,0.06)', border: '1px solid rgba(0,229,255,0.25)',
+                        background: 'rgba(194, 91, 60, 0.06)', border: '1px solid rgba(194, 91, 60, 0.25)',
                         borderRadius: 14, padding: 18
                     }}>
-                        <div style={{ fontSize: 11, color: '#00E5FF', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em' }}>
+                        <div style={{ fontSize: 11, color: 'var(--accent-primary)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em' }}>
                             💡 Next Best Test (Max VOI)
                         </div>
-                        <div style={{ fontSize: 14, fontWeight: 800, color: '#fff', marginTop: 4, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                        <div style={{ fontSize: 14, fontWeight: 800, color: 'var(--text-primary)', marginTop: 4, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                             {bestTest ? bestTest.name : 'All Key Tests Completed'}
                         </div>
                         {bestTest && (
-                            <div style={{ fontSize: 11, color: '#00FF87', marginTop: 4, fontWeight: 700 }}>
+                            <div style={{ fontSize: 11, color: 'var(--risk-low)', marginTop: 4, fontWeight: 700 }}>
                                 📉 Reduces Uncertainty by {bestTest.expected_entropy_reduction_pct}%
                             </div>
                         )}
@@ -161,7 +161,7 @@ export default function BayesianUncertaintyCard({ patientData }: Props) {
 
             {/* Interactive Clinical Evidence Sliders */}
             <div style={{
-                background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.06)',
+                background: 'var(--surface-1)', border: '1px solid var(--surface-border)',
                 borderRadius: 14, padding: 16, marginBottom: 20
             }}>
                 <div style={{ fontSize: 12, fontWeight: 700, color: 'var(--text-secondary)', marginBottom: 12 }}>
@@ -170,37 +170,37 @@ export default function BayesianUncertaintyCard({ patientData }: Props) {
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 14 }}>
                     <div>
                         <label style={{ fontSize: 11, color: 'var(--text-muted)', display: 'block', marginBottom: 4 }}>
-                            Age: <strong style={{ color: '#fff' }}>{age} yrs</strong>
+                            Age: <strong style={{ color: 'var(--text-primary)' }}>{age} yrs</strong>
                         </label>
-                        <input type="range" min={20} max={90} value={age} onChange={e => setAge(Number(e.target.value))} style={{ width: '100%', accentColor: '#00E5FF' }} />
+                        <input type="range" min={20} max={90} value={age} onChange={e => setAge(Number(e.target.value))} style={{ width: '100%', accentColor: 'var(--accent-primary)' }} />
                     </div>
                     <div>
                         <label style={{ fontSize: 11, color: 'var(--text-muted)', display: 'block', marginBottom: 4 }}>
-                            Resting BP: <strong style={{ color: '#fff' }}>{bp} mmHg</strong>
+                            Resting BP: <strong style={{ color: 'var(--text-primary)' }}>{bp} mmHg</strong>
                         </label>
-                        <input type="range" min={90} max={200} value={bp} onChange={e => setBp(Number(e.target.value))} style={{ width: '100%', accentColor: '#00E5FF' }} />
+                        <input type="range" min={90} max={200} value={bp} onChange={e => setBp(Number(e.target.value))} style={{ width: '100%', accentColor: 'var(--accent-primary)' }} />
                     </div>
                     <div>
                         <label style={{ fontSize: 11, color: 'var(--text-muted)', display: 'block', marginBottom: 4 }}>
-                            Cholesterol: <strong style={{ color: '#fff' }}>{chol} mg/dL</strong>
+                            Cholesterol: <strong style={{ color: 'var(--text-primary)' }}>{chol} mg/dL</strong>
                         </label>
-                        <input type="range" min={120} max={380} value={chol} onChange={e => setChol(Number(e.target.value))} style={{ width: '100%', accentColor: '#00E5FF' }} />
+                        <input type="range" min={120} max={380} value={chol} onChange={e => setChol(Number(e.target.value))} style={{ width: '100%', accentColor: 'var(--accent-primary)' }} />
                     </div>
                     <div>
                         <label style={{ fontSize: 11, color: 'var(--text-muted)', display: 'block', marginBottom: 4 }}>
-                            Fasting Blood Sugar: <strong style={{ color: '#fff' }}>{fbs} mg/dL</strong>
+                            Fasting Blood Sugar: <strong style={{ color: 'var(--text-primary)' }}>{fbs} mg/dL</strong>
                         </label>
-                        <input type="range" min={70} max={250} value={fbs} onChange={e => setFbs(Number(e.target.value))} style={{ width: '100%', accentColor: '#00E5FF' }} />
+                        <input type="range" min={70} max={250} value={fbs} onChange={e => setFbs(Number(e.target.value))} style={{ width: '100%', accentColor: 'var(--accent-primary)' }} />
                     </div>
                 </div>
 
-                <div style={{ display: 'flex', gap: 20, marginTop: 12, borderTop: '1px solid rgba(255,255,255,0.05)', paddingTop: 10 }}>
-                    <label style={{ display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer', fontSize: 12, color: '#fff' }}>
-                        <input type="checkbox" checked={angina} onChange={e => setAngina(e.target.checked)} style={{ accentColor: '#00E5FF' }} />
+                <div style={{ display: 'flex', gap: 20, marginTop: 12, borderTop: '1px solid var(--surface-border)', paddingTop: 10 }}>
+                    <label style={{ display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer', fontSize: 12, color: 'var(--text-primary)' }}>
+                        <input type="checkbox" checked={angina} onChange={e => setAngina(e.target.checked)} style={{ accentColor: 'var(--accent-primary)' }} />
                         Anginal Chest Pain Present
                     </label>
-                    <label style={{ display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer', fontSize: 12, color: '#fff' }}>
-                        <input type="checkbox" checked={ecg} onChange={e => setEcg(e.target.checked)} style={{ accentColor: '#00E5FF' }} />
+                    <label style={{ display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer', fontSize: 12, color: 'var(--text-primary)' }}>
+                        <input type="checkbox" checked={ecg} onChange={e => setEcg(e.target.checked)} style={{ accentColor: 'var(--accent-primary)' }} />
                         ST-T ECG Wave Abnormality
                     </label>
                 </div>
@@ -209,10 +209,10 @@ export default function BayesianUncertaintyCard({ patientData }: Props) {
             {/* Value of Information (VOI) Diagnostic Test Ranking Table */}
             {result?.all_voi_rankings?.length > 0 && (
                 <div style={{
-                    background: 'rgba(0,0,0,0.2)', border: '1px solid rgba(255,255,255,0.06)',
+                    background: 'rgba(90, 65, 45, 0.10)', border: '1px solid var(--surface-border)',
                     borderRadius: 14, padding: 16
                 }}>
-                    <div style={{ fontSize: 13, fontWeight: 800, color: '#fff', marginBottom: 10, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <div style={{ fontSize: 13, fontWeight: 800, color: 'var(--text-primary)', marginBottom: 10, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                         <span>📊 Value of Information (VOI) Ranking — Optimal Diagnostic Strategy</span>
                         <span style={{ fontSize: 11, color: 'var(--text-muted)' }}>Ranked by Entropy Reduction ($\Delta H$)</span>
                     </div>
@@ -224,21 +224,21 @@ export default function BayesianUncertaintyCard({ patientData }: Props) {
                                 <div key={test.id} style={{
                                     display: 'flex', alignItems: 'center', justifyContent: 'space-between',
                                     padding: '12px 14px', borderRadius: 10,
-                                    background: idx === 0 && !isCompleted ? 'rgba(0,229,255,0.08)' : 'rgba(255,255,255,0.03)',
-                                    border: idx === 0 && !isCompleted ? '1px solid rgba(0,229,255,0.25)' : '1px solid rgba(255,255,255,0.05)',
+                                    background: idx === 0 && !isCompleted ? 'rgba(194, 91, 60, 0.08)' : 'var(--surface-2)',
+                                    border: idx === 0 && !isCompleted ? '1px solid rgba(194, 91, 60, 0.25)' : '1px solid var(--surface-border)',
                                     opacity: isCompleted ? 0.5 : 1,
                                 }}>
                                     <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
                                         <div style={{
                                             width: 24, height: 24, borderRadius: '50%',
-                                            background: idx === 0 ? '#00E5FF' : 'rgba(255,255,255,0.1)',
-                                            color: idx === 0 ? '#000' : '#fff',
+                                            background: idx === 0 ? 'var(--accent-primary)' : 'var(--surface-2)',
+                                            color: idx === 0 ? '#000' : 'var(--text-primary)',
                                             fontSize: 11, fontWeight: 800, display: 'flex', alignItems: 'center', justifyContent: 'center'
                                         }}>
                                             #{idx + 1}
                                         </div>
                                         <div>
-                                            <div style={{ fontSize: 13, fontWeight: 700, color: '#fff' }}>
+                                            <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-primary)' }}>
                                                 {test.name}
                                                 <span style={{ fontSize: 10, color: 'var(--text-muted)', marginLeft: 8 }}>({test.category})</span>
                                             </div>
@@ -248,7 +248,7 @@ export default function BayesianUncertaintyCard({ patientData }: Props) {
 
                                     <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
                                         <div style={{ textAlign: 'right' }}>
-                                            <div style={{ fontSize: 12, fontWeight: 800, color: '#00FF87' }}>
+                                            <div style={{ fontSize: 12, fontWeight: 800, color: 'var(--risk-low)' }}>
                                                 -{test.expected_entropy_reduction_pct}% Uncertainty
                                             </div>
                                             <div style={{ fontSize: 10, color: 'var(--text-muted)' }}>
@@ -261,8 +261,8 @@ export default function BayesianUncertaintyCard({ patientData }: Props) {
                                             style={{
                                                 padding: '6px 12px', borderRadius: 8, fontSize: 11, fontWeight: 700,
                                                 border: 'none', cursor: 'pointer',
-                                                background: isCompleted ? 'rgba(255,255,255,0.1)' : 'linear-gradient(90deg, #00E5FF, #00B4D8)',
-                                                color: isCompleted ? 'rgba(255,255,255,0.6)' : '#000'
+                                                background: isCompleted ? 'var(--surface-2)' : 'linear-gradient(90deg, var(--accent-primary), var(--accent-primary))',
+                                                color: isCompleted ? 'var(--text-secondary)' : '#000'
                                             }}
                                         >
                                             {isCompleted ? 'Completed ✓' : 'Mark Completed'}

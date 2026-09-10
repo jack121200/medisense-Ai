@@ -15,14 +15,14 @@ import toast from 'react-hot-toast';
 function InfoRow({ label, value, highlight }: { label: string; value?: string | number | null; highlight?: boolean }) {
     if (!value && value !== 0) return null;
     return (
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', padding: '8px 0', borderBottom: '1px solid rgba(255,255,255,0.04)' }}>
-            <span style={{ fontSize: 12, color: 'rgba(255,255,255,0.4)', flexShrink: 0, marginRight: 16 }}>{label}</span>
-            <span style={{ fontSize: 13, fontWeight: 600, color: highlight ? '#FF6B35' : '#fff', textAlign: 'right' }}>{value}</span>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', padding: '8px 0', borderBottom: '1px solid var(--surface-border)' }}>
+            <span style={{ fontSize: 12, color: 'var(--text-muted)', flexShrink: 0, marginRight: 16 }}>{label}</span>
+            <span style={{ fontSize: 13, fontWeight: 600, color: highlight ? 'var(--risk-high)' : 'var(--text-primary)', textAlign: 'right' }}>{value}</span>
         </div>
     );
 }
 
-function Tag({ label, color = '#FF6B35' }: { label: string; color?: string }) {
+function Tag({ label, color = 'var(--risk-high)' }: { label: string; color?: string }) {
     return (
         <span style={{ fontSize: 11, padding: '2px 9px', borderRadius: 20, background: `${color}18`, color, border: `1px solid ${color}30`, fontWeight: 600 }}>
             {label}
@@ -117,10 +117,10 @@ export default function DoctorPatientDetail() {
 
     if (loading) return (
         <div style={{ display: 'flex', justifyContent: 'center', padding: 80 }}>
-            <div style={{ width: 36, height: 36, borderRadius: '50%', border: '3px solid rgba(0,229,255,0.15)', borderTopColor: '#00E5FF', animation: 'spin 0.8s linear infinite' }} />
+            <div style={{ width: 36, height: 36, borderRadius: '50%', border: '3px solid rgba(194, 91, 60, 0.15)', borderTopColor: 'var(--accent-primary)', animation: 'spin 0.8s linear infinite' }} />
         </div>
     );
-    if (!patient) return <div style={{ padding: 40, color: 'rgba(255,255,255,0.4)' }}>Patient not found</div>;
+    if (!patient) return <div style={{ padding: 40, color: 'var(--text-muted)' }}>Patient not found</div>;
 
     const age = patient.dateOfBirth
         ? Math.floor((Date.now() - new Date(patient.dateOfBirth).getTime()) / (365.25 * 24 * 3600000))
@@ -134,7 +134,7 @@ export default function DoctorPatientDetail() {
     ].filter(Boolean) as string[];
 
     const pred = prediction || patient.mlPredictions?.[0];
-    const RISK_COLORS: Record<string, string> = { CRITICAL: '#FF2D55', HIGH: '#FF6B35', MEDIUM: '#FFD166', LOW: '#00FF87' };
+    const RISK_COLORS: Record<string, string> = { CRITICAL: 'var(--risk-critical)', HIGH: 'var(--risk-high)', MEDIUM: 'var(--risk-medium)', LOW: 'var(--risk-low)' };
 
     return (
         <div style={{ padding: '28px 40px', maxWidth: 1100, margin: '0 auto' }}>
@@ -142,7 +142,7 @@ export default function DoctorPatientDetail() {
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
                 <button onClick={() => navigate('/my-patients')} style={{
                     display: 'flex', alignItems: 'center', gap: 6, background: 'none', border: 'none',
-                    color: 'rgba(255,255,255,0.4)', fontSize: 13, cursor: 'pointer',
+                    color: 'var(--text-muted)', fontSize: 13, cursor: 'pointer',
                 }}>
                     <ArrowLeft size={15} /> My Patients
                 </button>
@@ -152,14 +152,14 @@ export default function DoctorPatientDetail() {
                         <>
                             <button onClick={openAITools} style={{
                                 display: 'flex', alignItems: 'center', gap: 8, padding: '10px 18px',
-                                background: 'linear-gradient(135deg, #6366f1, #8b5cf6)', border: 'none',
+                                background: 'linear-gradient(135deg, var(--accent-primary), var(--accent-magenta))', border: 'none',
                                 borderRadius: 10, color: '#fff', fontWeight: 700, fontSize: 13, cursor: 'pointer',
                             }}>
                                 <Brain size={14} /> AI Clinical Tools
                             </button>
                             <button onClick={startConsultation} disabled={starting} style={{
                                 display: 'flex', alignItems: 'center', gap: 8, padding: '10px 20px',
-                                background: 'linear-gradient(135deg, #E63946, #C1121F)', border: 'none',
+                                background: 'linear-gradient(135deg, var(--accent-primary), var(--accent-primary-dim))', border: 'none',
                                 borderRadius: 10, color: '#fff', fontWeight: 800, fontSize: 13, cursor: 'pointer',
                                 opacity: starting ? 0.6 : 1,
                             }}>
@@ -172,34 +172,34 @@ export default function DoctorPatientDetail() {
 
             {/* Patient Header */}
             <div style={{
-                background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.08)',
+                background: 'var(--surface-1)', border: '1px solid var(--surface-border)',
                 borderRadius: 20, padding: '24px 28px', marginBottom: 24,
                 display: 'flex', gap: 20, alignItems: 'center',
             }}>
                 <div style={{
                     width: 64, height: 64, borderRadius: '50%', flexShrink: 0,
                     background: 'linear-gradient(135deg, #00E5FF33, #6366f133)',
-                    border: '2px solid rgba(0,229,255,0.2)',
+                    border: '2px solid rgba(194, 91, 60, 0.2)',
                     display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    fontSize: 24, fontWeight: 800, color: '#00E5FF',
+                    fontSize: 24, fontWeight: 800, color: 'var(--accent-primary)',
                 }}>
                     {patient.firstName[0]}{patient.lastName[0]}
                 </div>
                 <div style={{ flex: 1 }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap', marginBottom: 6 }}>
-                        <h1 style={{ fontSize: 22, fontWeight: 800, color: '#fff', margin: 0 }}>
+                        <h1 style={{ fontSize: 22, fontWeight: 800, color: 'var(--text-primary)', margin: 0 }}>
                             {patient.firstName} {patient.lastName}
                         </h1>
                         {patient.currentRiskLevel && (
                             <span style={{
                                 fontSize: 11, fontWeight: 700, padding: '3px 10px', borderRadius: 20,
-                                color: RISK_COLORS[patient.currentRiskLevel] || '#aaa',
-                                background: `${RISK_COLORS[patient.currentRiskLevel] || '#aaa'}15`,
-                                border: `1px solid ${RISK_COLORS[patient.currentRiskLevel] || '#aaa'}30`,
+                                color: RISK_COLORS[patient.currentRiskLevel] || 'var(--text-muted)',
+                                background: `${RISK_COLORS[patient.currentRiskLevel] || 'var(--surface-2)'}15`,
+                                border: `1px solid ${RISK_COLORS[patient.currentRiskLevel] || 'var(--surface-border)'}30`,
                             }}>{patient.currentRiskLevel} RISK</span>
                         )}
                     </div>
-                    <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.4)', marginBottom: 10 }}>
+                    <div style={{ fontSize: 12, color: 'var(--text-muted)', marginBottom: 10 }}>
                         <span style={{ fontFamily: 'monospace' }}>{patient.patientCode}</span>
                         {age && ` · ${age} yrs`}
                         {patient.gender && ` · ${patient.gender}`}
@@ -216,9 +216,9 @@ export default function DoctorPatientDetail() {
                     <div style={{ textAlign: 'center', flexShrink: 0 }}>
                         <div style={{
                             fontFamily: 'monospace', fontSize: 42, fontWeight: 700,
-                            color: patient.riskScore > 70 ? '#FF2D55' : patient.riskScore > 50 ? '#FF6B35' : '#00FF87',
+                            color: patient.riskScore > 70 ? 'var(--risk-critical)' : patient.riskScore > 50 ? 'var(--risk-high)' : 'var(--risk-low)',
                         }}>{patient.riskScore.toFixed(1)}</div>
-                        <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.3)', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
+                        <div style={{ fontSize: 10, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
                             🤖 AI Risk Score
                         </div>
                     </div>
@@ -229,8 +229,8 @@ export default function DoctorPatientDetail() {
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20, marginBottom: 20 }}>
 
                 {/* Patient Profile Info */}
-                <div style={{ background: 'rgba(255,255,255,0.025)', border: '1px solid rgba(255,255,255,0.07)', borderRadius: 18, padding: 24 }}>
-                    <div style={{ fontSize: 11, fontWeight: 700, color: '#00E5FF', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 16 }}>
+                <div style={{ background: 'var(--surface-1)', border: '1px solid var(--surface-border)', borderRadius: 18, padding: 24 }}>
+                    <div style={{ fontSize: 11, fontWeight: 700, color: 'var(--accent-primary)', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 16 }}>
                         📋 Patient Registration Info
                     </div>
                     <InfoRow label="Full Name" value={`${patient.firstName} ${patient.lastName}`} />
@@ -249,8 +249,8 @@ export default function DoctorPatientDetail() {
 
                 {/* Medical History */}
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-                    <div style={{ background: 'rgba(255,255,255,0.025)', border: '1px solid rgba(255,255,255,0.07)', borderRadius: 18, padding: 24 }}>
-                        <div style={{ fontSize: 11, fontWeight: 700, color: '#FF6B35', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 14 }}>
+                    <div style={{ background: 'var(--surface-1)', border: '1px solid var(--surface-border)', borderRadius: 18, padding: 24 }}>
+                        <div style={{ fontSize: 11, fontWeight: 700, color: 'var(--risk-high)', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 14 }}>
                             🏥 Medical History
                         </div>
                         {comorbidities.length > 0 ? (
@@ -258,46 +258,46 @@ export default function DoctorPatientDetail() {
                                 {comorbidities.map(c => <Tag key={c} label={c} />)}
                             </div>
                         ) : (
-                            <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.3)', marginBottom: 12 }}>No comorbidities on record</div>
+                            <div style={{ fontSize: 12, color: 'var(--text-muted)', marginBottom: 12 }}>No comorbidities on record</div>
                         )}
 
                         {patient.medicalHistory && (
                             <div style={{ marginBottom: 10 }}>
-                                <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.35)', fontWeight: 700, textTransform: 'uppercase', marginBottom: 4 }}>Medical History</div>
-                                <div style={{ fontSize: 12.5, color: 'rgba(255,255,255,0.7)', lineHeight: 1.6 }}>{patient.medicalHistory}</div>
+                                <div style={{ fontSize: 10, color: 'var(--text-muted)', fontWeight: 700, textTransform: 'uppercase', marginBottom: 4 }}>Medical History</div>
+                                <div style={{ fontSize: 12.5, color: 'var(--text-secondary)', lineHeight: 1.6 }}>{patient.medicalHistory}</div>
                             </div>
                         )}
                         {patient.allergies && (
                             <div style={{ marginBottom: 10 }}>
-                                <div style={{ fontSize: 10, color: '#FFD166', fontWeight: 700, textTransform: 'uppercase', marginBottom: 4 }}>Allergies ⚠️</div>
-                                <div style={{ fontSize: 12.5, color: '#FFD166', lineHeight: 1.6 }}>{patient.allergies}</div>
+                                <div style={{ fontSize: 10, color: 'var(--risk-medium)', fontWeight: 700, textTransform: 'uppercase', marginBottom: 4 }}>Allergies ⚠️</div>
+                                <div style={{ fontSize: 12.5, color: 'var(--risk-medium)', lineHeight: 1.6 }}>{patient.allergies}</div>
                             </div>
                         )}
                         {patient.currentMedications && (
                             <div>
-                                <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.35)', fontWeight: 700, textTransform: 'uppercase', marginBottom: 4 }}>Current Medications</div>
-                                <div style={{ fontSize: 12.5, color: 'rgba(255,255,255,0.7)', lineHeight: 1.6 }}>{patient.currentMedications}</div>
+                                <div style={{ fontSize: 10, color: 'var(--text-muted)', fontWeight: 700, textTransform: 'uppercase', marginBottom: 4 }}>Current Medications</div>
+                                <div style={{ fontSize: 12.5, color: 'var(--text-secondary)', lineHeight: 1.6 }}>{patient.currentMedications}</div>
                             </div>
                         )}
                     </div>
 
                     {/* Appointment History */}
                     {appointments.length > 0 && (
-                        <div style={{ background: 'rgba(255,255,255,0.025)', border: '1px solid rgba(255,255,255,0.07)', borderRadius: 18, padding: 20 }}>
-                            <div style={{ fontSize: 11, fontWeight: 700, color: 'rgba(255,255,255,0.35)', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 12 }}>
+                        <div style={{ background: 'var(--surface-1)', border: '1px solid var(--surface-border)', borderRadius: 18, padding: 20 }}>
+                            <div style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 12 }}>
                                 📅 Appointment History
                             </div>
                             {appointments.slice(0, 4).map((a: any) => (
-                                <div key={a.id} style={{ display: 'flex', justifyContent: 'space-between', padding: '7px 0', borderBottom: '1px solid rgba(255,255,255,0.04)' }}>
-                                    <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.55)' }}>
+                                <div key={a.id} style={{ display: 'flex', justifyContent: 'space-between', padding: '7px 0', borderBottom: '1px solid var(--surface-border)' }}>
+                                    <div style={{ fontSize: 12, color: 'var(--text-secondary)' }}>
                                         {new Date(a.requestedDate || a.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })}
                                         {a.timeSlot && ` · ${a.timeSlot}`}
-                                        {a.reason && <span style={{ marginLeft: 8, fontStyle: 'italic', color: 'rgba(255,255,255,0.3)' }}>{a.reason}</span>}
+                                        {a.reason && <span style={{ marginLeft: 8, fontStyle: 'italic', color: 'var(--text-muted)' }}>{a.reason}</span>}
                                     </div>
                                     <span style={{
                                         fontSize: 10, fontWeight: 700, padding: '2px 8px', borderRadius: 20,
-                                        color: a.status === 'APPROVED' || a.status === 'PATIENT_ACCEPTED' ? '#00FF87' : 'rgba(255,255,255,0.3)',
-                                        background: a.status === 'APPROVED' || a.status === 'PATIENT_ACCEPTED' ? 'rgba(0,255,135,0.1)' : 'rgba(255,255,255,0.05)',
+                                        color: a.status === 'APPROVED' || a.status === 'PATIENT_ACCEPTED' ? 'var(--risk-low)' : 'var(--text-muted)',
+                                        background: a.status === 'APPROVED' || a.status === 'PATIENT_ACCEPTED' ? 'rgba(62, 142, 126, 0.1)' : 'var(--surface-2)',
                                     }}>{a.status}</span>
                                 </div>
                             ))}
@@ -308,19 +308,19 @@ export default function DoctorPatientDetail() {
 
             {/* ML Prediction Panel — DOCTOR only, not shown to RECEPTIONIST */}
             {!isReceptionist && (
-            <div style={{ background: 'rgba(255,255,255,0.025)', border: '1px solid rgba(99,102,241,0.2)', borderRadius: 18, padding: 24 }}>
+            <div style={{ background: 'var(--surface-1)', border: '1px solid rgba(194, 91, 60, 0.2)', borderRadius: 18, padding: 24 }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
                     <div>
-                        <div style={{ fontSize: 11, fontWeight: 700, color: '#8b5cf6', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 4 }}>
+                        <div style={{ fontSize: 11, fontWeight: 700, color: 'var(--accent-magenta)', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 4 }}>
                             🧠 ML Risk Prediction
                         </div>
-                        <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.35)' }}>
+                        <div style={{ fontSize: 12, color: 'var(--text-muted)' }}>
                             AI-powered clinical risk assessment based on patient health profile
                         </div>
                     </div>
                     <button onClick={runPrediction} disabled={predicting} style={{
                         display: 'flex', alignItems: 'center', gap: 8, padding: '9px 18px',
-                        background: 'linear-gradient(135deg, #6366f1, #8b5cf6)', border: 'none',
+                        background: 'linear-gradient(135deg, var(--accent-primary), var(--accent-magenta))', border: 'none',
                         borderRadius: 10, color: '#fff', fontWeight: 700, fontSize: 13, cursor: 'pointer',
                         opacity: predicting ? 0.6 : 1, flexShrink: 0,
                     }}>
@@ -341,24 +341,24 @@ export default function DoctorPatientDetail() {
                                     { label: 'Readmission Risk', value: pred.readmissionProbability ? `${(pred.readmissionProbability * 100).toFixed(1)}%` : '—', danger: pred.readmissionRisk },
                                     { label: 'Predicted LOS', value: pred.predictedLengthOfStay ? `${pred.predictedLengthOfStay.toFixed(1)} days` : '—' },
                                 ].map(m => (
-                                    <div key={m.label} style={{ background: 'rgba(255,255,255,0.04)', borderRadius: 12, padding: '12px 14px' }}>
-                                        <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.35)', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 4 }}>{m.label}</div>
+                                    <div key={m.label} style={{ background: 'var(--surface-1)', borderRadius: 12, padding: '12px 14px' }}>
+                                        <div style={{ fontSize: 10, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 4 }}>{m.label}</div>
                                         {m.isRisk ? (
                                             <span style={{
                                                 fontSize: 13, fontWeight: 700, padding: '2px 10px', borderRadius: 20,
-                                                color: RISK_COLORS[m.value || ''] || '#aaa',
-                                                background: `${RISK_COLORS[m.value || ''] || '#aaa'}15`,
-                                                border: `1px solid ${RISK_COLORS[m.value || ''] || '#aaa'}30`,
+                                                color: RISK_COLORS[m.value || ''] || 'var(--text-muted)',
+                                                background: `${RISK_COLORS[m.value || ''] || 'var(--surface-2)'}15`,
+                                                border: `1px solid ${RISK_COLORS[m.value || ''] || 'var(--surface-border)'}30`,
                                             }}>{m.value}</span>
                                         ) : (
-                                            <div style={{ fontSize: 16, fontWeight: 700, color: (m as any).danger ? '#FF2D55' : '#fff' }}>{m.value}</div>
+                                            <div style={{ fontSize: 16, fontWeight: 700, color: (m as any).danger ? 'var(--risk-critical)' : 'var(--text-primary)' }}>{m.value}</div>
                                         )}
                                     </div>
                                 ))}
                             </div>
                         </div>
                         <div>
-                            <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.35)', fontWeight: 700, textTransform: 'uppercase', marginBottom: 12 }}>Risk Probability Breakdown</div>
+                            <div style={{ fontSize: 10, color: 'var(--text-muted)', fontWeight: 700, textTransform: 'uppercase', marginBottom: 12 }}>Risk Probability Breakdown</div>
                             {Object.entries({
                                 'CRITICAL': pred.riskProbabilityCritical || 0,
                                 'HIGH': pred.riskProbabilityHigh || 0,
@@ -367,13 +367,13 @@ export default function DoctorPatientDetail() {
                             }).map(([level, prob]: [string, any]) => (
                                 <div key={level} style={{ marginBottom: 10 }}>
                                     <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 11, marginBottom: 4 }}>
-                                        <span style={{ color: RISK_COLORS[level] || 'rgba(255,255,255,0.5)' }}>{level}</span>
-                                        <span style={{ color: '#fff', fontFamily: 'monospace' }}>{(prob * 100).toFixed(1)}%</span>
+                                        <span style={{ color: RISK_COLORS[level] || 'var(--text-secondary)' }}>{level}</span>
+                                        <span style={{ color: 'var(--text-primary)', fontFamily: 'monospace' }}>{(prob * 100).toFixed(1)}%</span>
                                     </div>
-                                    <div style={{ height: 5, background: 'rgba(255,255,255,0.06)', borderRadius: 4 }}>
+                                    <div style={{ height: 5, background: 'var(--surface-2)', borderRadius: 4 }}>
                                         <div style={{
                                             height: '100%', borderRadius: 4, width: `${prob * 100}%`,
-                                            background: RISK_COLORS[level] || '#aaa',
+                                            background: RISK_COLORS[level] || 'var(--surface-2)',
                                             transition: 'width 0.5s ease',
                                         }} />
                                     </div>
@@ -382,7 +382,7 @@ export default function DoctorPatientDetail() {
                         </div>
                     </div>
                 ) : (
-                    <div style={{ textAlign: 'center', padding: '30px 0', color: 'rgba(255,255,255,0.3)' }}>
+                    <div style={{ textAlign: 'center', padding: '30px 0', color: 'var(--text-muted)' }}>
                         <Brain size={36} style={{ margin: '0 auto 12px', display: 'block', opacity: 0.3 }} />
                         <div style={{ fontSize: 13 }}>No prediction yet. Click "Run Now" to analyze this patient's risk profile.</div>
                     </div>
@@ -392,30 +392,30 @@ export default function DoctorPatientDetail() {
 
             {/* Receptionist view: simple risk badge only */}
             {isReceptionist && patient.currentRiskLevel && (
-                <div style={{ background: 'rgba(255,255,255,0.025)', border: `1px solid ${RISK_COLORS[patient.currentRiskLevel] || '#aaa'}25`, borderRadius: 18, padding: 20, display: 'flex', alignItems: 'center', gap: 16 }}>
-                    <div style={{ fontSize: 11, fontWeight: 700, color: 'rgba(255,255,255,0.35)', textTransform: 'uppercase', letterSpacing: '0.1em' }}>🏷️ Scheduling Priority</div>
+                <div style={{ background: 'var(--surface-1)', border: `1px solid ${RISK_COLORS[patient.currentRiskLevel] || 'var(--surface-border)'}25`, borderRadius: 18, padding: 20, display: 'flex', alignItems: 'center', gap: 16 }}>
+                    <div style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.1em' }}>🏷️ Scheduling Priority</div>
                     <span style={{
                         fontSize: 14, fontWeight: 800, padding: '6px 18px', borderRadius: 20,
-                        color: RISK_COLORS[patient.currentRiskLevel] || '#aaa',
-                        background: `${RISK_COLORS[patient.currentRiskLevel] || '#aaa'}15`,
-                        border: `1px solid ${RISK_COLORS[patient.currentRiskLevel] || '#aaa'}30`,
+                        color: RISK_COLORS[patient.currentRiskLevel] || 'var(--text-muted)',
+                        background: `${RISK_COLORS[patient.currentRiskLevel] || 'var(--surface-2)'}15`,
+                        border: `1px solid ${RISK_COLORS[patient.currentRiskLevel] || 'var(--surface-border)'}30`,
                     }}>{patient.currentRiskLevel} RISK</span>
-                    <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.3)' }}>Use this to prioritize appointment scheduling</div>
+                    <div style={{ fontSize: 12, color: 'var(--text-muted)' }}>Use this to prioritize appointment scheduling</div>
                 </div>
             )}
 
             {/* Past Consultations / Prescriptions */}
             {patient.prescriptions?.length > 0 && (
-                <div style={{ background: 'rgba(255,255,255,0.025)', border: '1px solid rgba(255,255,255,0.07)', borderRadius: 18, padding: 20, marginTop: 20 }}>
-                    <div style={{ fontSize: 11, fontWeight: 700, color: 'rgba(255,255,255,0.35)', textTransform: 'uppercase', marginBottom: 12 }}>
+                <div style={{ background: 'var(--surface-1)', border: '1px solid var(--surface-border)', borderRadius: 18, padding: 20, marginTop: 20 }}>
+                    <div style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', marginBottom: 12 }}>
                         💊 Previous Prescriptions
                     </div>
                     {patient.prescriptions.slice(0, 5).map((rx: any) => (
-                        <div key={rx.id} style={{ fontSize: 12.5, color: 'rgba(255,255,255,0.5)', padding: '7px 0', borderBottom: '1px solid rgba(255,255,255,0.04)' }}>
+                        <div key={rx.id} style={{ fontSize: 12.5, color: 'var(--text-secondary)', padding: '7px 0', borderBottom: '1px solid var(--surface-border)' }}>
                             {new Date(rx.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}
                             {' — '}
                             {rx.items?.length || 0} medicine{rx.items?.length !== 1 ? 's' : ''}
-                            {rx.notes && <span style={{ marginLeft: 10, color: 'rgba(255,255,255,0.3)', fontStyle: 'italic' }}>{rx.notes}</span>}
+                            {rx.notes && <span style={{ marginLeft: 10, color: 'var(--text-muted)', fontStyle: 'italic' }}>{rx.notes}</span>}
                         </div>
                     ))}
                 </div>
@@ -423,10 +423,10 @@ export default function DoctorPatientDetail() {
 
             {/* AI Doctor Call History — previously fully siloed to the patient's own portal */}
             {aiDoctorCalls.length > 0 && (
-                <div style={{ background: 'rgba(255,255,255,0.025)', border: '1px solid rgba(99,102,241,0.2)', borderRadius: 18, padding: 20, marginTop: 20 }}>
+                <div style={{ background: 'var(--surface-1)', border: '1px solid rgba(194, 91, 60, 0.2)', borderRadius: 18, padding: 20, marginTop: 20 }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 14 }}>
-                        <Bot size={15} color="#6366F1" />
-                        <div style={{ fontSize: 11, fontWeight: 700, color: '#6366F1', textTransform: 'uppercase', letterSpacing: '0.1em' }}>
+                        <Bot size={15} color="var(--accent-primary)" />
+                        <div style={{ fontSize: 11, fontWeight: 700, color: 'var(--accent-primary)', textTransform: 'uppercase', letterSpacing: '0.1em' }}>
                             AI Doctor Consultations (Voice Assistant)
                         </div>
                     </div>
@@ -434,41 +434,41 @@ export default function DoctorPatientDetail() {
                         const suggestions = call.doctorSuggestions;
                         const isExpanded = expandedCallId === call.id;
                         return (
-                            <div key={call.id} style={{ borderBottom: '1px solid rgba(255,255,255,0.04)', padding: '10px 0' }}>
+                            <div key={call.id} style={{ borderBottom: '1px solid var(--surface-border)', padding: '10px 0' }}>
                                 <div
                                     onClick={() => setExpandedCallId(isExpanded ? null : call.id)}
                                     style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', cursor: 'pointer' }}
                                 >
-                                    <div style={{ fontSize: 12.5, color: 'rgba(255,255,255,0.6)' }}>
+                                    <div style={{ fontSize: 12.5, color: 'var(--text-secondary)' }}>
                                         {new Date(call.startedAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}
                                         {call.durationSecs ? ` · ${Math.round(call.durationSecs / 60)} min` : ''}
                                     </div>
                                     {suggestions?.urgency && (
                                         <span style={{
                                             fontSize: 10, fontWeight: 700, padding: '2px 9px', borderRadius: 20,
-                                            color: suggestions.urgency === 'URGENT' ? '#FF2D55' : suggestions.urgency === 'SOON' ? '#FFD166' : '#00FF87',
-                                            background: suggestions.urgency === 'URGENT' ? 'rgba(255,45,85,0.1)' : suggestions.urgency === 'SOON' ? 'rgba(255,209,102,0.1)' : 'rgba(0,255,135,0.1)',
+                                            color: suggestions.urgency === 'URGENT' ? 'var(--risk-critical)' : suggestions.urgency === 'SOON' ? 'var(--risk-medium)' : 'var(--risk-low)',
+                                            background: suggestions.urgency === 'URGENT' ? 'rgba(179, 64, 46, 0.1)' : suggestions.urgency === 'SOON' ? 'rgba(184, 145, 47, 0.1)' : 'rgba(62, 142, 126, 0.1)',
                                         }}>{suggestions.urgency}</span>
                                     )}
                                 </div>
                                 {isExpanded && suggestions && (
-                                    <div style={{ marginTop: 10, fontSize: 12.5, color: 'rgba(255,255,255,0.65)', lineHeight: 1.6 }}>
+                                    <div style={{ marginTop: 10, fontSize: 12.5, color: 'var(--text-secondary)', lineHeight: 1.6 }}>
                                         <div style={{ marginBottom: 8 }}>{suggestions.summary}</div>
                                         {suggestions.possible_conditions?.length > 0 && (
                                             <div style={{ marginBottom: 6 }}>
-                                                <strong style={{ color: '#fff' }}>Possible conditions: </strong>
+                                                <strong style={{ color: 'var(--text-primary)' }}>Possible conditions: </strong>
                                                 {suggestions.possible_conditions.join(', ')}
                                             </div>
                                         )}
                                         {suggestions.red_flags?.length > 0 && (
-                                            <div style={{ marginBottom: 6, color: '#FF6B6B' }}>
+                                            <div style={{ marginBottom: 6, color: 'var(--accent-primary-hover)' }}>
                                                 <strong>Red flags: </strong>
                                                 {suggestions.red_flags.join(' | ')}
                                             </div>
                                         )}
                                         {suggestions.follow_up && (
-                                            <div style={{ color: 'rgba(255,255,255,0.45)' }}>
-                                                <strong style={{ color: 'rgba(255,255,255,0.6)' }}>Follow-up: </strong>
+                                            <div style={{ color: 'var(--text-secondary)' }}>
+                                                <strong style={{ color: 'var(--text-secondary)' }}>Follow-up: </strong>
                                                 {suggestions.follow_up}
                                             </div>
                                         )}

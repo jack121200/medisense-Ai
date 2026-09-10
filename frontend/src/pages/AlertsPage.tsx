@@ -6,10 +6,10 @@ import { useAlertStore } from '../store/alertStore';
 import toast from 'react-hot-toast';
 
 const SEVERITY_CONFIG: Record<string, { color: string; bg: string; border: string; icon: any }> = {
-    CRITICAL: { color: '#FF2D55', bg: 'rgba(255,45,85,0.08)', border: 'rgba(255,45,85,0.25)', icon: AlertTriangle },
-    WARNING: { color: '#FFD166', bg: 'rgba(255,209,102,0.08)', border: 'rgba(255,209,102,0.20)', icon: AlertTriangle },
-    HIGH: { color: '#FF6B35', bg: 'rgba(255,107,53,0.08)', border: 'rgba(255,107,53,0.20)', icon: AlertTriangle },
-    INFO: { color: '#00E5FF', bg: 'rgba(0,229,255,0.06)', border: 'rgba(0,229,255,0.15)', icon: Info },
+    CRITICAL: { color: 'var(--risk-critical)', bg: 'rgba(179, 64, 46, 0.08)', border: 'rgba(179, 64, 46, 0.25)', icon: AlertTriangle },
+    WARNING: { color: 'var(--risk-medium)', bg: 'rgba(184, 145, 47, 0.08)', border: 'rgba(184, 145, 47, 0.20)', icon: AlertTriangle },
+    HIGH: { color: 'var(--risk-high)', bg: 'rgba(204, 107, 61, 0.08)', border: 'rgba(204, 107, 61, 0.20)', icon: AlertTriangle },
+    INFO: { color: 'var(--accent-primary)', bg: 'rgba(194, 91, 60, 0.06)', border: 'rgba(194, 91, 60, 0.15)', icon: Info },
 };
 
 export default function AlertsPage() {
@@ -65,8 +65,8 @@ export default function AlertsPage() {
                         {criticalCount > 0 && (
                             <div style={{
                                 display: 'flex', alignItems: 'center', gap: 5, padding: '4px 12px',
-                                background: 'rgba(255,45,85,0.10)', borderRadius: 9999,
-                                border: '1px solid rgba(255,45,85,0.30)', fontSize: 12, fontWeight: 800,
+                                background: 'rgba(179, 64, 46, 0.10)', borderRadius: 9999,
+                                border: '1px solid rgba(179, 64, 46, 0.30)', fontSize: 12, fontWeight: 800,
                                 color: 'var(--risk-critical)',
                             }} className="pulse-critical">
                                 🚨 {criticalCount} CRITICAL
@@ -98,8 +98,8 @@ export default function AlertsPage() {
                             onClick={() => setFilter(f => ({ ...f, severity: s }))}
                             style={{
                                 padding: '7px 16px', borderRadius: 9999,
-                                border: `1px solid ${isActive ? (cfg?.border || 'rgba(0,229,255,0.30)') : 'var(--surface-border)'}`,
-                                background: isActive ? (cfg?.bg || 'rgba(0,229,255,0.06)') : 'rgba(255,255,255,0.03)',
+                                border: `1px solid ${isActive ? (cfg?.border || 'rgba(194, 91, 60, 0.30)') : 'var(--surface-border)'}`,
+                                background: isActive ? (cfg?.bg || 'rgba(194, 91, 60, 0.06)') : 'var(--surface-2)',
                                 color: isActive ? (cfg?.color || 'var(--accent-primary)') : 'var(--text-muted)',
                                 fontSize: 12, fontWeight: 700, cursor: 'pointer',
                                 transition: 'all 0.15s', letterSpacing: s ? '0.04em' : '0',
@@ -113,8 +113,8 @@ export default function AlertsPage() {
                     onClick={() => setFilter(f => ({ ...f, resolved: f.resolved === 'false' ? 'true' : 'false' }))}
                     style={{
                         padding: '7px 16px', borderRadius: 9999,
-                        border: filter.resolved === 'true' ? '1px solid rgba(0,255,135,0.25)' : '1px solid var(--surface-border)',
-                        background: filter.resolved === 'true' ? 'rgba(0,255,135,0.08)' : 'rgba(255,255,255,0.03)',
+                        border: filter.resolved === 'true' ? '1px solid rgba(62, 142, 126, 0.25)' : '1px solid var(--surface-border)',
+                        background: filter.resolved === 'true' ? 'rgba(62, 142, 126, 0.08)' : 'var(--surface-2)',
                         color: filter.resolved === 'true' ? 'var(--accent-green)' : 'var(--text-muted)',
                         fontSize: 12, fontWeight: 700, cursor: 'pointer', transition: 'all 0.15s',
                     }}
@@ -128,7 +128,7 @@ export default function AlertsPage() {
                 <div style={{ display: 'flex', justifyContent: 'center', padding: 60 }}>
                     <div style={{
                         width: 40, height: 40, borderRadius: '50%',
-                        border: '3px solid rgba(0,229,255,0.15)',
+                        border: '3px solid rgba(194, 91, 60, 0.15)',
                         borderTopColor: 'var(--accent-primary)',
                         animation: 'spin 0.8s linear infinite',
                     }} />

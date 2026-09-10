@@ -45,7 +45,7 @@ export default function LiveWaveformMonitor() {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
 
             // Draw Grid Lines
-            ctx.strokeStyle = 'rgba(0, 229, 255, 0.05)';
+            ctx.strokeStyle = 'rgba(194, 91, 60, 0.05)';
             ctx.lineWidth = 1;
             for (let x = 0; x < canvas.width; x += 20) {
                 ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, canvas.height); ctx.stroke();
@@ -61,9 +61,9 @@ export default function LiveWaveformMonitor() {
 
             // Draw ECG Waveform
             ctx.lineWidth = 2.5;
-            ctx.strokeStyle = result?.is_anomaly ? '#FF2D55' : '#00FF87';
+            ctx.strokeStyle = result?.is_anomaly ? 'var(--risk-critical)' : 'var(--risk-low)';
             ctx.shadowBlur = 8;
-            ctx.shadowColor = result?.is_anomaly ? 'rgba(255,45,85,0.6)' : 'rgba(0,255,135,0.6)';
+            ctx.shadowColor = result?.is_anomaly ? 'rgba(179, 64, 46, 0.6)' : 'rgba(62, 142, 126, 0.6)';
 
             ctx.beginPath();
             const sliceWidth = canvas.width / raw.length;
@@ -102,7 +102,7 @@ export default function LiveWaveformMonitor() {
     return (
         <div style={{
             background: 'var(--surface-1)',
-            border: '1px solid rgba(255,45,85,0.25)',
+            border: '1px solid rgba(179, 64, 46, 0.25)',
             borderRadius: 20,
             padding: 24,
             marginBottom: 24,
@@ -113,20 +113,20 @@ export default function LiveWaveformMonitor() {
                 <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
                     <div style={{
                         width: 44, height: 44, borderRadius: 14,
-                        background: 'linear-gradient(135deg, rgba(255,45,85,0.2), rgba(255,107,107,0.05))',
-                        border: '1px solid rgba(255,45,85,0.3)',
+                        background: 'linear-gradient(135deg, rgba(179, 64, 46, 0.2), rgba(220, 116, 84, 0.05))',
+                        border: '1px solid rgba(179, 64, 46, 0.3)',
                         display: 'flex', alignItems: 'center', justifyContent: 'center'
                     }}>
-                        <Activity size={22} color="#FF2D55" />
+                        <Activity size={22} color="var(--risk-critical)" />
                     </div>
                     <div>
                         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                            <h2 style={{ fontSize: 18, fontWeight: 800, color: '#fff', margin: 0 }}>
+                            <h2 style={{ fontSize: 18, fontWeight: 800, color: 'var(--text-primary)', margin: 0 }}>
                                 Deep LSTM Autoencoder & Waveform Stream Monitor
                             </h2>
                             <span style={{
                                 fontSize: 10, fontWeight: 800, padding: '2px 8px', borderRadius: 12,
-                                background: 'rgba(255,45,85,0.15)', color: '#FF2D55', border: '1px solid rgba(255,45,85,0.3)'
+                                background: 'rgba(179, 64, 46, 0.15)', color: 'var(--risk-critical)', border: '1px solid rgba(179, 64, 46, 0.3)'
                             }}>
                                 UNIT IV & VI — DEEP AUTOENCODER
                             </span>
@@ -147,8 +147,8 @@ export default function LiveWaveformMonitor() {
                         style={{
                             padding: '8px 16px', borderRadius: 10, fontSize: 12, fontWeight: 800,
                             border: 'none', cursor: 'pointer',
-                            background: isAnomalyTriggered ? '#FF2D55' : 'rgba(255,255,255,0.08)',
-                            color: '#fff'
+                            background: isAnomalyTriggered ? 'var(--risk-critical)' : 'var(--surface-2)',
+                            color: 'var(--text-primary)'
                         }}
                     >
                         {isAnomalyTriggered ? '🚨 Stop Arrhythmia Simulation' : '⚡ Simulate Arrhythmia Burst'}
@@ -165,13 +165,13 @@ export default function LiveWaveformMonitor() {
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 16, marginBottom: 20 }}>
                     {/* Reconstruction Loss */}
                     <div style={{
-                        background: 'rgba(255,255,255,0.03)', border: `1px solid ${result.is_anomaly ? '#FF2D55' : '#00FF87'}40`,
+                        background: 'var(--surface-1)', border: `1px solid ${result.is_anomaly ? 'var(--risk-critical)' : 'var(--risk-low)'}40`,
                         borderRadius: 14, padding: 18
                     }}>
                         <div style={{ fontSize: 11, color: 'var(--text-muted)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em' }}>
                             Reconstruction Loss MSE (||X - X̂||²)
                         </div>
-                        <div className="font-mono" style={{ fontSize: 30, fontWeight: 900, color: result.is_anomaly ? '#FF2D55' : '#00FF87', marginTop: 4 }}>
+                        <div className="font-mono" style={{ fontSize: 30, fontWeight: 900, color: result.is_anomaly ? 'var(--risk-critical)' : 'var(--risk-low)', marginTop: 4 }}>
                             {result.reconstruction_loss_mse}
                         </div>
                         <div style={{ fontSize: 11, color: 'var(--text-secondary)', marginTop: 4 }}>
@@ -181,29 +181,29 @@ export default function LiveWaveformMonitor() {
 
                     {/* Classified Rhythm */}
                     <div style={{
-                        background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.08)',
+                        background: 'var(--surface-1)', border: '1px solid var(--surface-border)',
                         borderRadius: 14, padding: 18
                     }}>
                         <div style={{ fontSize: 11, color: 'var(--text-muted)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em' }}>
                             1D-CNN Classified Rhythm
                         </div>
-                        <div style={{ fontSize: 16, fontWeight: 800, color: '#fff', marginTop: 6 }}>
+                        <div style={{ fontSize: 16, fontWeight: 800, color: 'var(--text-primary)', marginTop: 6 }}>
                             {result.classified_rhythm}
                         </div>
-                        <div style={{ fontSize: 11, fontWeight: 700, color: result.is_anomaly ? '#FF2D55' : '#00FF87', marginTop: 4 }}>
+                        <div style={{ fontSize: 11, fontWeight: 700, color: result.is_anomaly ? 'var(--risk-critical)' : 'var(--risk-low)', marginTop: 4 }}>
                             Status: {result.severity}
                         </div>
                     </div>
 
                     {/* Architecture Model */}
                     <div style={{
-                        background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.08)',
+                        background: 'var(--surface-1)', border: '1px solid var(--surface-border)',
                         borderRadius: 14, padding: 18
                     }}>
                         <div style={{ fontSize: 11, color: 'var(--text-muted)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em' }}>
                             Deep Network Architecture
                         </div>
-                        <div style={{ fontSize: 13, fontWeight: 700, color: '#00E5FF', marginTop: 6 }}>
+                        <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--accent-primary)', marginTop: 6 }}>
                             {result.model_architecture}
                         </div>
                         <div style={{ fontSize: 11, color: 'var(--text-secondary)', marginTop: 4 }}>
@@ -215,16 +215,16 @@ export default function LiveWaveformMonitor() {
 
             {/* Live HTML5 Canvas Waveform Monitor */}
             <div style={{
-                background: 'rgba(0, 0, 0, 0.4)', border: `1px solid ${result?.is_anomaly ? 'rgba(255,45,85,0.5)' : 'rgba(0,255,135,0.3)'}`,
+                background: 'rgba(90, 65, 45, 0.16)', border: `1px solid ${result?.is_anomaly ? 'rgba(179, 64, 46, 0.5)' : 'rgba(62, 142, 126, 0.3)'}`,
                 borderRadius: 14, padding: 16, position: 'relative', overflow: 'hidden'
             }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 }}>
-                    <div style={{ fontSize: 12, fontWeight: 800, color: '#fff', display: 'flex', alignItems: 'center', gap: 8 }}>
-                        <Radio size={14} color={result?.is_anomaly ? '#FF2D55' : '#00FF87'} style={{ animation: 'pulse 1s infinite' }} />
+                    <div style={{ fontSize: 12, fontWeight: 800, color: 'var(--text-primary)', display: 'flex', alignItems: 'center', gap: 8 }}>
+                        <Radio size={14} color={result?.is_anomaly ? 'var(--risk-critical)' : 'var(--risk-low)'} style={{ animation: 'pulse 1s infinite' }} />
                         REAL-TIME ECG WAVEFORM & TEMPORAL ATTENTION HEATMAP OVERLAY
                     </div>
                     {result?.is_anomaly && (
-                        <span style={{ fontSize: 11, fontWeight: 800, color: '#FF2D55', background: 'rgba(255,45,85,0.15)', padding: '2px 8px', borderRadius: 8, border: '1px solid rgba(255,45,85,0.3)' }}>
+                        <span style={{ fontSize: 11, fontWeight: 800, color: 'var(--risk-critical)', background: 'rgba(179, 64, 46, 0.15)', padding: '2px 8px', borderRadius: 8, border: '1px solid rgba(179, 64, 46, 0.3)' }}>
                             🚨 ANOMALOUS SEGMENT HIGHLIGHTED IN RED
                         </span>
                     )}
@@ -237,11 +237,11 @@ export default function LiveWaveformMonitor() {
             {result?.recommendation && (
                 <div style={{
                     marginTop: 16, padding: '12px 16px', borderRadius: 10,
-                    background: result.is_anomaly ? 'rgba(255,45,85,0.1)' : 'rgba(0,255,135,0.06)',
-                    border: `1px solid ${result.is_anomaly ? 'rgba(255,45,85,0.25)' : 'rgba(0,255,135,0.2)'}`,
-                    fontSize: 12, color: '#fff', display: 'flex', alignItems: 'center', gap: 10
+                    background: result.is_anomaly ? 'rgba(179, 64, 46, 0.1)' : 'rgba(62, 142, 126, 0.06)',
+                    border: `1px solid ${result.is_anomaly ? 'rgba(179, 64, 46, 0.25)' : 'rgba(62, 142, 126, 0.2)'}`,
+                    fontSize: 12, color: 'var(--text-primary)', display: 'flex', alignItems: 'center', gap: 10
                 }}>
-                    <Zap size={16} color={result.is_anomaly ? '#FF2D55' : '#00FF87'} />
+                    <Zap size={16} color={result.is_anomaly ? 'var(--risk-critical)' : 'var(--risk-low)'} />
                     <span><strong>Clinical Recommendation:</strong> {result.recommendation}</span>
                 </div>
             )}

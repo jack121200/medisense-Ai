@@ -112,7 +112,7 @@ const LoginPage = () => {
     return (
         <div style={{
             minHeight: '100vh',
-            background: 'linear-gradient(135deg, #0A0E1A 0%, #0D1B2A 50%, #0A0E1A 100%)',
+            background: 'linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-secondary) 50%, var(--bg-primary) 100%)',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
@@ -122,20 +122,20 @@ const LoginPage = () => {
             overflow: 'hidden',
         }}>
             {/* Ambient glows */}
-            <div style={{ position: 'absolute', top: '-20%', left: '-10%', width: 600, height: 600, borderRadius: '50%', background: 'radial-gradient(circle, rgba(230,57,70,0.07) 0%, transparent 70%)', pointerEvents: 'none' }} />
-            <div style={{ position: 'absolute', bottom: '-20%', right: '-10%', width: 500, height: 500, borderRadius: '50%', background: 'radial-gradient(circle, rgba(255,107,107,0.05) 0%, transparent 70%)', pointerEvents: 'none' }} />
+            <div style={{ position: 'absolute', top: '-20%', left: '-10%', width: 600, height: 600, borderRadius: '50%', background: 'radial-gradient(circle, rgba(194, 91, 60, 0.07) 0%, transparent 70%)', pointerEvents: 'none' }} />
+            <div style={{ position: 'absolute', bottom: '-20%', right: '-10%', width: 500, height: 500, borderRadius: '50%', background: 'radial-gradient(circle, rgba(220, 116, 84, 0.05) 0%, transparent 70%)', pointerEvents: 'none' }} />
 
             <div style={{ width: '100%', maxWidth: step === 'role' ? 900 : 440, transition: 'max-width 0.4s ease' }}>
                 {/* Header */}
                 <div style={{ textAlign: 'center', marginBottom: 40 }}>
                     <div style={{ display: 'inline-flex', alignItems: 'center', gap: 10, marginBottom: 16 }}>
-                        <div style={{ width: 40, height: 40, background: 'linear-gradient(135deg, #E63946, #A4161A)', borderRadius: 10, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 20 }}>🫀</div>
-                        <span style={{ fontSize: 22, fontWeight: 800, letterSpacing: '-0.03em' }}><span style={{ background: 'linear-gradient(90deg, #E63946, #FF6B6B)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>MediSense</span> <span style={{ color: '#E63946' }}>AI</span></span>
+                        <div style={{ width: 40, height: 40, background: 'linear-gradient(135deg, var(--accent-primary), var(--accent-primary-dim))', borderRadius: 10, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 20 }}>🫀</div>
+                        <span style={{ fontSize: 22, fontWeight: 800, letterSpacing: '-0.03em' }}><span style={{ background: 'linear-gradient(90deg, var(--accent-primary), var(--accent-primary-hover))', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>MediSense</span> <span style={{ color: 'var(--accent-primary)' }}>AI</span></span>
                     </div>
-                    <h1 style={{ fontSize: step === 'role' ? 32 : 26, fontWeight: 700, color: '#fff', margin: 0, letterSpacing: '-0.5px' }}>
+                    <h1 style={{ fontSize: step === 'role' ? 32 : 26, fontWeight: 700, color: 'var(--text-primary)', margin: 0, letterSpacing: '-0.5px' }}>
                         {step === 'role' ? 'Who are you?' : `Sign in as ${selectedRoleData?.label}`}
                     </h1>
-                    <p style={{ fontSize: 15, color: 'rgba(255,255,255,0.5)', marginTop: 8 }}>
+                    <p style={{ fontSize: 15, color: 'var(--text-secondary)', marginTop: 8 }}>
                         {step === 'role' ? 'Select your role to continue' : `Access your ${selectedRoleData?.label.toLowerCase()} dashboard`}
                     </p>
                 </div>
@@ -148,8 +148,8 @@ const LoginPage = () => {
                                 key={role.id}
                                 onClick={() => handleRoleSelect(role.id)}
                                 style={{
-                                    background: 'rgba(255,255,255,0.04)',
-                                    border: `1px solid rgba(255,255,255,0.08)`,
+                                    background: 'var(--surface-1)',
+                                    border: `1px solid var(--surface-border)`,
                                     borderRadius: 16,
                                     padding: '28px 24px',
                                     cursor: 'pointer',
@@ -161,22 +161,22 @@ const LoginPage = () => {
                                 onMouseEnter={e => {
                                     const el = e.currentTarget;
                                     el.style.transform = 'translateY(-3px)';
-                                    el.style.border = `1px solid rgba(255,255,255,0.18)`;
-                                    el.style.background = 'rgba(255,255,255,0.07)';
+                                    el.style.border = `1px solid var(--surface-border)`;
+                                    el.style.background = 'var(--surface-2)';
                                 }}
                                 onMouseLeave={e => {
                                     const el = e.currentTarget;
                                     el.style.transform = 'translateY(0)';
-                                    el.style.border = '1px solid rgba(255,255,255,0.08)';
-                                    el.style.background = 'rgba(255,255,255,0.04)';
+                                    el.style.border = '1px solid var(--surface-border)';
+                                    el.style.background = 'var(--surface-1)';
                                 }}
                             >
                                 <div style={{ fontSize: 36, marginBottom: 14 }}>{role.icon}</div>
-                                <div style={{ fontSize: 17, fontWeight: 600, color: '#fff', marginBottom: 6 }}>{role.label}</div>
-                                <div style={{ fontSize: 13, color: 'rgba(255,255,255,0.45)', lineHeight: 1.5 }}>{role.desc}</div>
+                                <div style={{ fontSize: 17, fontWeight: 600, color: 'var(--text-primary)', marginBottom: 6 }}>{role.label}</div>
+                                <div style={{ fontSize: 13, color: 'var(--text-secondary)', lineHeight: 1.5 }}>{role.desc}</div>
                                 <div style={{
                                     position: 'absolute', bottom: 0, left: 0, right: 0, height: 3,
-                                    background: `linear-gradient(90deg, transparent, rgba(255,255,255,0.1))`,
+                                    background: `linear-gradient(90deg, transparent, var(--surface-2))`,
                                 }} />
                             </button>
                         ))}
@@ -186,22 +186,22 @@ const LoginPage = () => {
                 {/* Step 2: Login form */}
                 {step === 'form' && selectedRoleData && (
                     <div style={{
-                        background: 'rgba(255,255,255,0.04)',
-                        border: '1px solid rgba(255,255,255,0.08)',
+                        background: 'var(--surface-1)',
+                        border: '1px solid var(--surface-border)',
                         borderRadius: 20,
                         padding: 36,
                         backdropFilter: 'blur(20px)',
                     }}>
                         {/* Role badge */}
-                        <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 28, paddingBottom: 20, borderBottom: '1px solid rgba(255,255,255,0.07)' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 28, paddingBottom: 20, borderBottom: '1px solid var(--surface-border)' }}>
                             <span style={{ fontSize: 24 }}>{selectedRoleData.icon}</span>
                             <div>
-                                <div style={{ fontSize: 13, color: 'rgba(255,255,255,0.4)', marginBottom: 2 }}>Signed in as</div>
-                                <div style={{ fontSize: 15, fontWeight: 600, color: '#fff' }}>{selectedRoleData.label}</div>
+                                <div style={{ fontSize: 13, color: 'var(--text-muted)', marginBottom: 2 }}>Signed in as</div>
+                                <div style={{ fontSize: 15, fontWeight: 600, color: 'var(--text-primary)' }}>{selectedRoleData.label}</div>
                             </div>
-                            <button onClick={() => { setStep('role'); setError(''); }} style={{ marginLeft: 'auto', fontSize: 12, color: 'rgba(255,255,255,0.4)', background: 'none', border: 'none', cursor: 'pointer', padding: '4px 10px', borderRadius: 6, transition: 'color 0.2s' }}
-                                onMouseEnter={e => (e.currentTarget.style.color = '#fff')}
-                                onMouseLeave={e => (e.currentTarget.style.color = 'rgba(255,255,255,0.4)')}>
+                            <button onClick={() => { setStep('role'); setError(''); }} style={{ marginLeft: 'auto', fontSize: 12, color: 'var(--text-muted)', background: 'none', border: 'none', cursor: 'pointer', padding: '4px 10px', borderRadius: 6, transition: 'color 0.2s' }}
+                                onMouseEnter={e => (e.currentTarget.style.color = 'var(--text-primary)')}
+                                onMouseLeave={e => (e.currentTarget.style.color = 'var(--text-muted)')}>
                                 ← Change
                             </button>
                         </div>
@@ -209,7 +209,7 @@ const LoginPage = () => {
                         <form onSubmit={handleLogin}>
                             {/* Email */}
                             <div style={{ marginBottom: 16 }}>
-                                <label style={{ display: 'block', fontSize: 13, color: 'rgba(255,255,255,0.6)', marginBottom: 8, fontWeight: 500 }}>Email Address</label>
+                                <label style={{ display: 'block', fontSize: 13, color: 'var(--text-secondary)', marginBottom: 8, fontWeight: 500 }}>Email Address</label>
                                 <input
                                     type="email"
                                     value={email}
@@ -217,18 +217,18 @@ const LoginPage = () => {
                                     required
                                     placeholder="you@example.com"
                                     style={{
-                                        width: '100%', padding: '12px 16px', borderRadius: 10, border: '1px solid rgba(255,255,255,0.1)',
-                                        background: 'rgba(255,255,255,0.05)', color: '#fff', fontSize: 14, outline: 'none', boxSizing: 'border-box',
+                                        width: '100%', padding: '12px 16px', borderRadius: 10, border: '1px solid var(--surface-border-md)',
+                                        background: 'var(--surface-1)', color: 'var(--text-primary)', fontSize: 14, outline: 'none', boxSizing: 'border-box',
                                         transition: 'border-color 0.2s',
                                     }}
-                                    onFocus={e => (e.target.style.borderColor = '#E63946')}
-                                    onBlur={e => (e.target.style.borderColor = 'rgba(255,255,255,0.1)')}
+                                    onFocus={e => (e.target.style.borderColor = 'var(--accent-primary)')}
+                                    onBlur={e => (e.target.style.borderColor = 'var(--surface-border)')}
                                 />
                             </div>
 
                             {/* Password */}
                             <div style={{ marginBottom: 24, position: 'relative' }}>
-                                <label style={{ display: 'block', fontSize: 13, color: 'rgba(255,255,255,0.6)', marginBottom: 8, fontWeight: 500 }}>Password</label>
+                                <label style={{ display: 'block', fontSize: 13, color: 'var(--text-secondary)', marginBottom: 8, fontWeight: 500 }}>Password</label>
                                 <input
                                     type={showPassword ? 'text' : 'password'}
                                     value={password}
@@ -236,20 +236,20 @@ const LoginPage = () => {
                                     required
                                     placeholder="••••••••"
                                     style={{
-                                        width: '100%', padding: '12px 44px 12px 16px', borderRadius: 10, border: '1px solid rgba(255,255,255,0.1)',
-                                        background: 'rgba(255,255,255,0.05)', color: '#fff', fontSize: 14, outline: 'none', boxSizing: 'border-box',
+                                        width: '100%', padding: '12px 44px 12px 16px', borderRadius: 10, border: '1px solid var(--surface-border-md)',
+                                        background: 'var(--surface-1)', color: 'var(--text-primary)', fontSize: 14, outline: 'none', boxSizing: 'border-box',
                                         transition: 'border-color 0.2s',
                                     }}
-                                    onFocus={e => (e.target.style.borderColor = '#E63946')}
-                                    onBlur={e => (e.target.style.borderColor = 'rgba(255,255,255,0.1)')}
+                                    onFocus={e => (e.target.style.borderColor = 'var(--accent-primary)')}
+                                    onBlur={e => (e.target.style.borderColor = 'var(--surface-border)')}
                                 />
-                                <button type="button" onClick={() => setShowPassword(v => !v)} style={{ position: 'absolute', right: 14, top: 38, background: 'none', border: 'none', cursor: 'pointer', color: 'rgba(255,255,255,0.4)', fontSize: 14, padding: 0 }}>
+                                <button type="button" onClick={() => setShowPassword(v => !v)} style={{ position: 'absolute', right: 14, top: 38, background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-muted)', fontSize: 14, padding: 0 }}>
                                     {showPassword ? '🙈' : '👁️'}
                                 </button>
                             </div>
 
                             {error && (
-                                <div style={{ marginBottom: 16, padding: '10px 14px', background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.25)', borderRadius: 8, fontSize: 13, color: '#f87171' }}>
+                                <div style={{ marginBottom: 16, padding: '10px 14px', background: 'rgba(179, 64, 46, 0.1)', border: '1px solid rgba(179, 64, 46, 0.25)', borderRadius: 8, fontSize: 13, color: 'var(--risk-high)' }}>
                                     ⚠️ {error}
                                 </div>
                             )}
@@ -259,8 +259,8 @@ const LoginPage = () => {
                                 disabled={submitting}
                                 style={{
                                     width: '100%', padding: '14px', borderRadius: 10, border: 'none', cursor: submitting ? 'not-allowed' : 'pointer',
-                                    background: submitting ? 'rgba(230,57,70,0.4)' : 'linear-gradient(135deg, #E63946, #C1121F)',
-                                    color: '#fff', fontSize: 15, fontWeight: 700, transition: 'opacity 0.2s, transform 0.1s',
+                                    background: submitting ? 'rgba(194, 91, 60, 0.4)' : 'linear-gradient(135deg, var(--accent-primary), var(--accent-primary-dim))',
+                                    color: 'var(--text-primary)', fontSize: 15, fontWeight: 700, transition: 'opacity 0.2s, transform 0.1s',
                                     opacity: submitting ? 0.7 : 1,
                                 }}
                                 onMouseEnter={e => { if (!submitting) e.currentTarget.style.transform = 'translateY(-1px)'; }}
@@ -271,9 +271,9 @@ const LoginPage = () => {
                         </form>
 
                         {/* Register link — all roles */}
-                        <div style={{ textAlign: 'center', marginTop: 20, paddingTop: 20, borderTop: '1px solid rgba(255,255,255,0.07)' }}>
-                            <span style={{ fontSize: 13, color: 'rgba(255,255,255,0.4)' }}>Not registered yet? </span>
-                            <Link to={`/register?role=${selectedRole}`} style={{ fontSize: 13, color: '#E63946', fontWeight: 700, textDecoration: 'none' }}>
+                        <div style={{ textAlign: 'center', marginTop: 20, paddingTop: 20, borderTop: '1px solid var(--surface-border)' }}>
+                            <span style={{ fontSize: 13, color: 'var(--text-muted)' }}>Not registered yet? </span>
+                            <Link to={`/register?role=${selectedRole}`} style={{ fontSize: 13, color: 'var(--accent-primary)', fontWeight: 700, textDecoration: 'none' }}>
                                 Register as {selectedRoleData?.label} →
                             </Link>
                         </div>
@@ -284,7 +284,7 @@ const LoginPage = () => {
             <style>{`
                 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
                 @keyframes spin { to { transform: rotate(360deg); } }
-                input::placeholder { color: rgba(255,255,255,0.25); }
+                input::placeholder { color: var(--text-muted); }
             `}</style>
         </div>
     );

@@ -67,7 +67,9 @@ export default function App() {
                         </ProtectedRoute>
                     }
                 >
-                    <Route index element={<Navigate to="/dashboard" replace />} />
+                    {/* No `index` route here: a pathless parent's index child
+                        also matches "/", which outranked the public landing
+                        page and bounced every logged-out visitor to /login. */}
 
                     {/* Shared / Receptionist */}
                     <Route path="/dashboard" element={<DashboardPage />} />

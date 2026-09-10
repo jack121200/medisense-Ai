@@ -74,8 +74,8 @@ export default function AnalyticsPage() {
                             style={{
                                 display: 'flex', alignItems: 'center', gap: 7,
                                 padding: '8px 16px', borderRadius: 10, cursor: 'pointer',
-                                background: isActive ? 'rgba(0,229,255,0.10)' : 'transparent',
-                                border: isActive ? '1px solid rgba(0,229,255,0.20)' : '1px solid transparent',
+                                background: isActive ? 'rgba(194, 91, 60, 0.10)' : 'transparent',
+                                border: isActive ? '1px solid rgba(194, 91, 60, 0.20)' : '1px solid transparent',
                                 color: isActive ? 'var(--accent-primary)' : 'var(--text-secondary)',
                                 fontSize: 12.5, fontWeight: 600,
                                 transition: 'all 0.15s ease',
@@ -94,7 +94,7 @@ export default function AnalyticsPage() {
                 <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: 300, flexDirection: 'column', gap: 16 }}>
                     <div style={{
                         width: 40, height: 40, borderRadius: '50%',
-                        border: '3px solid rgba(0,229,255,0.15)',
+                        border: '3px solid rgba(194, 91, 60, 0.15)',
                         borderTopColor: 'var(--accent-primary)',
                         animation: 'spin 0.8s linear infinite',
                     }} />
@@ -114,7 +114,7 @@ export default function AnalyticsPage() {
                                         borderRadius: 14, padding: '16px 18px',
                                         transition: 'all 0.2s',
                                     }}
-                                        onMouseEnter={e => (e.currentTarget as HTMLDivElement).style.borderColor = 'rgba(0,229,255,0.20)'}
+                                        onMouseEnter={e => (e.currentTarget as HTMLDivElement).style.borderColor = 'rgba(194, 91, 60, 0.20)'}
                                         onMouseLeave={e => (e.currentTarget as HTMLDivElement).style.borderColor = 'var(--surface-border)'}
                                     >
                                         <div style={{
@@ -147,12 +147,12 @@ export default function AnalyticsPage() {
                                     <h3 style={{ fontSize: 14.5, fontWeight: 700, marginBottom: 18 }}>KPIs by Risk Level</h3>
                                     <ResponsiveContainer width="100%" height={220}>
                                         <BarChart data={stats.group_stats.by_risk_level}>
-                                            <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.04)" vertical={false} />
+                                            <CartesianGrid strokeDasharray="3 3" stroke="var(--text-muted)" vertical={false} />
                                             <XAxis dataKey="risk_level" tick={{ fontSize: 12, fill: 'var(--text-muted)' }} axisLine={false} tickLine={false} />
                                             <YAxis tick={{ fontSize: 11, fill: 'var(--text-muted)' }} axisLine={false} tickLine={false} />
-                                            <Tooltip contentStyle={{ background: 'var(--surface-2)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 12, color: 'var(--text-primary)', fontSize: 12 }} />
-                                            <Bar dataKey="avg_los" name="Avg LOS (days)" fill="#00E5FF" radius={[4, 4, 0, 0]} opacity={0.9} />
-                                            <Bar dataKey="readmission_rate" name="Readmission Rate" fill="#FF6B35" radius={[4, 4, 0, 0]} opacity={0.9} />
+                                            <Tooltip contentStyle={{ background: 'var(--surface-2)', border: '1px solid var(--surface-border-md)', borderRadius: 12, color: 'var(--text-primary)', fontSize: 12 }} />
+                                            <Bar dataKey="avg_los" name="Avg LOS (days)" fill="var(--accent-primary)" radius={[4, 4, 0, 0]} opacity={0.9} />
+                                            <Bar dataKey="readmission_rate" name="Readmission Rate" fill="var(--risk-high)" radius={[4, 4, 0, 0]} opacity={0.9} />
                                         </BarChart>
                                     </ResponsiveContainer>
                                 </div>
@@ -168,7 +168,7 @@ export default function AnalyticsPage() {
                                 return (
                                     <div key={test.test_id} style={{
                                         background: 'var(--surface-1)',
-                                        border: `1px solid ${test.reject_h0 ? 'rgba(255,209,102,0.20)' : 'rgba(0,255,135,0.15)'}`,
+                                        border: `1px solid ${test.reject_h0 ? 'rgba(184, 145, 47, 0.20)' : 'rgba(62, 142, 126, 0.15)'}`,
                                         borderRadius: 14, padding: '20px 24px',
                                     }}>
                                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 14 }}>
@@ -186,7 +186,7 @@ export default function AnalyticsPage() {
                                         </div>
                                         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginBottom: 14 }}>
                                             {[['H₀ (Null)', test.h0], ['H₁ (Alternative)', test.h1]].map(([label, val]) => (
-                                                <div key={label} style={{ background: 'rgba(255,255,255,0.03)', padding: '10px 14px', borderRadius: 10, border: '1px solid rgba(255,255,255,0.05)' }}>
+                                                <div key={label} style={{ background: 'var(--surface-1)', padding: '10px 14px', borderRadius: 10, border: '1px solid var(--surface-border)' }}>
                                                     <div style={{ fontSize: 10, color: 'var(--text-muted)', marginBottom: 4, fontWeight: 700 }}>{label}</div>
                                                     <div style={{ fontSize: 12.5, color: 'var(--text-secondary)' }}>{val}</div>
                                                 </div>
@@ -198,7 +198,7 @@ export default function AnalyticsPage() {
                                             <span style={{ color: 'var(--text-muted)' }}>p-value: <strong className="font-mono" style={{ color }}>{test.p_value}</strong></span>
                                             {test.effect_size !== null && <span style={{ color: 'var(--text-muted)' }}>Effect: <strong className="font-mono">{test.effect_size}</strong></span>}
                                         </div>
-                                        <div style={{ marginTop: 12, fontSize: 12.5, color: 'var(--text-secondary)', borderTop: '1px solid rgba(255,255,255,0.05)', paddingTop: 12 }}>
+                                        <div style={{ marginTop: 12, fontSize: 12.5, color: 'var(--text-secondary)', borderTop: '1px solid var(--surface-border)', paddingTop: 12 }}>
                                             💡 {test.conclusion}
                                         </div>
                                     </div>
@@ -222,14 +222,14 @@ export default function AnalyticsPage() {
                                         <AreaChart data={dist.values.slice(0, 100).map((v: number, i: number) => ({ i, v }))}>
                                             <defs>
                                                 <linearGradient id={`g_${col}`} x1="0" y1="0" x2="0" y2="1">
-                                                    <stop offset="5%" stopColor="#00E5FF" stopOpacity={0.25} />
-                                                    <stop offset="95%" stopColor="#00E5FF" stopOpacity={0} />
+                                                    <stop offset="5%" stopColor="var(--accent-primary)" stopOpacity={0.25} />
+                                                    <stop offset="95%" stopColor="var(--accent-primary)" stopOpacity={0} />
                                                 </linearGradient>
                                             </defs>
                                             <XAxis dataKey="i" hide />
                                             <YAxis hide />
                                             <Tooltip contentStyle={{ background: 'var(--surface-2)', border: 'none', borderRadius: 10, fontSize: 11 }} />
-                                            <Area type="monotone" dataKey="v" stroke="#00E5FF" strokeWidth={2} fill={`url(#g_${col})`} dot={false} />
+                                            <Area type="monotone" dataKey="v" stroke="var(--accent-primary)" strokeWidth={2} fill={`url(#g_${col})`} dot={false} />
                                         </AreaChart>
                                     </ResponsiveContainer>
                                 </div>
@@ -259,12 +259,12 @@ export default function AnalyticsPage() {
                                 <h3 style={{ fontSize: 14.5, fontWeight: 700, marginBottom: 18 }}>Ward Statistics</h3>
                                 <ResponsiveContainer width="100%" height={240}>
                                     <BarChart data={bigdata.ward_statistics}>
-                                        <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.04)" vertical={false} />
+                                        <CartesianGrid strokeDasharray="3 3" stroke="var(--text-muted)" vertical={false} />
                                         <XAxis dataKey="ward_type" tick={{ fontSize: 11, fill: 'var(--text-muted)' }} axisLine={false} tickLine={false} />
                                         <YAxis tick={{ fontSize: 11, fill: 'var(--text-muted)' }} axisLine={false} tickLine={false} />
-                                        <Tooltip contentStyle={{ background: 'var(--surface-2)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 12, color: 'var(--text-primary)', fontSize: 12 }} />
-                                        <Bar dataKey="avg_los" name="Avg LOS (days)" fill="#00E5FF" radius={[4, 4, 0, 0]} opacity={0.9} />
-                                        <Bar dataKey="avg_risk_score" name="Avg Risk Score" fill="#FF6B35" radius={[4, 4, 0, 0]} opacity={0.9} />
+                                        <Tooltip contentStyle={{ background: 'var(--surface-2)', border: '1px solid var(--surface-border-md)', borderRadius: 12, color: 'var(--text-primary)', fontSize: 12 }} />
+                                        <Bar dataKey="avg_los" name="Avg LOS (days)" fill="var(--accent-primary)" radius={[4, 4, 0, 0]} opacity={0.9} />
+                                        <Bar dataKey="avg_risk_score" name="Avg Risk Score" fill="var(--risk-high)" radius={[4, 4, 0, 0]} opacity={0.9} />
                                     </BarChart>
                                 </ResponsiveContainer>
                             </div>

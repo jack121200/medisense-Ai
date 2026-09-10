@@ -174,7 +174,7 @@ export default function ConsultationPage() {
             <!DOCTYPE html><html><head><title>Prescription — ${p?.firstName} ${p?.lastName}</title>
             <style>
                 body { font-family: 'Arial', sans-serif; padding: 40px; color: #111; max-width: 720px; margin: 0 auto; }
-                h1 { font-size: 22px; margin: 0; } .sub { color: #555; font-size: 13px; }
+                h1 { font-size: 22px; margin: 0; } .sub { color: #666; font-size: 13px; }
                 .header { border-bottom: 2px solid #0096AA; padding-bottom: 16px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: flex-start; }
                 .section { margin-bottom: 20px; } .section h3 { font-size: 13px; text-transform: uppercase; letter-spacing: 0.06em; color: #0096AA; border-bottom: 1px solid #ddd; padding-bottom: 6px; margin-bottom: 10px; }
                 table { width: 100%; border-collapse: collapse; font-size: 13px; } th { text-align: left; padding: 8px; background: #f5f5f5; font-size: 11px; text-transform: uppercase; } td { padding: 8px; border-bottom: 1px solid #eee; }
@@ -209,11 +209,11 @@ export default function ConsultationPage() {
                 <table><thead><tr><th>#</th><th>Medicine</th><th>Dosage</th><th>Frequency</th><th>Duration</th><th>Instructions</th></tr></thead><tbody>
                     ${validRx.map((rx: any, i: number) => `<tr><td>${i+1}</td><td><b>${rx.medicineName}</b></td><td>${rx.dosage||'—'}</td><td>${rx.frequency||'—'}</td><td>${rx.duration||'—'}</td><td>${rx.instructions||''}</td></tr>`).join('')}
                 </tbody></table>
-                ${rxNotes ? `<p style="font-size:12px;color:#555;margin-top:10px"><i>Notes: ${rxNotes}</i></p>` : ''}
+                ${rxNotes ? `<p style="font-size:12px;color:#666;margin-top:10px"><i>Notes: ${rxNotes}</i></p>` : ''}
             </div>
             ${labList ? `<div class="section"><h3>Lab Tests Ordered</h3><ul style="font-size:13px">${labList}</ul></div>` : ''}
             <div class="footer">
-                <div><p style="font-size:11px;color:#aaa">⚠️ This prescription is generated digitally via MediSense AI.<br/>This is not valid without the doctor's physical signature.</p></div>
+                <div><p style="font-size:11px;color:#888">⚠️ This prescription is generated digitally via MediSense AI.<br/>This is not valid without the doctor's physical signature.</p></div>
                 <div class="sig"><div class="line">Dr. ${consultation?.doctor?.firstName || ''} ${consultation?.doctor?.lastName || ''}<br>Signature & Stamp</div></div>
             </div>
             </body></html>`);
@@ -222,7 +222,7 @@ export default function ConsultationPage() {
         setTimeout(() => { printWindow.print(); }, 500);
     }
 
-    if (loading) return <div style={{ padding: 60, textAlign: 'center', color: 'rgba(255,255,255,0.4)' }}>Loading consultation...</div>;
+    if (loading) return <div style={{ padding: 60, textAlign: 'center', color: 'var(--text-muted)' }}>Loading consultation...</div>;
     if (!consultation) return null;
 
     const p = consultation.patient;
@@ -232,8 +232,8 @@ export default function ConsultationPage() {
         <button onClick={() => setActiveTab(key)} style={{
             display: 'flex', alignItems: 'center', gap: 8, padding: '10px 18px',
             borderRadius: 10, border: 'none', cursor: 'pointer', fontSize: 13, fontWeight: 700,
-            background: activeTab === key ? 'rgba(0,229,255,0.15)' : 'transparent',
-            color: activeTab === key ? '#00E5FF' : 'rgba(255,255,255,0.45)',
+            background: activeTab === key ? 'rgba(194, 91, 60, 0.15)' : 'transparent',
+            color: activeTab === key ? 'var(--accent-primary)' : 'var(--text-secondary)',
             transition: 'all 0.15s',
         }}>
             {icon} {label}
@@ -243,26 +243,26 @@ export default function ConsultationPage() {
     return (
         <div style={{ padding: '28px 40px', maxWidth: 1100, margin: '0 auto' }}>
             {/* Back */}
-            <button onClick={() => navigate('/doctor-dashboard')} style={{ display: 'flex', alignItems: 'center', gap: 6, background: 'none', border: 'none', color: 'rgba(255,255,255,0.45)', fontSize: 13, cursor: 'pointer', marginBottom: 20 }}>
+            <button onClick={() => navigate('/doctor-dashboard')} style={{ display: 'flex', alignItems: 'center', gap: 6, background: 'none', border: 'none', color: 'var(--text-secondary)', fontSize: 13, cursor: 'pointer', marginBottom: 20 }}>
                 <ChevronLeft size={16} /> Back to Dashboard
             </button>
 
             {/* Patient Header */}
-            <div style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: 18, padding: '20px 24px', marginBottom: 24, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+            <div style={{ background: 'var(--surface-1)', border: '1px solid var(--surface-border)', borderRadius: 18, padding: '20px 24px', marginBottom: 24, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 20 }}>
                     <div style={{ width: 52, height: 52, borderRadius: 14, background: 'linear-gradient(135deg, #00E5FF22, #FF2CF522)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 22 }}>👤</div>
                     <div>
-                        <div style={{ fontSize: 20, fontWeight: 900, color: '#fff' }}>{p?.firstName} {p?.lastName}</div>
-                        <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.4)', marginTop: 3 }}>{p?.patientCode} · {p?.phone}</div>
+                        <div style={{ fontSize: 20, fontWeight: 900, color: 'var(--text-primary)' }}>{p?.firstName} {p?.lastName}</div>
+                        <div style={{ fontSize: 12, color: 'var(--text-muted)', marginTop: 3 }}>{p?.patientCode} · {p?.phone}</div>
                     </div>
                 </div>
                 <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
                     {isCompleted ? (
-                        <span style={{ fontSize: 12, fontWeight: 700, color: '#00FF87', background: '#00FF8720', padding: '6px 14px', borderRadius: 20, border: '1px solid #00FF8730' }}>✓ COMPLETED</span>
+                        <span style={{ fontSize: 12, fontWeight: 700, color: 'var(--risk-low)', background: '#00FF8720', padding: '6px 14px', borderRadius: 20, border: '1px solid #00FF8730' }}>✓ COMPLETED</span>
                     ) : (
                         <button onClick={closeAndBill} disabled={closing} style={{
-                            padding: '10px 20px', background: 'linear-gradient(135deg, #00FF87, #00A858)',
-                            border: 'none', borderRadius: 10, color: '#050709', fontWeight: 800, fontSize: 13, cursor: 'pointer',
+                            padding: '10px 20px', background: 'linear-gradient(135deg, var(--risk-low), #00A858)',
+                            border: 'none', borderRadius: 10, color: 'var(--bg-primary)', fontWeight: 800, fontSize: 13, cursor: 'pointer',
                         }}>
                             {closing ? 'Closing...' : '✓ Close & Generate Bill'}
                         </button>
@@ -274,7 +274,7 @@ export default function ConsultationPage() {
                 {/* Main Panel */}
                 <div>
                     {/* Tabs */}
-                    <div style={{ display: 'flex', gap: 4, marginBottom: 20, background: 'rgba(255,255,255,0.03)', padding: 6, borderRadius: 14, border: '1px solid rgba(255,255,255,0.07)' }}>
+                    <div style={{ display: 'flex', gap: 4, marginBottom: 20, background: 'var(--surface-1)', padding: 6, borderRadius: 14, border: '1px solid var(--surface-border)' }}>
                         {tab('Symptoms & Diagnosis', 'symptoms', <Activity size={14} />)}
                         {tab('Prescription', 'prescription', <Pill size={14} />)}
                         {tab('Lab Tests', 'lab', <FlaskConical size={14} />)}
@@ -284,15 +284,15 @@ export default function ConsultationPage() {
                     {/* SYMPTOMS TAB */}
                     {activeTab === 'symptoms' && (
                         <div>
-                            <div style={{ background: 'rgba(255,255,255,0.025)', border: '1px solid rgba(255,255,255,0.07)', borderRadius: 16, padding: 24, marginBottom: 16 }}>
-                                <div style={{ fontWeight: 700, fontSize: 14, color: '#fff', marginBottom: 16 }}>Select Symptoms</div>
+                            <div style={{ background: 'var(--surface-1)', border: '1px solid var(--surface-border)', borderRadius: 16, padding: 24, marginBottom: 16 }}>
+                                <div style={{ fontWeight: 700, fontSize: 14, color: 'var(--text-primary)', marginBottom: 16 }}>Select Symptoms</div>
                                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginBottom: 20 }}>
                                     {SYMPTOM_OPTIONS.map(s => (
                                         <button key={s} onClick={() => !isCompleted && toggleSymptom(s)} style={{
                                             padding: '6px 14px', borderRadius: 20, fontSize: 12.5, fontWeight: 600, cursor: 'pointer',
-                                            background: symptoms.includes(s) ? 'rgba(0,229,255,0.15)' : 'rgba(255,255,255,0.04)',
-                                            border: `1px solid ${symptoms.includes(s) ? '#00E5FF44' : 'rgba(255,255,255,0.1)'}`,
-                                            color: symptoms.includes(s) ? '#00E5FF' : 'rgba(255,255,255,0.6)',
+                                            background: symptoms.includes(s) ? 'rgba(194, 91, 60, 0.15)' : 'var(--surface-2)',
+                                            border: `1px solid ${symptoms.includes(s) ? '#00E5FF44' : 'var(--surface-border-md)'}`,
+                                            color: symptoms.includes(s) ? 'var(--accent-primary)' : 'var(--text-secondary)',
                                             transition: 'all 0.15s',
                                         }}>{s}</button>
                                     ))}
@@ -314,25 +314,25 @@ export default function ConsultationPage() {
                                         {aiPredictions.map(pred => (
                                             <div key={pred.name} style={{ marginBottom: 10 }}>
                                                 <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 4 }}>
-                                                    <span style={{ fontSize: 13, fontWeight: 700, color: '#fff' }}>{pred.name}</span>
-                                                    <span style={{ fontSize: 13, fontWeight: 900, color: pred.prob > 50 ? '#FF2CF5' : pred.prob > 25 ? '#FFD166' : '#00FF87' }}>{pred.prob}%</span>
+                                                    <span style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-primary)' }}>{pred.name}</span>
+                                                    <span style={{ fontSize: 13, fontWeight: 900, color: pred.prob > 50 ? '#FF2CF5' : pred.prob > 25 ? 'var(--risk-medium)' : 'var(--risk-low)' }}>{pred.prob}%</span>
                                                 </div>
-                                                <div style={{ height: 5, background: 'rgba(255,255,255,0.06)', borderRadius: 4 }}>
-                                                    <div style={{ height: '100%', borderRadius: 4, width: `${pred.prob}%`, background: pred.prob > 50 ? '#FF2CF5' : pred.prob > 25 ? '#FFD166' : '#00FF87' }} />
+                                                <div style={{ height: 5, background: 'var(--surface-2)', borderRadius: 4 }}>
+                                                    <div style={{ height: '100%', borderRadius: 4, width: `${pred.prob}%`, background: pred.prob > 50 ? '#FF2CF5' : pred.prob > 25 ? 'var(--risk-medium)' : 'var(--risk-low)' }} />
                                                 </div>
                                             </div>
                                         ))}
-                                        <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.3)', marginTop: 8 }}>⚠️ AI suggestion only — Doctor makes the final diagnosis</div>
+                                        <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 8 }}>⚠️ AI suggestion only — Doctor makes the final diagnosis</div>
                                     </div>
                                 )}
                             </div>
 
-                            <div style={{ background: 'rgba(255,255,255,0.025)', border: '1px solid rgba(255,255,255,0.07)', borderRadius: 16, padding: 24 }}>
-                                <div style={{ fontWeight: 700, fontSize: 14, color: '#fff', marginBottom: 16 }}>Notes & Diagnosis</div>
+                            <div style={{ background: 'var(--surface-1)', border: '1px solid var(--surface-border)', borderRadius: 16, padding: 24 }}>
+                                <div style={{ fontWeight: 700, fontSize: 14, color: 'var(--text-primary)', marginBottom: 16 }}>Notes & Diagnosis</div>
                                 <textarea value={notes} onChange={e => setNotes(e.target.value)} disabled={isCompleted} rows={3} placeholder="Clinical notes..." className="form-input" style={{ marginBottom: 16, resize: 'vertical' }} />
                                 <input value={diagnosis} onChange={e => setDiagnosis(e.target.value)} disabled={isCompleted} placeholder="Final diagnosis..." className="form-input" style={{ marginBottom: 16 }} />
                                 {!isCompleted && (
-                                    <button onClick={saveSymptoms} style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '10px 20px', background: 'rgba(0,229,255,0.1)', border: '1px solid rgba(0,229,255,0.25)', borderRadius: 10, color: '#00E5FF', fontWeight: 700, fontSize: 13, cursor: 'pointer' }}>
+                                    <button onClick={saveSymptoms} style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '10px 20px', background: 'rgba(194, 91, 60, 0.1)', border: '1px solid rgba(194, 91, 60, 0.25)', borderRadius: 10, color: 'var(--accent-primary)', fontWeight: 700, fontSize: 13, cursor: 'pointer' }}>
                                         <Save size={14} /> Save
                                     </button>
                                 )}
@@ -342,11 +342,11 @@ export default function ConsultationPage() {
 
                     {/* PRESCRIPTION TAB */}
                     {activeTab === 'prescription' && (
-                        <div style={{ background: 'rgba(255,255,255,0.025)', border: '1px solid rgba(255,255,255,0.07)', borderRadius: 16, padding: 24 }}>
+                        <div style={{ background: 'var(--surface-1)', border: '1px solid var(--surface-border)', borderRadius: 16, padding: 24 }}>
                             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
-                                <div style={{ fontWeight: 700, fontSize: 14, color: '#fff' }}>Digital Prescription</div>
+                                <div style={{ fontWeight: 700, fontSize: 14, color: 'var(--text-primary)' }}>Digital Prescription</div>
                                 {!isCompleted && (
-                                    <button onClick={() => setRxItems([...rxItems, { medicineName: '', dosage: '', frequency: '', duration: '' }])} style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '7px 14px', background: 'rgba(0,255,135,0.1)', border: '1px solid rgba(0,255,135,0.25)', borderRadius: 8, color: '#00FF87', fontSize: 12, fontWeight: 700, cursor: 'pointer' }}>
+                                    <button onClick={() => setRxItems([...rxItems, { medicineName: '', dosage: '', frequency: '', duration: '' }])} style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '7px 14px', background: 'rgba(62, 142, 126, 0.1)', border: '1px solid rgba(62, 142, 126, 0.25)', borderRadius: 8, color: 'var(--risk-low)', fontSize: 12, fontWeight: 700, cursor: 'pointer' }}>
                                         <Plus size={13} /> Add Medicine
                                     </button>
                                 )}
@@ -354,26 +354,26 @@ export default function ConsultationPage() {
                             {rxItems.map((item, idx) => (
                                 <div key={idx} style={{ display: 'grid', gridTemplateColumns: '2fr 1fr 1fr 1fr auto', gap: 10, marginBottom: 12, alignItems: 'start' }}>
                                     <div>
-                                        <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.35)', marginBottom: 4 }}>MEDICINE</div>
+                                        <div style={{ fontSize: 10, color: 'var(--text-muted)', marginBottom: 4 }}>MEDICINE</div>
                                         <input value={item.medicineName} disabled={isCompleted} onChange={e => { const n = [...rxItems]; n[idx].medicineName = e.target.value; setRxItems(n); }} placeholder="e.g. Paracetamol" className="form-input" />
                                     </div>
                                     <div>
-                                        <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.35)', marginBottom: 4 }}>DOSAGE</div>
+                                        <div style={{ fontSize: 10, color: 'var(--text-muted)', marginBottom: 4 }}>DOSAGE</div>
                                         <input value={item.dosage} disabled={isCompleted} onChange={e => { const n = [...rxItems]; n[idx].dosage = e.target.value; setRxItems(n); }} placeholder="500mg" className="form-input" />
                                     </div>
                                     <div>
-                                        <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.35)', marginBottom: 4 }}>FREQUENCY</div>
+                                        <div style={{ fontSize: 10, color: 'var(--text-muted)', marginBottom: 4 }}>FREQUENCY</div>
                                         <select value={item.frequency} disabled={isCompleted} onChange={e => { const n = [...rxItems]; n[idx].frequency = e.target.value; setRxItems(n); }} className="form-input">
                                             <option value="">Select</option>
                                             {['Once daily', 'Twice daily', '3 times daily', '4 times daily', 'As needed', 'Weekly'].map(f => <option key={f}>{f}</option>)}
                                         </select>
                                     </div>
                                     <div>
-                                        <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.35)', marginBottom: 4 }}>DURATION</div>
+                                        <div style={{ fontSize: 10, color: 'var(--text-muted)', marginBottom: 4 }}>DURATION</div>
                                         <input value={item.duration} disabled={isCompleted} onChange={e => { const n = [...rxItems]; n[idx].duration = e.target.value; setRxItems(n); }} placeholder="5 days" className="form-input" />
                                     </div>
                                     {!isCompleted && (
-                                        <button onClick={() => setRxItems(rxItems.filter((_, i) => i !== idx))} style={{ marginTop: 24, padding: 8, background: 'rgba(255,45,85,0.1)', border: '1px solid rgba(255,45,85,0.2)', borderRadius: 8, color: '#FF2D55', cursor: 'pointer' }}>
+                                        <button onClick={() => setRxItems(rxItems.filter((_, i) => i !== idx))} style={{ marginTop: 24, padding: 8, background: 'rgba(179, 64, 46, 0.1)', border: '1px solid rgba(179, 64, 46, 0.2)', borderRadius: 8, color: 'var(--risk-critical)', cursor: 'pointer' }}>
                                             <Trash2 size={13} />
                                         </button>
                                     )}
@@ -381,12 +381,12 @@ export default function ConsultationPage() {
                             ))}
                             <textarea value={rxNotes} disabled={isCompleted} onChange={e => setRxNotes(e.target.value)} rows={2} placeholder="Additional notes for pharmacist..." className="form-input" style={{ marginTop: 8, marginBottom: 16, resize: 'vertical' }} />
                             {!isCompleted && (
-                                <button onClick={savePrescription} disabled={savingRx} style={{ padding: '11px 24px', background: 'linear-gradient(135deg, #00E5FF, #0096AA)', border: 'none', borderRadius: 10, color: '#050709', fontWeight: 800, fontSize: 13, cursor: 'pointer' }}>
+                                <button onClick={savePrescription} disabled={savingRx} style={{ padding: '11px 24px', background: 'linear-gradient(135deg, var(--accent-primary), #0096AA)', border: 'none', borderRadius: 10, color: 'var(--bg-primary)', fontWeight: 800, fontSize: 13, cursor: 'pointer' }}>
                                     <Pill size={14} style={{ display: 'inline', marginRight: 6 }} />
                                     {savingRx ? 'Saving...' : 'Save Prescription'}
                                 </button>
                             )}
-                            <button onClick={downloadPrescriptionPDF} style={{ padding: '11px 18px', background: 'rgba(0,229,255,0.08)', border: '1px solid rgba(0,229,255,0.25)', borderRadius: 10, color: '#00E5FF', fontWeight: 700, fontSize: 13, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 8 }}>
+                            <button onClick={downloadPrescriptionPDF} style={{ padding: '11px 18px', background: 'rgba(194, 91, 60, 0.08)', border: '1px solid rgba(194, 91, 60, 0.25)', borderRadius: 10, color: 'var(--accent-primary)', fontWeight: 700, fontSize: 13, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 8 }}>
                                 <Download size={14} /> Download PDF
                             </button>
                         </div>
@@ -395,28 +395,28 @@ export default function ConsultationPage() {
                     {/* LAB TEST TAB */}
                     {activeTab === 'lab' && (
                         <div>
-                            <div style={{ background: 'rgba(255,255,255,0.025)', border: '1px solid rgba(255,255,255,0.07)', borderRadius: 16, padding: 24, marginBottom: 16 }}>
-                                <div style={{ fontWeight: 700, fontSize: 14, color: '#fff', marginBottom: 16 }}>Order Lab Tests</div>
+                            <div style={{ background: 'var(--surface-1)', border: '1px solid var(--surface-border)', borderRadius: 16, padding: 24, marginBottom: 16 }}>
+                                <div style={{ fontWeight: 700, fontSize: 14, color: 'var(--text-primary)', marginBottom: 16 }}>Order Lab Tests</div>
                                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 10, marginBottom: 20 }}>
                                     {LAB_TEST_OPTIONS.map(t => (
                                         <label key={t.value} style={{
                                             display: 'flex', alignItems: 'center', gap: 12, padding: '12px 16px',
-                                            background: labTests.includes(t.value) ? 'rgba(255,107,53,0.1)' : 'rgba(255,255,255,0.03)',
-                                            border: `1px solid ${labTests.includes(t.value) ? 'rgba(255,107,53,0.3)' : 'rgba(255,255,255,0.08)'}`,
+                                            background: labTests.includes(t.value) ? 'rgba(204, 107, 61, 0.1)' : 'var(--surface-2)',
+                                            border: `1px solid ${labTests.includes(t.value) ? 'rgba(204, 107, 61, 0.3)' : 'var(--surface-border)'}`,
                                             borderRadius: 12, cursor: 'pointer',
                                         }}>
                                             <input type="checkbox" checked={labTests.includes(t.value)} disabled={isCompleted}
                                                 onChange={() => setLabTests(prev => prev.includes(t.value) ? prev.filter(x => x !== t.value) : [...prev, t.value])}
-                                                style={{ accentColor: '#FF6B35' }} />
+                                                style={{ accentColor: 'var(--risk-high)' }} />
                                             <div>
-                                                <div style={{ fontSize: 13, fontWeight: 700, color: '#fff' }}>{t.label}</div>
-                                                <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.35)' }}>₹{t.price.toLocaleString()}</div>
+                                                <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-primary)' }}>{t.label}</div>
+                                                <div style={{ fontSize: 11, color: 'var(--text-muted)' }}>₹{t.price.toLocaleString()}</div>
                                             </div>
                                         </label>
                                     ))}
                                 </div>
                                 {!isCompleted && (
-                                    <button onClick={orderLabTests} disabled={orderingLab || labTests.length === 0} style={{ padding: '11px 24px', background: 'linear-gradient(135deg, #FF6B35, #CC4400)', border: 'none', borderRadius: 10, color: '#fff', fontWeight: 800, fontSize: 13, cursor: 'pointer', opacity: labTests.length === 0 ? 0.5 : 1 }}>
+                                    <button onClick={orderLabTests} disabled={orderingLab || labTests.length === 0} style={{ padding: '11px 24px', background: 'linear-gradient(135deg, var(--risk-high), #CC4400)', border: 'none', borderRadius: 10, color: '#fff', fontWeight: 800, fontSize: 13, cursor: 'pointer', opacity: labTests.length === 0 ? 0.5 : 1 }}>
                                         <FlaskConical size={14} style={{ display: 'inline', marginRight: 6 }} />
                                         {orderingLab ? 'Ordering...' : `Order ${labTests.length > 0 ? labTests.length : ''} Test(s)`}
                                     </button>
@@ -424,16 +424,16 @@ export default function ConsultationPage() {
                             </div>
                             {/* Ordered tests */}
                             {consultation.labTestRequests?.length > 0 && (
-                                <div style={{ background: 'rgba(255,255,255,0.025)', border: '1px solid rgba(255,255,255,0.07)', borderRadius: 16, padding: 24 }}>
-                                    <div style={{ fontWeight: 700, fontSize: 14, color: '#fff', marginBottom: 14 }}>Ordered Tests ({consultation.labTestRequests.length})</div>
+                                <div style={{ background: 'var(--surface-1)', border: '1px solid var(--surface-border)', borderRadius: 16, padding: 24 }}>
+                                    <div style={{ fontWeight: 700, fontSize: 14, color: 'var(--text-primary)', marginBottom: 14 }}>Ordered Tests ({consultation.labTestRequests.length})</div>
                                     {consultation.labTestRequests.map((t: any) => {
-                                        const statusColors: Record<string, string> = { PENDING: '#FFD166', ACCEPTED: '#00E5FF', SAMPLE_COLLECTED: '#FF6B35', COMPLETED: '#00FF87' };
-                                        const sc = statusColors[t.status] || '#aaa';
+                                        const statusColors: Record<string, string> = { PENDING: 'var(--risk-medium)', ACCEPTED: 'var(--accent-primary)', SAMPLE_COLLECTED: 'var(--risk-high)', COMPLETED: 'var(--risk-low)' };
+                                        const sc = statusColors[t.status] || 'var(--text-muted)';
                                         return (
-                                            <div key={t.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '10px 0', borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
+                                            <div key={t.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '10px 0', borderBottom: '1px solid var(--surface-border)' }}>
                                                 <div>
-                                                    <span style={{ fontSize: 13, fontWeight: 700, color: '#fff' }}>{t.testType.replace('_', ' ')}</span>
-                                                    <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.35)', marginLeft: 8 }}>{t.testId}</span>
+                                                    <span style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-primary)' }}>{t.testType.replace('_', ' ')}</span>
+                                                    <span style={{ fontSize: 11, color: 'var(--text-muted)', marginLeft: 8 }}>{t.testId}</span>
                                                 </div>
                                                 <span style={{ fontSize: 11, fontWeight: 700, color: sc, background: `${sc}15`, padding: '3px 10px', borderRadius: 20 }}>{t.status}</span>
                                             </div>
@@ -446,7 +446,7 @@ export default function ConsultationPage() {
 
                     {/* BILL TAB */}
                     {activeTab === 'bill' && (
-                        <div style={{ background: 'rgba(255,255,255,0.025)', border: '1px solid rgba(255,255,255,0.07)', borderRadius: 16, padding: 28 }}>
+                        <div style={{ background: 'var(--surface-1)', border: '1px solid var(--surface-border)', borderRadius: 16, padding: 28 }}>
                             {invoice || consultation.invoice ? (
                                 (() => {
                                     const inv = invoice || consultation.invoice;
@@ -454,37 +454,37 @@ export default function ConsultationPage() {
                                         <>
                                             <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 24 }}>
                                                 <div>
-                                                    <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.4)', marginBottom: 4 }}>INVOICE NUMBER</div>
-                                                    <div style={{ fontSize: 18, fontWeight: 900, color: '#00E5FF' }}>{inv.invoiceNumber}</div>
+                                                    <div style={{ fontSize: 11, color: 'var(--text-muted)', marginBottom: 4 }}>INVOICE NUMBER</div>
+                                                    <div style={{ fontSize: 18, fontWeight: 900, color: 'var(--accent-primary)' }}>{inv.invoiceNumber}</div>
                                                 </div>
                                                 <div style={{ textAlign: 'right' }}>
-                                                    <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.4)', marginBottom: 4 }}>STATUS</div>
-                                                    <div style={{ fontSize: 13, fontWeight: 700, color: inv.isPaid ? '#00FF87' : '#FFD166' }}>{inv.isPaid ? `✓ PAID (${inv.paymentMethod})` : '⏳ UNPAID'}</div>
+                                                    <div style={{ fontSize: 11, color: 'var(--text-muted)', marginBottom: 4 }}>STATUS</div>
+                                                    <div style={{ fontSize: 13, fontWeight: 700, color: inv.isPaid ? 'var(--risk-low)' : 'var(--risk-medium)' }}>{inv.isPaid ? `✓ PAID (${inv.paymentMethod})` : '⏳ UNPAID'}</div>
                                                 </div>
                                             </div>
-                                            <div style={{ borderTop: '1px solid rgba(255,255,255,0.07)', paddingTop: 16, marginBottom: 16 }}>
+                                            <div style={{ borderTop: '1px solid var(--surface-border)', paddingTop: 16, marginBottom: 16 }}>
                                                 {inv.items?.map((item: any) => (
-                                                    <div key={item.id} style={{ display: 'flex', justifyContent: 'space-between', padding: '8px 0', borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
-                                                        <span style={{ fontSize: 13, color: 'rgba(255,255,255,0.7)' }}>{item.description}</span>
-                                                        <span style={{ fontSize: 13, fontWeight: 700, color: '#fff' }}>₹{item.amount.toLocaleString()}</span>
+                                                    <div key={item.id} style={{ display: 'flex', justifyContent: 'space-between', padding: '8px 0', borderBottom: '1px solid var(--surface-border)' }}>
+                                                        <span style={{ fontSize: 13, color: 'var(--text-secondary)' }}>{item.description}</span>
+                                                        <span style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-primary)' }}>₹{item.amount.toLocaleString()}</span>
                                                     </div>
                                                 ))}
                                             </div>
-                                            <div style={{ display: 'flex', justifyContent: 'space-between', padding: '12px 0', borderTop: '2px solid rgba(255,255,255,0.1)' }}>
-                                                <span style={{ fontWeight: 900, fontSize: 16, color: '#fff' }}>Total</span>
-                                                <span style={{ fontWeight: 900, fontSize: 20, color: '#00E5FF' }}>₹{inv.totalAmount?.toLocaleString()}</span>
+                                            <div style={{ display: 'flex', justifyContent: 'space-between', padding: '12px 0', borderTop: '2px solid var(--surface-border-md)' }}>
+                                                <span style={{ fontWeight: 900, fontSize: 16, color: 'var(--text-primary)' }}>Total</span>
+                                                <span style={{ fontWeight: 900, fontSize: 20, color: 'var(--accent-primary)' }}>₹{inv.totalAmount?.toLocaleString()}</span>
                                             </div>
                                             {!inv.isPaid && (
                                                 <div style={{ marginTop: 20 }}>
-                                                    <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.4)', marginBottom: 10 }}>Mark as Paid at Reception</div>
-                                                    <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.3)' }}>The receptionist can mark payment via the <strong style={{ color: '#00E5FF' }}>Billing</strong> page.</div>
+                                                    <div style={{ fontSize: 11, color: 'var(--text-muted)', marginBottom: 10 }}>Mark as Paid at Reception</div>
+                                                    <div style={{ fontSize: 12, color: 'var(--text-muted)' }}>The receptionist can mark payment via the <strong style={{ color: 'var(--accent-primary)' }}>Billing</strong> page.</div>
                                                 </div>
                                             )}
                                         </>
                                     );
                                 })()
                             ) : (
-                                <div style={{ textAlign: 'center', padding: 40, color: 'rgba(255,255,255,0.3)', fontSize: 13 }}>
+                                <div style={{ textAlign: 'center', padding: 40, color: 'var(--text-muted)', fontSize: 13 }}>
                                     No bill generated yet. Close the consultation to generate the bill automatically.
                                 </div>
                             )}
@@ -494,27 +494,27 @@ export default function ConsultationPage() {
 
                 {/* Sidebar: Patient Info */}
                 <div>
-                    <div style={{ background: 'rgba(255,255,255,0.025)', border: '1px solid rgba(255,255,255,0.07)', borderRadius: 16, padding: 20, marginBottom: 16 }}>
-                        <div style={{ fontSize: 11, fontWeight: 700, color: 'rgba(255,255,255,0.35)', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 14 }}>Patient Profile</div>
+                    <div style={{ background: 'var(--surface-1)', border: '1px solid var(--surface-border)', borderRadius: 16, padding: 20, marginBottom: 16 }}>
+                        <div style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 14 }}>Patient Profile</div>
                         {[
                             { label: 'Blood Group', val: p?.bloodGroup?.replace('_', ' ') },
-                            { label: 'Risk Level', val: p?.currentRiskLevel, color: '#FF2D55' },
+                            { label: 'Risk Level', val: p?.currentRiskLevel, color: 'var(--risk-critical)' },
                             { label: 'Diabetes', val: p?.hasDiabetes ? 'Yes' : 'No' },
                             { label: 'Hypertension', val: p?.hasHypertension ? 'Yes' : 'No' },
                             { label: 'Heart Disease', val: p?.hasHeartDisease ? 'Yes' : 'No' },
                         ].map(f => (
-                            <div key={f.label} style={{ display: 'flex', justifyContent: 'space-between', padding: '6px 0', borderBottom: '1px solid rgba(255,255,255,0.04)' }}>
-                                <span style={{ fontSize: 12, color: 'rgba(255,255,255,0.4)' }}>{f.label}</span>
-                                <span style={{ fontSize: 12, fontWeight: 700, color: (f as any).color || '#fff' }}>{f.val || '—'}</span>
+                            <div key={f.label} style={{ display: 'flex', justifyContent: 'space-between', padding: '6px 0', borderBottom: '1px solid var(--surface-border)' }}>
+                                <span style={{ fontSize: 12, color: 'var(--text-muted)' }}>{f.label}</span>
+                                <span style={{ fontSize: 12, fontWeight: 700, color: (f as any).color || 'var(--text-primary)' }}>{f.val || '—'}</span>
                             </div>
                         ))}
                     </div>
                     {/* Previous prescriptions */}
                     {p?.prescriptions?.length > 0 && (
-                        <div style={{ background: 'rgba(255,255,255,0.025)', border: '1px solid rgba(255,255,255,0.07)', borderRadius: 16, padding: 20 }}>
-                            <div style={{ fontSize: 11, fontWeight: 700, color: 'rgba(255,255,255,0.35)', textTransform: 'uppercase', marginBottom: 12 }}>Previous Prescriptions</div>
+                        <div style={{ background: 'var(--surface-1)', border: '1px solid var(--surface-border)', borderRadius: 16, padding: 20 }}>
+                            <div style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', marginBottom: 12 }}>Previous Prescriptions</div>
                             {p.prescriptions.slice(0, 3).map((rx: any) => (
-                                <div key={rx.id} style={{ fontSize: 12, color: 'rgba(255,255,255,0.5)', padding: '6px 0', borderBottom: '1px solid rgba(255,255,255,0.04)' }}>
+                                <div key={rx.id} style={{ fontSize: 12, color: 'var(--text-secondary)', padding: '6px 0', borderBottom: '1px solid var(--surface-border)' }}>
                                     {new Date(rx.createdAt).toLocaleDateString()} — {rx.items?.length || 0} medicines
                                 </div>
                             ))}

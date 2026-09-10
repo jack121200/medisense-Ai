@@ -22,9 +22,9 @@ type ActiveTab = 'talk' | 'history';
 
 // ── Urgency config ────────────────────────────────────────────────────────────
 const URGENCY_CFG: Record<string, { color: string; bg: string; label: string }> = {
-    URGENT:  { color: '#E63946', bg: 'rgba(230,57,70,0.12)',  label: '🚨 URGENT'  },
-    SOON:    { color: '#FF9F1C', bg: 'rgba(255,159,28,0.12)', label: '⚠️ SOON'    },
-    ROUTINE: { color: '#06D6A0', bg: 'rgba(6,214,160,0.12)',  label: '✅ ROUTINE'  },
+    URGENT:  { color: 'var(--accent-primary)', bg: 'rgba(194, 91, 60, 0.12)',  label: '🚨 URGENT'  },
+    SOON:    { color: 'var(--vitals-temp)', bg: 'rgba(210, 132, 60, 0.12)', label: '⚠️ SOON'    },
+    ROUTINE: { color: 'var(--risk-low)', bg: 'rgba(62, 142, 126, 0.12)',  label: '✅ ROUTINE'  },
 };
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
@@ -47,12 +47,12 @@ function PulsingOrb({ active }: { active: boolean }) {
                 <>
                     <div style={{
                         position: 'absolute', inset: 0, borderRadius: '50%',
-                        background: 'linear-gradient(135deg, #6366F1, #7C3AED)',
+                        background: 'linear-gradient(135deg, var(--accent-primary), var(--accent-primary-dim))',
                         opacity: 0.15, animation: 'ping 1.5s ease-in-out infinite',
                     }} />
                     <div style={{
                         position: 'absolute', inset: '16px', borderRadius: '50%',
-                        background: 'linear-gradient(135deg, #6366F1, #7C3AED)',
+                        background: 'linear-gradient(135deg, var(--accent-primary), var(--accent-primary-dim))',
                         opacity: 0.2, animation: 'ping 2s ease-in-out infinite',
                     }} />
                 </>
@@ -60,14 +60,14 @@ function PulsingOrb({ active }: { active: boolean }) {
             <div style={{
                 width: 130, height: 130, borderRadius: '50%',
                 background: active
-                    ? 'linear-gradient(135deg, #6366F1, #7C3AED)'
-                    : 'rgba(255,255,255,0.06)',
-                border: `3px solid ${active ? 'rgba(99,102,241,0.4)' : 'rgba(255,255,255,0.08)'}`,
+                    ? 'linear-gradient(135deg, var(--accent-primary), var(--accent-primary-dim))'
+                    : 'var(--text-muted)',
+                border: `3px solid ${active ? 'rgba(194, 91, 60, 0.4)' : 'var(--surface-border)'}`,
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
                 transition: 'all 0.4s ease',
-                boxShadow: active ? '0 0 60px rgba(99,102,241,0.35)' : 'none',
+                boxShadow: active ? '0 0 60px rgba(194, 91, 60, 0.35)' : 'none',
             }}>
-                <Stethoscope size={48} color={active ? '#fff' : 'rgba(255,255,255,0.3)'} />
+                <Stethoscope size={48} color={active ? 'var(--text-primary)' : 'var(--text-muted)'} />
             </div>
             <style>{`
                 @keyframes ping {
@@ -85,8 +85,8 @@ function DoctorReportCard({ suggestions, onDismiss }: { suggestions: DoctorSugge
     const urgency = URGENCY_CFG[suggestions.urgency] || URGENCY_CFG.ROUTINE;
     return (
         <div style={{
-            background: 'rgba(255,255,255,0.03)',
-            border: '1px solid rgba(255,255,255,0.08)',
+            background: 'var(--surface-1)',
+            border: '1px solid var(--surface-border)',
             borderRadius: 20, overflow: 'hidden',
             animation: 'fadeIn 0.5s ease',
         }}>
@@ -95,21 +95,21 @@ function DoctorReportCard({ suggestions, onDismiss }: { suggestions: DoctorSugge
             {/* Header */}
             <div style={{
                 padding: '18px 22px',
-                background: 'linear-gradient(135deg, rgba(99,102,241,0.15), rgba(124,58,237,0.1))',
-                borderBottom: '1px solid rgba(255,255,255,0.07)',
+                background: 'linear-gradient(135deg, rgba(194, 91, 60, 0.15), rgba(162, 71, 44, 0.1))',
+                borderBottom: '1px solid var(--surface-border)',
                 display: 'flex', alignItems: 'center', justifyContent: 'space-between',
             }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
                     <div style={{
                         width: 36, height: 36, borderRadius: 10,
-                        background: 'linear-gradient(135deg, #6366F1, #7C3AED)',
+                        background: 'linear-gradient(135deg, var(--accent-primary), var(--accent-primary-dim))',
                         display: 'flex', alignItems: 'center', justifyContent: 'center',
                     }}>
                         <Stethoscope size={18} color="#fff" />
                     </div>
                     <div>
-                        <div style={{ fontSize: 14, fontWeight: 800, color: '#fff' }}>Priya's Assessment (AI-Generated)</div>
-                        <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.4)', marginTop: 1 }}>AI-generated post-consultation report</div>
+                        <div style={{ fontSize: 14, fontWeight: 800, color: 'var(--text-primary)' }}>Priya's Assessment (AI-Generated)</div>
+                        <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 1 }}>AI-generated post-consultation report</div>
                     </div>
                 </div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
@@ -119,7 +119,7 @@ function DoctorReportCard({ suggestions, onDismiss }: { suggestions: DoctorSugge
                         border: `1px solid ${urgency.color}40`,
                     }}>{urgency.label}</span>
                     {onDismiss && (
-                        <button onClick={onDismiss} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'rgba(255,255,255,0.3)', padding: 4 }}>
+                        <button onClick={onDismiss} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-muted)', padding: 4 }}>
                             <X size={16} />
                         </button>
                     )}
@@ -129,27 +129,27 @@ function DoctorReportCard({ suggestions, onDismiss }: { suggestions: DoctorSugge
             <div style={{ padding: '20px 22px', display: 'flex', flexDirection: 'column', gap: 16 }}>
                 {/* Summary */}
                 <div>
-                    <div style={{ fontSize: 11, fontWeight: 700, color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 8 }}>📋 Summary</div>
-                    <p style={{ fontSize: 13.5, color: 'rgba(255,255,255,0.75)', lineHeight: 1.7, margin: 0 }}>{suggestions.summary}</p>
+                    <div style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 8 }}>📋 Summary</div>
+                    <p style={{ fontSize: 13.5, color: 'var(--text-primary)', lineHeight: 1.7, margin: 0 }}>{suggestions.summary}</p>
                 </div>
 
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
                     {/* Possible Conditions */}
                     {suggestions.possible_conditions?.length > 0 && (
-                        <div style={{ background: 'rgba(99,102,241,0.08)', border: '1px solid rgba(99,102,241,0.2)', borderRadius: 12, padding: '12px 14px' }}>
-                            <div style={{ fontSize: 11, fontWeight: 700, color: '#6366F1', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 8 }}>🔍 Possible Conditions</div>
+                        <div style={{ background: 'rgba(194, 91, 60, 0.08)', border: '1px solid rgba(194, 91, 60, 0.2)', borderRadius: 12, padding: '12px 14px' }}>
+                            <div style={{ fontSize: 11, fontWeight: 700, color: 'var(--accent-primary)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 8 }}>🔍 Possible Conditions</div>
                             {suggestions.possible_conditions.map((c, i) => (
-                                <div key={i} style={{ fontSize: 12.5, color: 'rgba(255,255,255,0.65)', marginBottom: 4 }}>• {c}</div>
+                                <div key={i} style={{ fontSize: 12.5, color: 'var(--text-secondary)', marginBottom: 4 }}>• {c}</div>
                             ))}
                         </div>
                     )}
 
                     {/* Recommended Actions */}
                     {suggestions.recommended_actions?.length > 0 && (
-                        <div style={{ background: 'rgba(6,214,160,0.06)', border: '1px solid rgba(6,214,160,0.2)', borderRadius: 12, padding: '12px 14px' }}>
-                            <div style={{ fontSize: 11, fontWeight: 700, color: '#06D6A0', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 8 }}>✅ Recommended Actions</div>
+                        <div style={{ background: 'rgba(62, 142, 126, 0.06)', border: '1px solid rgba(62, 142, 126, 0.2)', borderRadius: 12, padding: '12px 14px' }}>
+                            <div style={{ fontSize: 11, fontWeight: 700, color: 'var(--risk-low)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 8 }}>✅ Recommended Actions</div>
                             {suggestions.recommended_actions.map((a, i) => (
-                                <div key={i} style={{ fontSize: 12.5, color: 'rgba(255,255,255,0.65)', marginBottom: 4 }}>• {a}</div>
+                                <div key={i} style={{ fontSize: 12.5, color: 'var(--text-secondary)', marginBottom: 4 }}>• {a}</div>
                             ))}
                         </div>
                     )}
@@ -157,32 +157,32 @@ function DoctorReportCard({ suggestions, onDismiss }: { suggestions: DoctorSugge
 
                 {/* Red Flags */}
                 {suggestions.red_flags?.length > 0 ? (
-                    <div style={{ background: 'rgba(230,57,70,0.08)', border: '1px solid rgba(230,57,70,0.25)', borderRadius: 12, padding: '12px 14px' }}>
+                    <div style={{ background: 'rgba(194, 91, 60, 0.08)', border: '1px solid rgba(194, 91, 60, 0.25)', borderRadius: 12, padding: '12px 14px' }}>
                         <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 8 }}>
-                            <AlertTriangle size={13} color="#E63946" />
-                            <div style={{ fontSize: 11, fontWeight: 700, color: '#E63946', textTransform: 'uppercase', letterSpacing: '0.08em' }}>Red Flags</div>
+                            <AlertTriangle size={13} color="var(--accent-primary)" />
+                            <div style={{ fontSize: 11, fontWeight: 700, color: 'var(--accent-primary)', textTransform: 'uppercase', letterSpacing: '0.08em' }}>Red Flags</div>
                         </div>
                         {suggestions.red_flags.map((f, i) => (
-                            <div key={i} style={{ fontSize: 12.5, color: 'rgba(255,255,255,0.7)', marginBottom: 4 }}>• {f}</div>
+                            <div key={i} style={{ fontSize: 12.5, color: 'var(--text-secondary)', marginBottom: 4 }}>• {f}</div>
                         ))}
                     </div>
                 ) : (
-                    <div style={{ background: 'rgba(6,214,160,0.06)', border: '1px solid rgba(6,214,160,0.15)', borderRadius: 10, padding: '8px 14px', display: 'flex', alignItems: 'center', gap: 6 }}>
-                        <CheckCircle size={13} color="#06D6A0" />
-                        <span style={{ fontSize: 12, color: '#06D6A0' }}>No red flags identified</span>
+                    <div style={{ background: 'rgba(62, 142, 126, 0.06)', border: '1px solid rgba(62, 142, 126, 0.15)', borderRadius: 10, padding: '8px 14px', display: 'flex', alignItems: 'center', gap: 6 }}>
+                        <CheckCircle size={13} color="var(--risk-low)" />
+                        <span style={{ fontSize: 12, color: 'var(--risk-low)' }}>No red flags identified</span>
                     </div>
                 )}
 
                 {/* Follow-up */}
-                <div style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)', borderRadius: 10, padding: '10px 14px', display: 'flex', alignItems: 'center', gap: 8 }}>
-                    <Calendar size={14} color="rgba(255,255,255,0.4)" />
+                <div style={{ background: 'var(--surface-1)', border: '1px solid var(--surface-border)', borderRadius: 10, padding: '10px 14px', display: 'flex', alignItems: 'center', gap: 8 }}>
+                    <Calendar size={14} color="var(--text-muted)" />
                     <div>
-                        <span style={{ fontSize: 11, fontWeight: 700, color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase', letterSpacing: '0.07em' }}>Follow-up: </span>
-                        <span style={{ fontSize: 13, color: 'rgba(255,255,255,0.7)' }}>{suggestions.follow_up}</span>
+                        <span style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.07em' }}>Follow-up: </span>
+                        <span style={{ fontSize: 13, color: 'var(--text-secondary)' }}>{suggestions.follow_up}</span>
                     </div>
                 </div>
 
-                <p style={{ fontSize: 11, color: 'rgba(255,255,255,0.25)', margin: 0, lineHeight: 1.6, fontStyle: 'italic' }}>
+                <p style={{ fontSize: 11, color: 'var(--text-muted)', margin: 0, lineHeight: 1.6, fontStyle: 'italic' }}>
                     * This report is AI-generated for informational purposes only and does not constitute a medical diagnosis or prescription. Please consult a qualified physician for medical advice.
                 </p>
             </div>
@@ -237,25 +237,25 @@ function PreCallModal({
     return (
         <div style={{
             position: 'fixed', inset: 0, zIndex: 1000,
-            background: 'rgba(0,0,0,0.75)', backdropFilter: 'blur(6px)',
+            background: 'rgba(90, 65, 45, 0.16)', backdropFilter: 'blur(6px)',
             display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20,
         }}>
             <div style={{
                 width: '100%', maxWidth: 560,
-                background: 'linear-gradient(180deg, #0F1021 0%, #0A0B18 100%)',
-                border: '1px solid rgba(255,255,255,0.1)', borderRadius: 24,
-                boxShadow: '0 40px 80px rgba(0,0,0,0.6)',
+                background: 'linear-gradient(180deg, var(--surface-1) 0%, var(--bg-secondary) 100%)',
+                border: '1px solid var(--surface-border-md)', borderRadius: 24,
+                boxShadow: '0 40px 80px rgba(90, 65, 45, 0.16)',
                 animation: 'slideUp 0.3s ease',
             }}>
                 <style>{`@keyframes slideUp { from { opacity:0; transform: translateY(20px); } to { opacity:1; transform: translateY(0); } }`}</style>
 
                 {/* Modal header */}
-                <div style={{ padding: '22px 26px', borderBottom: '1px solid rgba(255,255,255,0.07)', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                <div style={{ padding: '22px 26px', borderBottom: '1px solid var(--surface-border)', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                     <div>
-                        <div style={{ fontSize: 16, fontWeight: 800, color: '#fff' }}>Before we begin...</div>
-                        <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.4)', marginTop: 2 }}>Help Priya, your AI health assistant, prepare</div>
+                        <div style={{ fontSize: 16, fontWeight: 800, color: 'var(--text-primary)' }}>Before we begin...</div>
+                        <div style={{ fontSize: 12, color: 'var(--text-muted)', marginTop: 2 }}>Help Priya, your AI health assistant, prepare</div>
                     </div>
-                    <button onClick={onCancel} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'rgba(255,255,255,0.3)', padding: 6 }}>
+                    <button onClick={onCancel} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-muted)', padding: 6 }}>
                         <X size={18} />
                     </button>
                 </div>
@@ -263,8 +263,8 @@ function PreCallModal({
                 <div style={{ padding: '22px 26px', display: 'flex', flexDirection: 'column', gap: 18 }}>
                     {/* Reason */}
                     <div>
-                        <label style={{ fontSize: 12, fontWeight: 700, color: 'rgba(255,255,255,0.55)', textTransform: 'uppercase', letterSpacing: '0.07em', display: 'block', marginBottom: 8 }}>
-                            📋 Main reason for consultation <span style={{ color: '#E63946' }}>*</span>
+                        <label style={{ fontSize: 12, fontWeight: 700, color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.07em', display: 'block', marginBottom: 8 }}>
+                            📋 Main reason for consultation <span style={{ color: 'var(--accent-primary)' }}>*</span>
                         </label>
                         <textarea
                             value={reason}
@@ -273,18 +273,18 @@ function PreCallModal({
                             placeholder="e.g. chest pain for last 2 days, high BP readings, routine checkup..."
                             style={{
                                 width: '100%', padding: '11px 14px', boxSizing: 'border-box',
-                                background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.1)',
-                                borderRadius: 10, color: '#fff', fontSize: 13.5, resize: 'vertical',
+                                background: 'var(--surface-1)', border: '1px solid var(--surface-border-md)',
+                                borderRadius: 10, color: 'var(--text-primary)', fontSize: 13.5, resize: 'vertical',
                                 outline: 'none', fontFamily: 'inherit', lineHeight: 1.6,
                             }}
-                            onFocus={e => (e.currentTarget.style.borderColor = 'rgba(99,102,241,0.6)')}
-                            onBlur={e => (e.currentTarget.style.borderColor = 'rgba(255,255,255,0.1)')}
+                            onFocus={e => (e.currentTarget.style.borderColor = 'rgba(194, 91, 60, 0.6)')}
+                            onBlur={e => (e.currentTarget.style.borderColor = 'var(--surface-border)')}
                         />
                     </div>
 
                     {/* PDF Upload */}
                     <div>
-                        <label style={{ fontSize: 12, fontWeight: 700, color: 'rgba(255,255,255,0.55)', textTransform: 'uppercase', letterSpacing: '0.07em', display: 'block', marginBottom: 8 }}>
+                        <label style={{ fontSize: 12, fontWeight: 700, color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.07em', display: 'block', marginBottom: 8 }}>
                             📎 Upload Medical Report (optional)
                         </label>
                         <input ref={fileRef} type="file" accept=".pdf,.docx" style={{ display: 'none' }}
@@ -292,29 +292,29 @@ function PreCallModal({
 
                         {pdfFile ? (
                             <div style={{
-                                padding: '10px 14px', background: 'rgba(99,102,241,0.08)', border: '1px solid rgba(99,102,241,0.3)',
+                                padding: '10px 14px', background: 'rgba(194, 91, 60, 0.08)', border: '1px solid rgba(194, 91, 60, 0.3)',
                                 borderRadius: 10, display: 'flex', alignItems: 'center', justifyContent: 'space-between',
                             }}>
                                 <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                                    <FileText size={14} color="#6366F1" />
-                                    <span style={{ fontSize: 12.5, color: 'rgba(255,255,255,0.7)' }}>{pdfFile.name}</span>
-                                    {uploading && <span style={{ fontSize: 11, color: '#6366F1' }}>Extracting...</span>}
-                                    {!uploading && reportText && <CheckCircle size={13} color="#06D6A0" />}
+                                    <FileText size={14} color="var(--accent-primary)" />
+                                    <span style={{ fontSize: 12.5, color: 'var(--text-secondary)' }}>{pdfFile.name}</span>
+                                    {uploading && <span style={{ fontSize: 11, color: 'var(--accent-primary)' }}>Extracting...</span>}
+                                    {!uploading && reportText && <CheckCircle size={13} color="var(--risk-low)" />}
                                 </div>
-                                <button onClick={() => { setPdfFile(null); setReportText(''); }} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'rgba(255,255,255,0.3)' }}>
+                                <button onClick={() => { setPdfFile(null); setReportText(''); }} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-muted)' }}>
                                     <X size={14} />
                                 </button>
                             </div>
                         ) : (
                             <button onClick={() => fileRef.current?.click()} style={{
-                                width: '100%', padding: '12px', background: 'rgba(255,255,255,0.03)',
-                                border: '2px dashed rgba(255,255,255,0.12)', borderRadius: 10,
-                                color: 'rgba(255,255,255,0.4)', cursor: 'pointer', fontSize: 13,
+                                width: '100%', padding: '12px', background: 'var(--surface-1)',
+                                border: '2px dashed var(--surface-border-md)', borderRadius: 10,
+                                color: 'var(--text-muted)', cursor: 'pointer', fontSize: 13,
                                 display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
                                 transition: 'all 0.2s',
                             }}
-                                onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.borderColor = 'rgba(99,102,241,0.5)'; (e.currentTarget as HTMLButtonElement).style.color = 'rgba(255,255,255,0.65)'; }}
-                                onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.borderColor = 'rgba(255,255,255,0.12)'; (e.currentTarget as HTMLButtonElement).style.color = 'rgba(255,255,255,0.4)'; }}
+                                onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.borderColor = 'rgba(194, 91, 60, 0.5)'; (e.currentTarget as HTMLButtonElement).style.color = 'var(--surface-border-md)'; }}
+                                onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.borderColor = 'var(--surface-border)'; (e.currentTarget as HTMLButtonElement).style.color = 'var(--surface-border)'; }}
                             >
                                 <Upload size={16} /> Choose PDF / DOCX (lab report, prescription, etc.)
                             </button>
@@ -323,7 +323,7 @@ function PreCallModal({
 
                     {/* Additional Notes */}
                     <div>
-                        <label style={{ fontSize: 12, fontWeight: 700, color: 'rgba(255,255,255,0.55)', textTransform: 'uppercase', letterSpacing: '0.07em', display: 'block', marginBottom: 8 }}>
+                        <label style={{ fontSize: 12, fontWeight: 700, color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.07em', display: 'block', marginBottom: 8 }}>
                             📝 Anything else Priya should know? (optional)
                         </label>
                         <textarea
@@ -333,26 +333,26 @@ function PreCallModal({
                             placeholder="e.g. currently on Metformin, diabetic, allergic to penicillin..."
                             style={{
                                 width: '100%', padding: '10px 14px', boxSizing: 'border-box',
-                                background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.1)',
-                                borderRadius: 10, color: '#fff', fontSize: 13.5, resize: 'vertical',
+                                background: 'var(--surface-1)', border: '1px solid var(--surface-border-md)',
+                                borderRadius: 10, color: 'var(--text-primary)', fontSize: 13.5, resize: 'vertical',
                                 outline: 'none', fontFamily: 'inherit', lineHeight: 1.6,
                             }}
-                            onFocus={e => (e.currentTarget.style.borderColor = 'rgba(99,102,241,0.6)')}
-                            onBlur={e => (e.currentTarget.style.borderColor = 'rgba(255,255,255,0.1)')}
+                            onFocus={e => (e.currentTarget.style.borderColor = 'rgba(194, 91, 60, 0.6)')}
+                            onBlur={e => (e.currentTarget.style.borderColor = 'var(--surface-border)')}
                         />
                     </div>
 
                     {/* Actions */}
                     <div style={{ display: 'flex', gap: 10, paddingTop: 4 }}>
                         <button onClick={onCancel} style={{
-                            flex: 1, padding: '12px', borderRadius: 10, border: '1px solid rgba(255,255,255,0.1)',
-                            background: 'transparent', color: 'rgba(255,255,255,0.5)', cursor: 'pointer', fontSize: 13.5, fontWeight: 600,
+                            flex: 1, padding: '12px', borderRadius: 10, border: '1px solid var(--surface-border-md)',
+                            background: 'transparent', color: 'var(--text-secondary)', cursor: 'pointer', fontSize: 13.5, fontWeight: 600,
                         }}>Cancel</button>
                         <button onClick={handleStart} disabled={uploading} style={{
                             flex: 2, padding: '12px', borderRadius: 10, border: 'none',
-                            background: uploading ? 'rgba(99,102,241,0.4)' : 'linear-gradient(135deg, #6366F1, #7C3AED)',
-                            color: '#fff', cursor: uploading ? 'not-allowed' : 'pointer', fontSize: 13.5, fontWeight: 800,
-                            boxShadow: '0 4px 20px rgba(99,102,241,0.35)', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
+                            background: uploading ? 'rgba(194, 91, 60, 0.4)' : 'linear-gradient(135deg, var(--accent-primary), var(--accent-primary-dim))',
+                            color: 'var(--text-primary)', cursor: uploading ? 'not-allowed' : 'pointer', fontSize: 13.5, fontWeight: 800,
+                            boxShadow: '0 4px 20px rgba(194, 91, 60, 0.35)', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
                         }}>
                             <Phone size={16} /> Proceed to Consultation →
                         </button>
@@ -372,30 +372,30 @@ function LiveTranscriptPanel({ messages, partial }: { messages: TranscriptMessag
 
     return (
         <div style={{
-            background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)',
+            background: 'var(--surface-1)', border: '1px solid var(--surface-border)',
             borderRadius: 18, height: '100%', display: 'flex', flexDirection: 'column', overflow: 'hidden',
         }}>
-            <div style={{ padding: '14px 18px', borderBottom: '1px solid rgba(255,255,255,0.06)', display: 'flex', alignItems: 'center', gap: 8 }}>
-                <span style={{ width: 7, height: 7, borderRadius: '50%', background: '#E63946', display: 'inline-block', animation: 'ping 1.2s ease infinite' }} />
-                <span style={{ fontSize: 11, fontWeight: 700, color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase', letterSpacing: '0.1em' }}>Live Transcript</span>
+            <div style={{ padding: '14px 18px', borderBottom: '1px solid var(--surface-border)', display: 'flex', alignItems: 'center', gap: 8 }}>
+                <span style={{ width: 7, height: 7, borderRadius: '50%', background: 'var(--accent-primary)', display: 'inline-block', animation: 'ping 1.2s ease infinite' }} />
+                <span style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.1em' }}>Live Transcript</span>
             </div>
             <div ref={ref} style={{ flex: 1, overflowY: 'auto', padding: '14px 16px', display: 'flex', flexDirection: 'column', gap: 10, scrollbarWidth: 'thin' }}>
                 {messages.length === 0 && !partial ? (
-                    <div style={{ textAlign: 'center', color: 'rgba(255,255,255,0.2)', fontSize: 13, marginTop: 30 }}>
+                    <div style={{ textAlign: 'center', color: 'var(--text-muted)', fontSize: 13, marginTop: 30 }}>
                         Conversation will appear here...
                     </div>
                 ) : (
                     <>
                         {messages.filter(m => m.role !== 'system').map((msg, i) => (
                             <div key={i} style={{ display: 'flex', flexDirection: 'column', alignItems: msg.role === 'user' ? 'flex-end' : 'flex-start' }}>
-                                <div style={{ fontSize: 10, fontWeight: 700, color: msg.role === 'user' ? '#6366F1' : '#10b981', marginBottom: 3, letterSpacing: '0.05em' }}>
+                                <div style={{ fontSize: 10, fontWeight: 700, color: msg.role === 'user' ? 'var(--accent-primary)' : 'var(--risk-low)', marginBottom: 3, letterSpacing: '0.05em' }}>
                                     {msg.role === 'user' ? 'You' : 'Priya (AI)'}
                                 </div>
                                 <div style={{
                                     maxWidth: '88%', padding: '9px 13px', borderRadius: msg.role === 'user' ? '14px 14px 4px 14px' : '14px 14px 14px 4px',
-                                    background: msg.role === 'user' ? 'rgba(99,102,241,0.25)' : 'rgba(255,255,255,0.06)',
-                                    border: `1px solid ${msg.role === 'user' ? 'rgba(99,102,241,0.3)' : 'rgba(255,255,255,0.08)'}`,
-                                    fontSize: 13, color: 'rgba(255,255,255,0.82)', lineHeight: 1.55,
+                                    background: msg.role === 'user' ? 'rgba(194, 91, 60, 0.25)' : 'var(--surface-2)',
+                                    border: `1px solid ${msg.role === 'user' ? 'rgba(194, 91, 60, 0.3)' : 'var(--surface-border)'}`,
+                                    fontSize: 13, color: 'var(--text-primary)', lineHeight: 1.55,
                                 }}>
                                     {msg.message}
                                 </div>
@@ -404,14 +404,14 @@ function LiveTranscriptPanel({ messages, partial }: { messages: TranscriptMessag
                         {/* In-progress (not-yet-final) speech — shows what's being said right now */}
                         {partial && partial.message.trim() && (
                             <div style={{ display: 'flex', flexDirection: 'column', alignItems: partial.role === 'user' ? 'flex-end' : 'flex-start' }}>
-                                <div style={{ fontSize: 10, fontWeight: 700, color: partial.role === 'user' ? '#6366F1' : '#10b981', marginBottom: 3, letterSpacing: '0.05em' }}>
+                                <div style={{ fontSize: 10, fontWeight: 700, color: partial.role === 'user' ? 'var(--accent-primary)' : 'var(--risk-low)', marginBottom: 3, letterSpacing: '0.05em' }}>
                                     {partial.role === 'user' ? 'You' : 'Priya (AI)'} <span style={{ opacity: 0.5, fontWeight: 400 }}>· speaking…</span>
                                 </div>
                                 <div style={{
                                     maxWidth: '88%', padding: '9px 13px', borderRadius: partial.role === 'user' ? '14px 14px 4px 14px' : '14px 14px 14px 4px',
-                                    background: partial.role === 'user' ? 'rgba(99,102,241,0.12)' : 'rgba(255,255,255,0.03)',
-                                    border: `1px dashed ${partial.role === 'user' ? 'rgba(99,102,241,0.3)' : 'rgba(255,255,255,0.08)'}`,
-                                    fontSize: 13, color: 'rgba(255,255,255,0.5)', lineHeight: 1.55, fontStyle: 'italic',
+                                    background: partial.role === 'user' ? 'rgba(194, 91, 60, 0.12)' : 'var(--surface-2)',
+                                    border: `1px dashed ${partial.role === 'user' ? 'rgba(194, 91, 60, 0.3)' : 'var(--surface-border)'}`,
+                                    fontSize: 13, color: 'var(--text-secondary)', lineHeight: 1.55, fontStyle: 'italic',
                                 }}>
                                     {partial.message}
                                 </div>
@@ -445,43 +445,43 @@ function CallHistoryItem({ call }: { call: AiDoctorCallSummary }) {
     const suggestions = (detail?.doctorSuggestions ?? call.doctorSuggestions) as DoctorSuggestions | null;
 
     return (
-        <div style={{ border: '1px solid rgba(255,255,255,0.07)', background: 'rgba(255,255,255,0.025)', borderRadius: 16, overflow: 'hidden' }}>
+        <div style={{ border: '1px solid var(--surface-border)', background: 'var(--surface-1)', borderRadius: 16, overflow: 'hidden' }}>
             <button onClick={toggle} style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '14px 18px', background: 'none', border: 'none', cursor: 'pointer' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-                    <div style={{ width: 38, height: 38, borderRadius: 10, background: 'rgba(99,102,241,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                        <Stethoscope size={17} color="#6366F1" />
+                    <div style={{ width: 38, height: 38, borderRadius: 10, background: 'rgba(194, 91, 60, 0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                        <Stethoscope size={17} color="var(--accent-primary)" />
                     </div>
                     <div style={{ textAlign: 'left' }}>
-                        <div style={{ fontSize: 13.5, fontWeight: 700, color: '#fff' }}>
+                        <div style={{ fontSize: 13.5, fontWeight: 700, color: 'var(--text-primary)' }}>
                             AI Doctor Consultation
-                            {call.doctorSuggestions && <span style={{ marginLeft: 8, fontSize: 10, padding: '2px 8px', borderRadius: 9999, background: 'rgba(6,214,160,0.15)', color: '#06D6A0', fontWeight: 700 }}>REPORT READY</span>}
+                            {call.doctorSuggestions && <span style={{ marginLeft: 8, fontSize: 10, padding: '2px 8px', borderRadius: 9999, background: 'rgba(62, 142, 126, 0.15)', color: 'var(--risk-low)', fontWeight: 700 }}>REPORT READY</span>}
                         </div>
                         <div style={{ display: 'flex', gap: 12, marginTop: 3 }}>
-                            <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.35)', display: 'flex', alignItems: 'center', gap: 4 }}><Calendar size={10} />{fmtDate(call.startedAt)}</span>
-                            <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.35)', display: 'flex', alignItems: 'center', gap: 4 }}><Clock size={10} />{fmtDuration(call.durationSecs)}</span>
+                            <span style={{ fontSize: 11, color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: 4 }}><Calendar size={10} />{fmtDate(call.startedAt)}</span>
+                            <span style={{ fontSize: 11, color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: 4 }}><Clock size={10} />{fmtDuration(call.durationSecs)}</span>
                         </div>
                     </div>
                 </div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                    <span style={{ fontSize: 10, padding: '3px 10px', borderRadius: 9999, fontWeight: 700, background: 'rgba(16,185,129,0.12)', color: '#10b981' }}>{call.status}</span>
-                    {expanded ? <ChevronUp size={15} color="rgba(255,255,255,0.3)" /> : <ChevronDown size={15} color="rgba(255,255,255,0.3)" />}
+                    <span style={{ fontSize: 10, padding: '3px 10px', borderRadius: 9999, fontWeight: 700, background: 'rgba(62, 142, 126, 0.12)', color: 'var(--risk-low)' }}>{call.status}</span>
+                    {expanded ? <ChevronUp size={15} color="var(--text-muted)" /> : <ChevronDown size={15} color="var(--text-muted)" />}
                 </div>
             </button>
 
             {expanded && (
-                <div style={{ borderTop: '1px solid rgba(255,255,255,0.06)', padding: '16px 18px' }}>
+                <div style={{ borderTop: '1px solid var(--surface-border)', padding: '16px 18px' }}>
                     {loading ? (
                         <div style={{ textAlign: 'center', padding: '20px 0' }}>
-                            <span style={{ display: 'inline-block', width: 24, height: 24, borderRadius: '50%', border: '2px solid #6366F1', borderTopColor: 'transparent', animation: 'spin 0.8s linear infinite' }} />
+                            <span style={{ display: 'inline-block', width: 24, height: 24, borderRadius: '50%', border: '2px solid var(--accent-primary)', borderTopColor: 'transparent', animation: 'spin 0.8s linear infinite' }} />
                             <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
                         </div>
                     ) : (
                         <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
                             {/* Pre-call reason */}
                             {call.preCallData?.reason && (
-                                <div style={{ padding: '10px 14px', background: 'rgba(99,102,241,0.08)', border: '1px solid rgba(99,102,241,0.2)', borderRadius: 10 }}>
-                                    <div style={{ fontSize: 10, fontWeight: 700, color: '#6366F1', textTransform: 'uppercase', letterSpacing: '0.07em', marginBottom: 4 }}>Reason for visit</div>
-                                    <div style={{ fontSize: 13, color: 'rgba(255,255,255,0.7)' }}>{call.preCallData.reason}</div>
+                                <div style={{ padding: '10px 14px', background: 'rgba(194, 91, 60, 0.08)', border: '1px solid rgba(194, 91, 60, 0.2)', borderRadius: 10 }}>
+                                    <div style={{ fontSize: 10, fontWeight: 700, color: 'var(--accent-primary)', textTransform: 'uppercase', letterSpacing: '0.07em', marginBottom: 4 }}>Reason for visit</div>
+                                    <div style={{ fontSize: 13, color: 'var(--text-secondary)' }}>{call.preCallData.reason}</div>
                                 </div>
                             )}
 
@@ -489,7 +489,7 @@ function CallHistoryItem({ call }: { call: AiDoctorCallSummary }) {
                             {suggestions ? (
                                 <DoctorReportCard suggestions={suggestions} />
                             ) : (
-                                <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.3)', textAlign: 'center', padding: '8px 0', fontStyle: 'italic' }}>
+                                <div style={{ fontSize: 12, color: 'var(--text-muted)', textAlign: 'center', padding: '8px 0', fontStyle: 'italic' }}>
                                     Doctor's report not available for this call.
                                 </div>
                             )}
@@ -497,16 +497,16 @@ function CallHistoryItem({ call }: { call: AiDoctorCallSummary }) {
                             {/* Transcript */}
                             {detail?.transcript && Array.isArray(detail.transcript) && detail.transcript.length > 0 && (
                                 <div>
-                                    <div style={{ fontSize: 11, fontWeight: 700, color: 'rgba(255,255,255,0.35)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 10 }}>Full Transcript</div>
+                                    <div style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 10 }}>Full Transcript</div>
                                     <div style={{ maxHeight: 260, overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: 8, scrollbarWidth: 'thin' }}>
                                         {(detail.transcript as TranscriptMessage[]).filter(m => m.role !== 'system').map((msg, i) => (
                                             <div key={i} style={{ display: 'flex', justifyContent: msg.role === 'user' ? 'flex-end' : 'flex-start' }}>
                                                 <div style={{
                                                     maxWidth: '80%', padding: '8px 12px', borderRadius: 10, fontSize: 12.5, lineHeight: 1.55,
-                                                    background: msg.role === 'user' ? 'rgba(99,102,241,0.15)' : 'rgba(255,255,255,0.04)',
-                                                    color: 'rgba(255,255,255,0.7)', border: '1px solid rgba(255,255,255,0.06)',
+                                                    background: msg.role === 'user' ? 'rgba(194, 91, 60, 0.15)' : 'var(--surface-2)',
+                                                    color: 'var(--text-secondary)', border: '1px solid var(--surface-border)',
                                                 }}>
-                                                    <div style={{ fontSize: 10, fontWeight: 700, color: msg.role === 'user' ? '#6366F1' : '#10b981', marginBottom: 3 }}>
+                                                    <div style={{ fontSize: 10, fontWeight: 700, color: msg.role === 'user' ? 'var(--accent-primary)' : 'var(--risk-low)', marginBottom: 3 }}>
                                                         {msg.role === 'user' ? 'You' : 'Priya'}
                                                     </div>
                                                     {msg.message}
@@ -796,26 +796,26 @@ export default function AiDoctorPage() {
             {/* ── Header ────────────────────────────────────────────── */}
             <div style={{ marginBottom: 26 }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 6 }}>
-                    <div style={{ width: 42, height: 42, borderRadius: 12, background: 'linear-gradient(135deg, #6366F1, #7C3AED)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <div style={{ width: 42, height: 42, borderRadius: 12, background: 'linear-gradient(135deg, var(--accent-primary), var(--accent-primary-dim))', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                         <Stethoscope size={20} color="#fff" />
                     </div>
                     <div>
-                        <h1 style={{ fontSize: 22, fontWeight: 900, color: '#fff', letterSpacing: '-0.02em' }}>AI Doctor OPD</h1>
-                        <p style={{ fontSize: 12.5, color: 'rgba(255,255,255,0.4)', marginTop: 2 }}>Priya — AI Health Assistant · Integrative & Natural Healing Guidance · Hindi & English</p>
+                        <h1 style={{ fontSize: 22, fontWeight: 900, color: 'var(--text-primary)', letterSpacing: '-0.02em' }}>AI Doctor OPD</h1>
+                        <p style={{ fontSize: 12.5, color: 'var(--text-muted)', marginTop: 2 }}>Priya — AI Health Assistant · Integrative & Natural Healing Guidance · Hindi & English</p>
                     </div>
                 </div>
             </div>
 
             {/* ── Tabs ──────────────────────────────────────────────── */}
-            <div style={{ display: 'flex', gap: 6, marginBottom: 26, background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)', borderRadius: 14, padding: 5, width: 'fit-content' }}>
+            <div style={{ display: 'flex', gap: 6, marginBottom: 26, background: 'var(--surface-1)', border: '1px solid var(--surface-border)', borderRadius: 14, padding: 5, width: 'fit-content' }}>
                 {[
                     { key: 'talk', label: '🩺 Talk to AI Doctor', },
                     { key: 'history', label: '📋 My Consultations' },
                 ].map(t => (
                     <button key={t.key} onClick={() => setActiveTab(t.key as ActiveTab)} style={{
                         padding: '9px 20px', borderRadius: 10, border: 'none', cursor: 'pointer',
-                        background: activeTab === t.key ? 'linear-gradient(135deg, #6366F1, #7C3AED)' : 'transparent',
-                        color: activeTab === t.key ? '#fff' : 'rgba(255,255,255,0.45)',
+                        background: activeTab === t.key ? 'linear-gradient(135deg, var(--accent-primary), var(--accent-primary-dim))' : 'transparent',
+                        color: activeTab === t.key ? 'var(--text-primary)' : 'var(--text-secondary)',
                         fontWeight: activeTab === t.key ? 800 : 600, fontSize: 13.5,
                         transition: 'all 0.2s',
                     }}>{t.label}</button>
@@ -833,12 +833,12 @@ export default function AiDoctorPage() {
                         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20, height: 500 }}>
                             {/* Left — Doctor orb + controls */}
                             <div style={{
-                                background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)',
+                                background: 'var(--surface-1)', border: '1px solid var(--surface-border)',
                                 borderRadius: 20, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 20, padding: 32,
                             }}>
                                 <PulsingOrb active />
                                 <div style={{ textAlign: 'center' }}>
-                                    <div style={{ fontSize: 18, fontWeight: 800, color: '#fff' }}>Priya</div>
+                                    <div style={{ fontSize: 18, fontWeight: 800, color: 'var(--text-primary)' }}>Priya</div>
                                     {/* Persistent, always-visible AI disclosure during the live call —
                                         not just spoken once at the start, so it stays visible even if
                                         the patient joined the call already in progress or looks away
@@ -846,24 +846,24 @@ export default function AiDoctorPage() {
                                     <div style={{
                                         display: 'inline-flex', alignItems: 'center', gap: 5, marginTop: 6,
                                         fontSize: 11, fontWeight: 800, padding: '3px 10px', borderRadius: 9999,
-                                        background: 'rgba(99,102,241,0.18)', color: '#a5b4fc',
-                                        border: '1px solid rgba(99,102,241,0.35)', letterSpacing: '0.03em',
+                                        background: 'rgba(194, 91, 60, 0.18)', color: 'var(--accent-primary-hover)',
+                                        border: '1px solid rgba(194, 91, 60, 0.35)', letterSpacing: '0.03em',
                                     }}>
                                         🤖 AI ASSISTANT — NOT A REAL DOCTOR
                                     </div>
-                                    <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.4)', marginTop: 6 }}>Integrative &amp; Ayurvedic self-care guidance</div>
+                                    <div style={{ fontSize: 12, color: 'var(--text-muted)', marginTop: 6 }}>Integrative &amp; Ayurvedic self-care guidance</div>
                                 </div>
                                 <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                                    <span style={{ width: 8, height: 8, borderRadius: '50%', background: '#10b981', animation: 'ping 1.2s ease infinite', display: 'inline-block' }} />
-                                    <span style={{ color: '#10b981', fontSize: 13, fontWeight: 700 }}>LIVE</span>
-                                    <span style={{ color: 'rgba(255,255,255,0.4)', fontSize: 13, fontFamily: 'monospace', marginLeft: 6 }}>{mins}:{secs}</span>
+                                    <span style={{ width: 8, height: 8, borderRadius: '50%', background: 'var(--risk-low)', animation: 'ping 1.2s ease infinite', display: 'inline-block' }} />
+                                    <span style={{ color: 'var(--risk-low)', fontSize: 13, fontWeight: 700 }}>LIVE</span>
+                                    <span style={{ color: 'var(--text-muted)', fontSize: 13, fontFamily: 'monospace', marginLeft: 6 }}>{mins}:{secs}</span>
                                 </div>
                                 <div style={{ display: 'flex', gap: 10 }}>
                                     <button onClick={toggleMute} style={{
                                         display: 'flex', alignItems: 'center', gap: 7, padding: '9px 18px', borderRadius: 10,
-                                        border: '1px solid rgba(255,255,255,0.1)', cursor: 'pointer',
-                                        background: isMuted ? '#ef4444' : 'rgba(255,255,255,0.06)',
-                                        color: isMuted ? '#fff' : 'rgba(255,255,255,0.7)', fontWeight: 600, fontSize: 13,
+                                        border: '1px solid var(--surface-border-md)', cursor: 'pointer',
+                                        background: isMuted ? 'var(--risk-critical)' : 'var(--surface-2)',
+                                        color: isMuted ? 'var(--text-primary)' : 'var(--text-secondary)', fontWeight: 600, fontSize: 13,
                                     }}>
                                         {isMuted ? <MicOff size={15} /> : <Mic size={15} />}
                                         {isMuted ? 'Unmute' : 'Mute'}
@@ -871,7 +871,7 @@ export default function AiDoctorPage() {
                                     <button onClick={endCall} style={{
                                         display: 'flex', alignItems: 'center', gap: 7, padding: '9px 18px', borderRadius: 10,
                                         border: 'none', cursor: 'pointer',
-                                        background: '#dc2626', color: '#fff', fontWeight: 700, fontSize: 13,
+                                        background: 'var(--risk-critical)', color: '#fff', fontWeight: 700, fontSize: 13,
                                         boxShadow: '0 4px 16px rgba(220,38,38,0.35)',
                                     }}>
                                         <PhoneOff size={15} /> End Call
@@ -886,11 +886,11 @@ export default function AiDoctorPage() {
 
                     {/* ── Connecting ── */}
                     {callStatus === 'connecting' && (
-                        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 18, padding: '60px 0', background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)', borderRadius: 20 }}>
-                            <div style={{ width: 50, height: 50, borderRadius: '50%', border: '3px solid rgba(99,102,241,0.3)', borderTopColor: '#6366F1', animation: 'spin 0.8s linear infinite' }} />
+                        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 18, padding: '60px 0', background: 'var(--surface-1)', border: '1px solid var(--surface-border)', borderRadius: 20 }}>
+                            <div style={{ width: 50, height: 50, borderRadius: '50%', border: '3px solid rgba(194, 91, 60, 0.3)', borderTopColor: 'var(--accent-primary)', animation: 'spin 0.8s linear infinite' }} />
                             <div style={{ textAlign: 'center' }}>
-                                <div style={{ fontSize: 15, fontWeight: 700, color: '#fff' }}>Connecting to Priya...</div>
-                                <div style={{ fontSize: 12.5, color: 'rgba(255,255,255,0.35)', marginTop: 4 }}>Please allow microphone access when prompted</div>
+                                <div style={{ fontSize: 15, fontWeight: 700, color: 'var(--text-primary)' }}>Connecting to Priya...</div>
+                                <div style={{ fontSize: 12.5, color: 'var(--text-muted)', marginTop: 4 }}>Please allow microphone access when prompted</div>
                             </div>
                             <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
                         </div>
@@ -898,38 +898,38 @@ export default function AiDoctorPage() {
 
                     {/* ── Idle or Ended → Doctor card + Start button ── */}
                     {(callStatus === 'idle' || callStatus === 'ended') && (
-                        <div style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)', borderRadius: 20, padding: '32px 36px', display: 'flex', alignItems: 'center', gap: 32 }}>
+                        <div style={{ background: 'var(--surface-1)', border: '1px solid var(--surface-border)', borderRadius: 20, padding: '32px 36px', display: 'flex', alignItems: 'center', gap: 32 }}>
                             <PulsingOrb active={false} />
                             <div style={{ flex: 1 }}>
                                 <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 4 }}>
-                                    <div style={{ fontSize: 22, fontWeight: 900, color: '#fff' }}>Priya</div>
-                                    <span style={{ fontSize: 11, fontWeight: 800, padding: '3px 10px', borderRadius: 9999, background: 'rgba(99,102,241,0.18)', color: '#a5b4fc', border: '1px solid rgba(99,102,241,0.35)', letterSpacing: '0.03em' }}>AI HEALTH ASSISTANT — NOT A REAL DOCTOR</span>
+                                    <div style={{ fontSize: 22, fontWeight: 900, color: 'var(--text-primary)' }}>Priya</div>
+                                    <span style={{ fontSize: 11, fontWeight: 800, padding: '3px 10px', borderRadius: 9999, background: 'rgba(194, 91, 60, 0.18)', color: 'var(--accent-primary-hover)', border: '1px solid rgba(194, 91, 60, 0.35)', letterSpacing: '0.03em' }}>AI HEALTH ASSISTANT — NOT A REAL DOCTOR</span>
                                 </div>
-                                <div style={{ fontSize: 13.5, color: '#6366F1', fontWeight: 600, marginBottom: 16 }}>Voice-based AI trained to discuss symptoms and suggest natural/Ayurvedic self-care — not a substitute for medical diagnosis or a licensed physician</div>
+                                <div style={{ fontSize: 13.5, color: 'var(--accent-primary)', fontWeight: 600, marginBottom: 16 }}>Voice-based AI trained to discuss symptoms and suggest natural/Ayurvedic self-care — not a substitute for medical diagnosis or a licensed physician</div>
                                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginBottom: 22 }}>
                                     {['Ayurveda & Home Remedies', '9-Phase OPD-style Interview', 'Hindi & English'].map(tag => (
-                                        <span key={tag} style={{ fontSize: 12, padding: '4px 12px', borderRadius: 9999, background: 'rgba(99,102,241,0.12)', color: '#6366F1', border: '1px solid rgba(99,102,241,0.25)' }}>{tag}</span>
+                                        <span key={tag} style={{ fontSize: 12, padding: '4px 12px', borderRadius: 9999, background: 'rgba(194, 91, 60, 0.12)', color: 'var(--accent-primary)', border: '1px solid rgba(194, 91, 60, 0.25)' }}>{tag}</span>
                                     ))}
                                 </div>
                                 {callStatus === 'ended' ? (
                                     <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 16 }}>
-                                        <CheckCircle size={16} color="#10b981" />
-                                        <span style={{ fontSize: 13, color: '#10b981', fontWeight: 600 }}>Consultation saved — check My Consultations tab</span>
+                                        <CheckCircle size={16} color="var(--risk-low)" />
+                                        <span style={{ fontSize: 13, color: 'var(--risk-low)', fontWeight: 600 }}>Consultation saved — check My Consultations tab</span>
                                     </div>
                                 ) : (
-                                    <div style={{ padding: '12px 16px', background: 'rgba(99,102,241,0.08)', border: '1px solid rgba(99,102,241,0.2)', borderRadius: 12, marginBottom: 18, display: 'flex', gap: 10 }}>
-                                        <AlertCircle size={16} color="#6366F1" style={{ flexShrink: 0, marginTop: 1 }} />
+                                    <div style={{ padding: '12px 16px', background: 'rgba(194, 91, 60, 0.08)', border: '1px solid rgba(194, 91, 60, 0.2)', borderRadius: 12, marginBottom: 18, display: 'flex', gap: 10 }}>
+                                        <AlertCircle size={16} color="var(--accent-primary)" style={{ flexShrink: 0, marginTop: 1 }} />
                                         <div>
-                                            <div style={{ fontSize: 12.5, fontWeight: 700, color: '#6366F1', marginBottom: 3 }}>Hindi, English ya Hinglish mein aaram se baat karein</div>
-                                            <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.5)', lineHeight: 1.6 }}>
-                                                Priya ek 9-phase OPD-style interview lengi aur aapko pure Ayurvedic, diet & home remedies suggest karenge. Emergency ke liye call <strong style={{ color: '#fff' }}>108</strong>.
+                                            <div style={{ fontSize: 12.5, fontWeight: 700, color: 'var(--accent-primary)', marginBottom: 3 }}>Hindi, English ya Hinglish mein aaram se baat karein</div>
+                                            <div style={{ fontSize: 12, color: 'var(--text-secondary)', lineHeight: 1.6 }}>
+                                                Priya ek 9-phase OPD-style interview lengi aur aapko pure Ayurvedic, diet & home remedies suggest karenge. Emergency ke liye call <strong style={{ color: 'var(--text-primary)' }}>108</strong>.
                                             </div>
                                         </div>
                                     </div>
                                 )}
                                 {usage && usage.count >= usage.cap ? (
-                                    <div style={{ padding: '12px 16px', background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.25)', borderRadius: 12, marginBottom: 10 }}>
-                                        <span style={{ fontSize: 12.5, fontWeight: 700, color: '#f87171' }}>
+                                    <div style={{ padding: '12px 16px', background: 'rgba(179, 64, 46, 0.08)', border: '1px solid rgba(179, 64, 46, 0.25)', borderRadius: 12, marginBottom: 10 }}>
+                                        <span style={{ fontSize: 12.5, fontWeight: 700, color: 'var(--risk-high)' }}>
                                             Daily consultation limit reached ({usage.cap}/{usage.cap}). Please try again tomorrow.
                                         </span>
                                     </div>
@@ -937,16 +937,16 @@ export default function AiDoctorPage() {
                                     <button onClick={openPreCallForm} style={{
                                         display: 'flex', alignItems: 'center', gap: 10, padding: '13px 30px',
                                         borderRadius: 12, border: 'none', cursor: 'pointer',
-                                        background: 'linear-gradient(135deg, #059669, #10b981)',
+                                        background: 'linear-gradient(135deg, var(--accent-green-dim), var(--risk-low))',
                                         color: '#fff', fontWeight: 800, fontSize: 15,
-                                        boxShadow: '0 8px 24px rgba(5,150,105,0.35)',
+                                        boxShadow: '0 8px 24px rgba(47, 114, 100, 0.35)',
                                         transition: 'all 0.2s',
                                     }}>
                                         <Phone size={20} /> Start Consultation
                                     </button>
                                 )}
                                 {usage && usage.count < usage.cap && (
-                                    <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.35)', marginTop: 8 }}>
+                                    <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 8 }}>
                                         {usage.cap - usage.count} of {usage.cap} consultations left today (shared demo limit)
                                     </div>
                                 )}
@@ -957,11 +957,11 @@ export default function AiDoctorPage() {
                     {/* ── Doctor's Report (post call) ── */}
                     {callStatus === 'ended' && (
                         reportLoading ? (
-                            <div style={{ display: 'flex', alignItems: 'center', gap: 14, padding: '20px 24px', background: 'rgba(99,102,241,0.08)', border: '1px solid rgba(99,102,241,0.2)', borderRadius: 16 }}>
-                                <div style={{ width: 22, height: 22, borderRadius: '50%', border: '2px solid rgba(99,102,241,0.4)', borderTopColor: '#6366F1', animation: 'spin 0.8s linear infinite', flexShrink: 0 }} />
+                            <div style={{ display: 'flex', alignItems: 'center', gap: 14, padding: '20px 24px', background: 'rgba(194, 91, 60, 0.08)', border: '1px solid rgba(194, 91, 60, 0.2)', borderRadius: 16 }}>
+                                <div style={{ width: 22, height: 22, borderRadius: '50%', border: '2px solid rgba(194, 91, 60, 0.4)', borderTopColor: 'var(--accent-primary)', animation: 'spin 0.8s linear infinite', flexShrink: 0 }} />
                                 <div>
-                                    <div style={{ fontSize: 13.5, fontWeight: 700, color: '#fff', marginBottom: 2 }}>Generating Doctor's Report...</div>
-                                    <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.4)' }}>Priya is analysing your consultation. This takes ~20s.</div>
+                                    <div style={{ fontSize: 13.5, fontWeight: 700, color: 'var(--text-primary)', marginBottom: 2 }}>Generating Doctor's Report...</div>
+                                    <div style={{ fontSize: 12, color: 'var(--text-muted)' }}>Priya is analysing your consultation. This takes ~20s.</div>
                                 </div>
                             </div>
                         ) : doctorReport ? (
@@ -972,7 +972,7 @@ export default function AiDoctorPage() {
                     {/* ── Show last stored report on idle ── */}
                     {callStatus === 'idle' && doctorReport && (
                         <div>
-                            <div style={{ fontSize: 11, fontWeight: 700, color: 'rgba(255,255,255,0.3)', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 12 }}>Last Consultation Report</div>
+                            <div style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 12 }}>Last Consultation Report</div>
                             <DoctorReportCard suggestions={doctorReport} onDismiss={() => {
                                 setDoctorReport(null);
                                 localStorage.removeItem('medisense_last_report');
@@ -988,21 +988,21 @@ export default function AiDoctorPage() {
             {activeTab === 'history' && (
                 <div>
                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 18 }}>
-                        <div style={{ fontSize: 17, fontWeight: 800, color: '#fff' }}>Past Consultations</div>
-                        <button onClick={() => loadHistory(historyPage)} style={{ fontSize: 12.5, padding: '6px 14px', borderRadius: 8, border: '1px solid rgba(255,255,255,0.1)', background: 'rgba(99,102,241,0.1)', color: '#6366F1', cursor: 'pointer', fontWeight: 600 }}>
+                        <div style={{ fontSize: 17, fontWeight: 800, color: 'var(--text-primary)' }}>Past Consultations</div>
+                        <button onClick={() => loadHistory(historyPage)} style={{ fontSize: 12.5, padding: '6px 14px', borderRadius: 8, border: '1px solid var(--surface-border-md)', background: 'rgba(194, 91, 60, 0.1)', color: 'var(--accent-primary)', cursor: 'pointer', fontWeight: 600 }}>
                             ↻ Refresh
                         </button>
                     </div>
 
                     {historyLoading ? (
                         <div style={{ display: 'flex', justifyContent: 'center', padding: '60px 0' }}>
-                            <div style={{ width: 36, height: 36, borderRadius: '50%', border: '3px solid rgba(99,102,241,0.3)', borderTopColor: '#6366F1', animation: 'spin 0.8s linear infinite' }} />
+                            <div style={{ width: 36, height: 36, borderRadius: '50%', border: '3px solid rgba(194, 91, 60, 0.3)', borderTopColor: 'var(--accent-primary)', animation: 'spin 0.8s linear infinite' }} />
                         </div>
                     ) : calls.length === 0 ? (
-                        <div style={{ textAlign: 'center', padding: '60px 0', background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.06)', borderRadius: 20 }}>
-                            <Stethoscope size={48} color="rgba(255,255,255,0.1)" style={{ marginBottom: 16 }} />
-                            <div style={{ fontSize: 16, fontWeight: 700, color: 'rgba(255,255,255,0.4)', marginBottom: 6 }}>No consultations yet</div>
-                            <div style={{ fontSize: 13, color: 'rgba(255,255,255,0.25)' }}>Start your first AI Doctor consultation from the Talk tab.</div>
+                        <div style={{ textAlign: 'center', padding: '60px 0', background: 'var(--surface-1)', border: '1px solid var(--surface-border)', borderRadius: 20 }}>
+                            <Stethoscope size={48} color="var(--text-muted)" style={{ marginBottom: 16 }} />
+                            <div style={{ fontSize: 16, fontWeight: 700, color: 'var(--text-muted)', marginBottom: 6 }}>No consultations yet</div>
+                            <div style={{ fontSize: 13, color: 'var(--text-muted)' }}>Start your first AI Doctor consultation from the Talk tab.</div>
                         </div>
                     ) : (
                         <>
@@ -1013,9 +1013,9 @@ export default function AiDoctorPage() {
                                 <div style={{ display: 'flex', justifyContent: 'center', gap: 6, marginTop: 20 }}>
                                     {Array.from({ length: totalPages }, (_, i) => i + 1).map(p => (
                                         <button key={p} onClick={() => loadHistory(p)} style={{
-                                            width: 32, height: 32, borderRadius: 8, border: '1px solid rgba(255,255,255,0.1)',
-                                            background: p === historyPage ? '#6366F1' : 'rgba(255,255,255,0.04)',
-                                            color: p === historyPage ? '#fff' : 'rgba(255,255,255,0.5)',
+                                            width: 32, height: 32, borderRadius: 8, border: '1px solid var(--surface-border-md)',
+                                            background: p === historyPage ? 'var(--accent-primary)' : 'var(--surface-1)',
+                                            color: p === historyPage ? 'var(--text-primary)' : 'var(--text-secondary)',
                                             cursor: 'pointer', fontSize: 12.5, fontWeight: 700,
                                         }}>{p}</button>
                                     ))}

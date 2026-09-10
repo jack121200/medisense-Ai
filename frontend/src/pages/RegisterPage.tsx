@@ -12,7 +12,7 @@ const ROLES = [
         label: 'Patient',
         icon: '🫀',
         desc: 'Book appointments, view cardiac reports, manage your heart health records',
-        color: '#06D6A0',
+        color: 'var(--risk-low)',
         endpoint: '/auth/patient-register',
     },
     {
@@ -20,7 +20,7 @@ const ROLES = [
         label: 'Cardiologist',
         icon: '🩺',
         desc: 'Access patient cardiac records, view AI diagnostics, run heart risk analysis',
-        color: '#E63946',
+        color: 'var(--accent-primary)',
         endpoint: '/auth/register',
     },
     {
@@ -28,7 +28,7 @@ const ROLES = [
         label: 'Receptionist',
         icon: '📋',
         desc: 'Manage appointments, handle patient intake and scheduling',
-        color: '#FFD166',
+        color: 'var(--risk-medium)',
         endpoint: '/auth/register',
     },
     {
@@ -36,17 +36,17 @@ const ROLES = [
         label: 'Lab Technician',
         icon: '🧪',
         desc: 'Upload CBC reports, extract lab values, link reports to patient records',
-        color: '#FF6B6B',
+        color: 'var(--accent-primary-hover)',
         endpoint: '/auth/register',
     },
 ];
 
 const inputStyle: React.CSSProperties = {
-    width: '100%', padding: '11px 14px', borderRadius: 10, border: '1px solid rgba(255,255,255,0.1)',
-    background: 'rgba(255,255,255,0.05)', color: '#fff', fontSize: 14, outline: 'none', boxSizing: 'border-box',
+    width: '100%', padding: '11px 14px', borderRadius: 10, border: '1px solid var(--surface-border-md)',
+    background: 'var(--surface-1)', color: 'var(--text-primary)', fontSize: 14, outline: 'none', boxSizing: 'border-box',
 };
 const labelStyle: React.CSSProperties = {
-    display: 'block', fontSize: 13, color: 'rgba(255,255,255,0.6)', marginBottom: 6, fontWeight: 500,
+    display: 'block', fontSize: 13, color: 'var(--text-secondary)', marginBottom: 6, fontWeight: 500,
 };
 
 export default function RegisterPage() {
@@ -144,7 +144,7 @@ export default function RegisterPage() {
     if (step === 0) {
         return (
             <div style={{
-                minHeight: '100vh', background: 'linear-gradient(135deg, #0A0E1A 0%, #0D1B2A 50%, #0A0E1A 100%)',
+                minHeight: '100vh', background: 'linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-secondary) 50%, var(--bg-primary) 100%)',
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
                 fontFamily: '"Inter", system-ui, sans-serif', padding: '24px',
             }}>
@@ -152,11 +152,11 @@ export default function RegisterPage() {
                     {/* Logo */}
                     <div style={{ textAlign: 'center', marginBottom: 40 }}>
                         <div style={{ display: 'inline-flex', alignItems: 'center', gap: 10, marginBottom: 14 }}>
-                            <div style={{ width: 40, height: 40, background: 'linear-gradient(135deg, #E63946, #A4161A)', borderRadius: 12, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 20 }}>🫀</div>
-                            <span style={{ fontSize: 22, fontWeight: 900, background: 'linear-gradient(90deg, #E63946, #FF6B6B)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>MediSense AI</span>
+                            <div style={{ width: 40, height: 40, background: 'linear-gradient(135deg, var(--accent-primary), var(--accent-primary-dim))', borderRadius: 12, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 20 }}>🫀</div>
+                            <span style={{ fontSize: 22, fontWeight: 900, background: 'linear-gradient(90deg, var(--accent-primary), var(--accent-primary-hover))', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>MediSense AI</span>
                         </div>
-                        <h1 style={{ fontSize: 28, fontWeight: 900, color: '#fff', marginBottom: 8 }}>Register As</h1>
-                        <p style={{ fontSize: 14, color: 'rgba(255,255,255,0.45)' }}>Choose your role to get started</p>
+                        <h1 style={{ fontSize: 28, fontWeight: 900, color: 'var(--text-primary)', marginBottom: 8 }}>Register As</h1>
+                        <p style={{ fontSize: 14, color: 'var(--text-secondary)' }}>Choose your role to get started</p>
                     </div>
 
                     {/* Role cards */}
@@ -182,8 +182,8 @@ export default function RegisterPage() {
                                 }}
                             >
                                 <div style={{ fontSize: 36 }}>{role.icon}</div>
-                                <div style={{ fontWeight: 800, fontSize: 18, color: '#fff' }}>{role.label}</div>
-                                <div style={{ fontSize: 13, color: 'rgba(255,255,255,0.45)', lineHeight: 1.6 }}>{role.desc}</div>
+                                <div style={{ fontWeight: 800, fontSize: 18, color: 'var(--text-primary)' }}>{role.label}</div>
+                                <div style={{ fontSize: 13, color: 'var(--text-secondary)', lineHeight: 1.6 }}>{role.desc}</div>
                                 <div style={{ marginTop: 4, display: 'inline-flex', alignItems: 'center', gap: 6, color: role.color, fontSize: 13, fontWeight: 700 }}>
                                     Register as {role.label} →
                                 </div>
@@ -192,11 +192,11 @@ export default function RegisterPage() {
                     </div>
 
                     <div style={{ textAlign: 'center' }}>
-                        <span style={{ fontSize: 13, color: 'rgba(255,255,255,0.4)' }}>Already have an account? </span>
-                        <Link to="/login" style={{ fontSize: 13, color: '#E63946', fontWeight: 700, textDecoration: 'none' }}>Sign In →</Link>
+                        <span style={{ fontSize: 13, color: 'var(--text-muted)' }}>Already have an account? </span>
+                        <Link to="/login" style={{ fontSize: 13, color: 'var(--accent-primary)', fontWeight: 700, textDecoration: 'none' }}>Sign In →</Link>
                     </div>
                     <div style={{ textAlign: 'center', marginTop: 10 }}>
-                        <Link to="/" style={{ fontSize: 12, color: 'rgba(255,255,255,0.25)', textDecoration: 'none' }}>← Back to home</Link>
+                        <Link to="/" style={{ fontSize: 12, color: 'var(--text-muted)', textDecoration: 'none' }}>← Back to home</Link>
                     </div>
                 </div>
                 <style>{`@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');`}</style>
@@ -205,12 +205,12 @@ export default function RegisterPage() {
     }
 
     // ── REGISTRATION FORM ─────────────────────────────────────────────────────
-    const accentColor = roleObj?.color || '#6366f1';
+    const accentColor = roleObj?.color || 'var(--accent-primary)';
     const dataStep = step - 1; // 0-indexed within form steps
 
     return (
         <div style={{
-            minHeight: '100vh', background: 'linear-gradient(135deg, #0A0E1A 0%, #0D1B2A 50%, #0A0E1A 100%)',
+            minHeight: '100vh', background: 'linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-secondary) 50%, var(--bg-primary) 100%)',
             display: 'flex', alignItems: 'center', justifyContent: 'center',
             fontFamily: '"Inter", system-ui, sans-serif', padding: '24px', overflowY: 'auto',
         }}>
@@ -218,14 +218,14 @@ export default function RegisterPage() {
                 {/* Logo + role badge */}
                 <div style={{ textAlign: 'center', marginBottom: 28 }}>
                     <div style={{ display: 'inline-flex', alignItems: 'center', gap: 10, marginBottom: 10 }}>
-                        <div style={{ width: 36, height: 36, background: 'linear-gradient(135deg, #E63946, #A4161A)', borderRadius: 10, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 18 }}>🫀</div>
-                        <span style={{ fontSize: 18, fontWeight: 900, background: 'linear-gradient(90deg, #E63946, #FF6B6B)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>MediSense AI</span>
+                        <div style={{ width: 36, height: 36, background: 'linear-gradient(135deg, var(--accent-primary), var(--accent-primary-dim))', borderRadius: 10, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 18 }}>🫀</div>
+                        <span style={{ fontSize: 18, fontWeight: 900, background: 'linear-gradient(90deg, var(--accent-primary), var(--accent-primary-hover))', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>MediSense AI</span>
                     </div>
                     <div style={{ display: 'inline-flex', alignItems: 'center', gap: 8, padding: '5px 14px', borderRadius: 20, background: `${accentColor}15`, border: `1px solid ${accentColor}40`, marginBottom: 10 }}>
                         <span style={{ fontSize: 16 }}>{roleObj?.icon}</span>
                         <span style={{ fontSize: 13, fontWeight: 700, color: accentColor }}>Registering as {roleObj?.label}</span>
                     </div>
-                    <h1 style={{ fontSize: 22, fontWeight: 800, color: '#fff', margin: 0 }}>{stepLabels[dataStep]}</h1>
+                    <h1 style={{ fontSize: 22, fontWeight: 800, color: 'var(--text-primary)', margin: 0 }}>{stepLabels[dataStep]}</h1>
                 </div>
 
                 {/* Step indicator */}
@@ -235,22 +235,22 @@ export default function RegisterPage() {
                             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 5 }}>
                                 <div style={{
                                     width: 34, height: 34, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center',
-                                    background: i < dataStep ? accentColor : i === dataStep ? `${accentColor}30` : 'rgba(255,255,255,0.06)',
+                                    background: i < dataStep ? accentColor : i === dataStep ? `${accentColor}30` : 'var(--surface-2)',
                                     border: i === dataStep ? `2px solid ${accentColor}` : '2px solid transparent',
-                                    fontSize: 13, fontWeight: 700, color: i <= dataStep ? '#fff' : 'rgba(255,255,255,0.3)', transition: 'all 0.3s',
+                                    fontSize: 13, fontWeight: 700, color: i <= dataStep ? 'var(--text-primary)' : 'var(--text-muted)', transition: 'all 0.3s',
                                 }}>
                                     {i < dataStep ? '✓' : i + 1}
                                 </div>
-                                <span style={{ fontSize: 10, color: i <= dataStep ? accentColor : 'rgba(255,255,255,0.3)', fontWeight: 600, whiteSpace: 'nowrap' }}>{label}</span>
+                                <span style={{ fontSize: 10, color: i <= dataStep ? accentColor : 'var(--text-muted)', fontWeight: 600, whiteSpace: 'nowrap' }}>{label}</span>
                             </div>
                             {i < stepLabels.length - 1 && (
-                                <div style={{ width: 50, height: 2, background: i < dataStep ? accentColor : 'rgba(255,255,255,0.08)', margin: '0 6px', marginBottom: 20, transition: 'background 0.3s' }} />
+                                <div style={{ width: 50, height: 2, background: i < dataStep ? accentColor : 'var(--surface-2)', margin: '0 6px', marginBottom: 20, transition: 'background 0.3s' }} />
                             )}
                         </React.Fragment>
                     ))}
                 </div>
 
-                <div style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: 20, padding: 28 }}>
+                <div style={{ background: 'var(--surface-1)', border: '1px solid var(--surface-border)', borderRadius: 20, padding: 28 }}>
 
                     {/* ── STEP 1: Basic Info (all roles) ── */}
                     {step === 1 && (
@@ -323,7 +323,7 @@ export default function RegisterPage() {
                                 <label style={labelStyle}>Existing Conditions</label>
                                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
                                     {[['hasDiabetes','Diabetes'],['hasHypertension','Hypertension'],['hasHeartDisease','Heart Disease'],['hasCKD','Chronic Kidney Disease'],['hasAsthma','Asthma'],['hasObesity','Obesity']].map(([key, label]) => (
-                                        <label key={key} style={{ display:'flex', alignItems:'center', gap:8, cursor:'pointer', fontSize:13, color:'rgba(255,255,255,0.7)' }}>
+                                        <label key={key} style={{ display:'flex', alignItems:'center', gap:8, cursor:'pointer', fontSize:13, color:'var(--text-secondary)' }}>
                                             <input type="checkbox" checked={(form as any)[key]} onChange={e => update(key, e.target.checked)} style={{ width:15, height:15, accentColor }} />
                                             {label}
                                         </label>
@@ -336,16 +336,16 @@ export default function RegisterPage() {
                     {/* ── STEP 2 (DOCTOR): Static Cardiologist Info ── */}
                     {step === 2 && isDoctor && (
                         <div>
-                            <div style={{ padding: '20px', background: 'rgba(230,57,70,0.07)', border: '1px solid rgba(230,57,70,0.2)', borderRadius: 14, marginBottom: 16, textAlign: 'center' }}>
+                            <div style={{ padding: '20px', background: 'rgba(194, 91, 60, 0.07)', border: '1px solid rgba(194, 91, 60, 0.2)', borderRadius: 14, marginBottom: 16, textAlign: 'center' }}>
                                 <div style={{ fontSize: 40, marginBottom: 8 }}>🫀</div>
-                                <div style={{ fontSize: 18, fontWeight: 900, color: '#E63946', marginBottom: 6 }}>Cardiologist</div>
-                                <div style={{ fontSize: 13, color: 'rgba(255,255,255,0.5)', lineHeight: 1.7 }}>
+                                <div style={{ fontSize: 18, fontWeight: 900, color: 'var(--accent-primary)', marginBottom: 6 }}>Cardiologist</div>
+                                <div style={{ fontSize: 13, color: 'var(--text-secondary)', lineHeight: 1.7 }}>
                                     All doctors in MediSense AI are registered as Cardiologists.<br />
                                     Your specialization is set automatically upon account creation.
                                 </div>
                             </div>
-                            <div style={{ padding: '12px 16px', background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: 10 }}>
-                                <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.35)', lineHeight: 1.6 }}>
+                            <div style={{ padding: '12px 16px', background: 'var(--surface-1)', border: '1px solid var(--surface-border)', borderRadius: 10 }}>
+                                <div style={{ fontSize: 12, color: 'var(--text-muted)', lineHeight: 1.6 }}>
                                     ✅ Your account will be reviewed by an admin before activation.<br />
                                     You will receive access to the cardiac AI tools upon approval.
                                 </div>
@@ -357,7 +357,7 @@ export default function RegisterPage() {
                     {step === 2 && !isPatient && !isDoctor && (
                         <div>
                             <div style={{ padding: '18px', background: `${accentColor}10`, border: `1px solid ${accentColor}25`, borderRadius: 12, marginBottom: 16 }}>
-                                <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.65)', margin: 0, lineHeight: 1.7 }}>
+                                <p style={{ fontSize: 13, color: 'var(--text-secondary)', margin: 0, lineHeight: 1.7 }}>
                                     You are registering as a <strong style={{ color: accentColor }}>{roleObj?.label}</strong>.<br />
                                     Your account will need to be approved by an admin before you can log in.<br /><br />
                                     <strong>Name:</strong> {form.firstName} {form.lastName}<br />
@@ -379,12 +379,12 @@ export default function RegisterPage() {
                                 <div><label style={labelStyle}>Contact Phone</label><input style={inputStyle} value={form.emergencyContactPhone} onChange={e => update('emergencyContactPhone', e.target.value)} placeholder="+91 98765 43210" /></div>
                                 <div><label style={labelStyle}>Relationship</label><input style={inputStyle} value={form.emergencyContactRel} onChange={e => update('emergencyContactRel', e.target.value)} placeholder="Mother, Spouse..." /></div>
                             </div>
-                            <div style={{ padding: '14px', background: 'rgba(16,185,129,0.07)', border: '1px solid rgba(16,185,129,0.2)', borderRadius: 10, marginBottom: 18 }}>
-                                <p style={{ fontSize: 12.5, color: 'rgba(255,255,255,0.55)', margin: 0, lineHeight: 1.6 }}>
+                            <div style={{ padding: '14px', background: 'rgba(62, 142, 126, 0.07)', border: '1px solid rgba(62, 142, 126, 0.2)', borderRadius: 10, marginBottom: 18 }}>
+                                <p style={{ fontSize: 12.5, color: 'var(--text-secondary)', margin: 0, lineHeight: 1.6 }}>
                                     ✓ By registering, you agree to provide accurate medical information. Your data is secured and only accessible to authorized medical staff.
                                 </p>
                             </div>
-                            {error && <div style={{ marginBottom: 14, padding: '10px 14px', background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.25)', borderRadius: 8, fontSize: 13, color: '#f87171' }}>⚠️ {error}</div>}
+                            {error && <div style={{ marginBottom: 14, padding: '10px 14px', background: 'rgba(179, 64, 46, 0.1)', border: '1px solid rgba(179, 64, 46, 0.25)', borderRadius: 8, fontSize: 13, color: 'var(--risk-high)' }}>⚠️ {error}</div>}
                             <button type="submit" disabled={submitting} style={{ width: '100%', padding: '14px', borderRadius: 10, border: 'none', cursor: submitting ? 'not-allowed' : 'pointer', background: submitting ? `${accentColor}50` : `linear-gradient(135deg, ${accentColor}, ${accentColor}cc)`, color: '#fff', fontSize: 15, fontWeight: 700, opacity: submitting ? 0.7 : 1 }}>
                                 {submitting ? '⏳ Creating account...' : `✅ Create ${roleObj?.label} Account`}
                             </button>
@@ -394,20 +394,20 @@ export default function RegisterPage() {
                     {/* ── FINAL SUBMIT for non-patient ── */}
                     {step === 2 && !isPatient && (
                         <form onSubmit={handleSubmit} style={{ marginTop: 0 }}>
-                            {error && <div style={{ marginBottom: 14, padding: '10px 14px', background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.25)', borderRadius: 8, fontSize: 13, color: '#f87171' }}>⚠️ {error}</div>}
+                            {error && <div style={{ marginBottom: 14, padding: '10px 14px', background: 'rgba(179, 64, 46, 0.1)', border: '1px solid rgba(179, 64, 46, 0.25)', borderRadius: 8, fontSize: 13, color: 'var(--risk-high)' }}>⚠️ {error}</div>}
                         </form>
                     )}
 
                     {/* Error for non-final steps */}
                     {error && step < (isPatient ? 3 : 2) && (
-                        <div style={{ marginTop: 12, padding: '10px 14px', background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.25)', borderRadius: 8, fontSize: 13, color: '#f87171' }}>⚠️ {error}</div>
+                        <div style={{ marginTop: 12, padding: '10px 14px', background: 'rgba(179, 64, 46, 0.1)', border: '1px solid rgba(179, 64, 46, 0.25)', borderRadius: 8, fontSize: 13, color: 'var(--risk-high)' }}>⚠️ {error}</div>
                     )}
 
                     {/* Navigation buttons */}
                     {!(step === 3 && isPatient) && (
                         <div style={{ display: 'flex', gap: 12, marginTop: 22 }}>
                             <button onClick={() => { setStep(s => s - 1); setError(''); }}
-                                style={{ flex: 1, padding: '13px', borderRadius: 10, border: '1px solid rgba(255,255,255,0.1)', background: 'transparent', color: '#fff', fontSize: 14, fontWeight: 600, cursor: 'pointer' }}>
+                                style={{ flex: 1, padding: '13px', borderRadius: 10, border: '1px solid var(--surface-border-md)', background: 'transparent', color: 'var(--text-primary)', fontSize: 14, fontWeight: 600, cursor: 'pointer' }}>
                                 ← Back
                             </button>
                             {step < (isPatient ? 3 : 2) ? (
@@ -427,14 +427,14 @@ export default function RegisterPage() {
                 </div>
 
                 <div style={{ textAlign: 'center', marginTop: 18, display: 'flex', justifyContent: 'center', gap: 20 }}>
-                    <button onClick={() => { setStep(0); setSelectedRole(null); setError(''); }} style={{ background: 'none', border: 'none', color: 'rgba(255,255,255,0.35)', fontSize: 13, cursor: 'pointer', textDecoration: 'underline' }}>← Change role</button>
+                    <button onClick={() => { setStep(0); setSelectedRole(null); setError(''); }} style={{ background: 'none', border: 'none', color: 'var(--text-muted)', fontSize: 13, cursor: 'pointer', textDecoration: 'underline' }}>← Change role</button>
                     <Link to="/login" style={{ fontSize: 13, color: accentColor, fontWeight: 600, textDecoration: 'none' }}>Already registered? Sign In →</Link>
                 </div>
             </div>
             <style>{`
                 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
-                input::placeholder, textarea::placeholder { color: rgba(255,255,255,0.2); }
-                select option { background: #1a1f2e; color: #fff; }
+                input::placeholder, textarea::placeholder { color: var(--text-muted); }
+                select option { background: var(--surface-0); color: var(--surface-0); }
                 input[type="date"]::-webkit-calendar-picker-indicator { filter: invert(0.5); }
             `}</style>
         </div>

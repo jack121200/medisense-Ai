@@ -10,11 +10,11 @@ import { mlApi } from '../api/ml.api';
 import toast from 'react-hot-toast';
 
 const C = {
-    crimson:  '#E63946',
-    rose:     '#FF6B6B',
-    gold:     '#FFD166',
-    teal:     '#06D6A0',
-    lavender: '#C77DFF',
+    crimson:  'var(--accent-primary)',
+    rose:     'var(--accent-primary-hover)',
+    gold:     'var(--risk-medium)',
+    teal:     'var(--risk-low)',
+    lavender: 'var(--vitals-bp)',
 };
 
 const CBC_PARAMS = [
@@ -79,21 +79,21 @@ export default function ReportAnalyzerPage() {
             {/* ── Header ── */}
             <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: 28 }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-                    <div style={{ width: 44, height: 44, borderRadius: 14, background: `linear-gradient(135deg, ${C.crimson}, #A4161A)`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 22 }}>🩸</div>
+                    <div style={{ width: 44, height: 44, borderRadius: 14, background: `linear-gradient(135deg, ${C.crimson}, var(--accent-primary-dim))`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 22 }}>🩸</div>
                     <div>
-                        <h1 style={{ fontSize: 22, fontWeight: 900, color: '#fff', letterSpacing: '-0.02em' }}>CBC Blood Report Analyzer</h1>
-                        <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.4)', marginTop: 2 }}>
+                        <h1 style={{ fontSize: 22, fontWeight: 900, color: 'var(--text-primary)', letterSpacing: '-0.02em' }}>CBC Blood Report Analyzer</h1>
+                        <p style={{ fontSize: 13, color: 'var(--text-muted)', marginTop: 2 }}>
                             AI-powered Complete Blood Count analysis with clinical interpretation
                         </p>
                     </div>
                 </div>
                 <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
-                    <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.4)', textAlign: 'right' }}>
-                        <div style={{ fontWeight: 700, color: filledCount > 0 ? C.teal : 'rgba(255,255,255,0.3)' }}>{filledCount} / {CBC_PARAMS.length} filled</div>
+                    <div style={{ fontSize: 12, color: 'var(--text-muted)', textAlign: 'right' }}>
+                        <div style={{ fontWeight: 700, color: filledCount > 0 ? C.teal : 'var(--text-muted)' }}>{filledCount} / {CBC_PARAMS.length} filled</div>
                         <div>parameters entered</div>
                     </div>
                     {(result || filledCount > 0) && (
-                        <button onClick={reset} style={{ padding: '8px 16px', borderRadius: 10, border: '1px solid rgba(255,255,255,0.1)', background: 'transparent', color: 'rgba(255,255,255,0.5)', fontSize: 12.5, fontWeight: 700, cursor: 'pointer' }}>
+                        <button onClick={reset} style={{ padding: '8px 16px', borderRadius: 10, border: '1px solid var(--surface-border-md)', background: 'transparent', color: 'var(--text-secondary)', fontSize: 12.5, fontWeight: 700, cursor: 'pointer' }}>
                             Clear
                         </button>
                     )}
@@ -101,19 +101,19 @@ export default function ReportAnalyzerPage() {
             </div>
 
             {/* ── Input Table ── */}
-            <div style={{ background: 'rgba(255,255,255,0.025)', border: '1px solid rgba(255,255,255,0.07)', borderRadius: 20, overflow: 'hidden', marginBottom: 22 }}>
-                <div style={{ padding: '18px 24px', borderBottom: '1px solid rgba(255,255,255,0.06)', display: 'flex', alignItems: 'center', gap: 10 }}>
+            <div style={{ background: 'var(--surface-1)', border: '1px solid var(--surface-border)', borderRadius: 20, overflow: 'hidden', marginBottom: 22 }}>
+                <div style={{ padding: '18px 24px', borderBottom: '1px solid var(--surface-border)', display: 'flex', alignItems: 'center', gap: 10 }}>
                     <Droplets size={16} color={C.rose} />
-                    <span style={{ fontWeight: 800, fontSize: 15, color: '#fff' }}>Enter CBC Parameters</span>
-                    <span style={{ fontSize: 12, color: 'rgba(255,255,255,0.35)', marginLeft: 4 }}>Enter any combination — partial analysis supported</span>
+                    <span style={{ fontWeight: 800, fontSize: 15, color: 'var(--text-primary)' }}>Enter CBC Parameters</span>
+                    <span style={{ fontSize: 12, color: 'var(--text-muted)', marginLeft: 4 }}>Enter any combination — partial analysis supported</span>
                 </div>
 
                 <div style={{ overflowX: 'auto' }}>
                     <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13.5 }}>
                         <thead>
-                            <tr style={{ background: 'rgba(255,255,255,0.03)' }}>
+                            <tr style={{ background: 'var(--surface-1)' }}>
                                 {['Parameter', 'Full Name', 'Normal Range', 'Unit', 'Your Value', ''].map(h => (
-                                    <th key={h} style={{ padding: '11px 20px', textAlign: 'left', color: 'rgba(255,255,255,0.4)', fontWeight: 700, fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.07em', borderBottom: '1px solid rgba(255,255,255,0.06)', whiteSpace: 'nowrap' }}>{h}</th>
+                                    <th key={h} style={{ padding: '11px 20px', textAlign: 'left', color: 'var(--text-muted)', fontWeight: 700, fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.07em', borderBottom: '1px solid var(--surface-border)', whiteSpace: 'nowrap' }}>{h}</th>
                                 ))}
                             </tr>
                         </thead>
@@ -122,14 +122,14 @@ export default function ReportAnalyzerPage() {
                                 const val = values[p.key] || '';
                                 const filled = val !== '';
                                 return (
-                                    <tr key={p.key} style={{ borderBottom: i < CBC_PARAMS.length - 1 ? '1px solid rgba(255,255,255,0.04)' : 'none' }}
-                                        onMouseOver={e => (e.currentTarget as HTMLTableRowElement).style.background = 'rgba(255,255,255,0.02)'}
+                                    <tr key={p.key} style={{ borderBottom: i < CBC_PARAMS.length - 1 ? '1px solid var(--surface-border)' : 'none' }}
+                                        onMouseOver={e => (e.currentTarget as HTMLTableRowElement).style.background = 'var(--surface-1)'}
                                         onMouseOut={e => (e.currentTarget as HTMLTableRowElement).style.background = ''}
                                     >
                                         <td style={{ padding: '10px 20px', fontWeight: 800, color: C.rose, fontSize: 13, fontFamily: 'monospace' }}>{p.key}</td>
-                                        <td style={{ padding: '10px 20px', color: 'rgba(255,255,255,0.7)' }}>{p.name}</td>
-                                        <td style={{ padding: '10px 20px', color: 'rgba(255,255,255,0.35)', fontSize: 12.5, fontFamily: 'monospace' }}>{p.ref}</td>
-                                        <td style={{ padding: '10px 20px', color: 'rgba(255,255,255,0.3)', fontSize: 12 }}>{p.unit}</td>
+                                        <td style={{ padding: '10px 20px', color: 'var(--text-secondary)' }}>{p.name}</td>
+                                        <td style={{ padding: '10px 20px', color: 'var(--text-muted)', fontSize: 12.5, fontFamily: 'monospace' }}>{p.ref}</td>
+                                        <td style={{ padding: '10px 20px', color: 'var(--text-muted)', fontSize: 12 }}>{p.unit}</td>
                                         <td style={{ padding: '8px 20px' }}>
                                             <input
                                                 type="number" step="any"
@@ -138,13 +138,13 @@ export default function ReportAnalyzerPage() {
                                                 placeholder={p.placeholder}
                                                 style={{
                                                     width: 120, padding: '8px 12px',
-                                                    background: filled ? `${C.teal}10` : 'rgba(255,255,255,0.04)',
-                                                    border: filled ? `1px solid ${C.teal}35` : '1px solid rgba(255,255,255,0.09)',
-                                                    borderRadius: 9, color: '#fff', fontSize: 13.5,
+                                                    background: filled ? `${C.teal}10` : 'var(--surface-2)',
+                                                    border: filled ? `1px solid ${C.teal}35` : '1px solid var(--surface-border)',
+                                                    borderRadius: 9, color: 'var(--text-primary)', fontSize: 13.5,
                                                     outline: 'none', fontFamily: 'monospace',
                                                 }}
                                                 onFocus={e => (e.currentTarget.style.border = `1px solid ${C.rose}50`)}
-                                                onBlur={e => (e.currentTarget.style.border = filled ? `1px solid ${C.teal}35` : '1px solid rgba(255,255,255,0.09)')}
+                                                onBlur={e => (e.currentTarget.style.border = filled ? `1px solid ${C.teal}35` : '1px solid var(--surface-border)')}
                                             />
                                         </td>
                                         <td style={{ padding: '10px 20px' }}>
@@ -157,18 +157,18 @@ export default function ReportAnalyzerPage() {
                     </table>
                 </div>
 
-                <div style={{ padding: '18px 24px', borderTop: '1px solid rgba(255,255,255,0.05)', display: 'flex', gap: 12, alignItems: 'center' }}>
+                <div style={{ padding: '18px 24px', borderTop: '1px solid var(--surface-border)', display: 'flex', gap: 12, alignItems: 'center' }}>
                     <button onClick={analyze} disabled={loading || filledCount < 3} style={{
                         padding: '12px 32px', borderRadius: 12, border: 'none',
-                        background: loading || filledCount < 3 ? 'rgba(255,255,255,0.06)' : `linear-gradient(135deg, ${C.crimson}, #A4161A)`,
-                        color: loading || filledCount < 3 ? 'rgba(255,255,255,0.3)' : '#fff',
+                        background: loading || filledCount < 3 ? 'var(--surface-2)' : `linear-gradient(135deg, ${C.crimson}, var(--accent-primary-dim))`,
+                        color: loading || filledCount < 3 ? 'var(--text-muted)' : 'var(--text-primary)',
                         fontWeight: 800, fontSize: 14.5, cursor: loading || filledCount < 3 ? 'not-allowed' : 'pointer',
                         boxShadow: !loading && filledCount >= 3 ? `0 6px 28px ${C.crimson}30` : 'none',
                         transition: 'all 0.2s',
                     }}>
                         {loading ? '🔄 Analyzing CBC...' : '🩸 Analyze Blood Report'}
                     </button>
-                    <span style={{ fontSize: 12, color: 'rgba(255,255,255,0.3)' }}>
+                    <span style={{ fontSize: 12, color: 'var(--text-muted)' }}>
                         {filledCount < 3 ? `Enter ${3 - filledCount} more value${3 - filledCount !== 1 ? 's' : ''} to enable analysis` : `${filledCount} parameters ready for analysis`}
                     </span>
                 </div>
@@ -179,9 +179,9 @@ export default function ReportAnalyzerPage() {
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 340px', gap: 22 }}>
 
                     {/* Results table */}
-                    <div style={{ background: 'rgba(255,255,255,0.025)', border: '1px solid rgba(255,255,255,0.07)', borderRadius: 20, overflow: 'hidden' }}>
-                        <div style={{ padding: '18px 24px', borderBottom: '1px solid rgba(255,255,255,0.06)', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                            <div style={{ fontWeight: 800, fontSize: 15, color: '#fff', display: 'flex', alignItems: 'center', gap: 8 }}>
+                    <div style={{ background: 'var(--surface-1)', border: '1px solid var(--surface-border)', borderRadius: 20, overflow: 'hidden' }}>
+                        <div style={{ padding: '18px 24px', borderBottom: '1px solid var(--surface-border)', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                            <div style={{ fontWeight: 800, fontSize: 15, color: 'var(--text-primary)', display: 'flex', alignItems: 'center', gap: 8 }}>
                                 <CheckCircle size={16} color={C.teal} /> Analysis Results
                             </div>
                             <div style={{ padding: '5px 16px', borderRadius: 9999, background: `${result.overall_color}18`, border: `1px solid ${result.overall_color}30`, color: result.overall_color, fontSize: 12, fontWeight: 800 }}>
@@ -190,9 +190,9 @@ export default function ReportAnalyzerPage() {
                         </div>
                         <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13.5 }}>
                             <thead>
-                                <tr style={{ background: 'rgba(255,255,255,0.03)' }}>
+                                <tr style={{ background: 'var(--surface-1)' }}>
                                     {['Parameter', 'Name', 'Value', 'Unit', 'Reference', 'Status', 'Deviation'].map(h => (
-                                        <th key={h} style={{ padding: '10px 18px', textAlign: 'left', color: 'rgba(255,255,255,0.4)', fontWeight: 700, fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.06em', borderBottom: '1px solid rgba(255,255,255,0.05)' }}>{h}</th>
+                                        <th key={h} style={{ padding: '10px 18px', textAlign: 'left', color: 'var(--text-muted)', fontWeight: 700, fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.06em', borderBottom: '1px solid var(--surface-border)' }}>{h}</th>
                                     ))}
                                 </tr>
                             </thead>
@@ -200,21 +200,21 @@ export default function ReportAnalyzerPage() {
                                 {Object.entries(result?.findings || {}).map(([key, f]: [string, any]) => {
                                     const sc = STATUS_CONFIG[f.status] || STATUS_CONFIG.NORMAL;
                                     return (
-                                        <tr key={key} style={{ borderBottom: '1px solid rgba(255,255,255,0.035)' }}
-                                            onMouseOver={e => (e.currentTarget as HTMLTableRowElement).style.background = 'rgba(255,255,255,0.025)'}
+                                        <tr key={key} style={{ borderBottom: '1px solid var(--surface-border)' }}
+                                            onMouseOver={e => (e.currentTarget as HTMLTableRowElement).style.background = 'var(--surface-1)'}
                                             onMouseOut={e => (e.currentTarget as HTMLTableRowElement).style.background = ''}
                                         >
                                             <td style={{ padding: '11px 18px', fontWeight: 800, color: C.rose, fontFamily: 'monospace', fontSize: 13 }}>{key}</td>
-                                            <td style={{ padding: '11px 18px', color: 'rgba(255,255,255,0.6)' }}>{f.name}</td>
+                                            <td style={{ padding: '11px 18px', color: 'var(--text-secondary)' }}>{f.name}</td>
                                             <td style={{ padding: '11px 18px', fontFamily: 'monospace', fontWeight: 700, color: sc.color, fontSize: 14 }}>{f.value}</td>
-                                            <td style={{ padding: '11px 18px', color: 'rgba(255,255,255,0.3)', fontSize: 12 }}>{f.unit}</td>
-                                            <td style={{ padding: '11px 18px', color: 'rgba(255,255,255,0.35)', fontSize: 12, fontFamily: 'monospace' }}>{f.reference}</td>
+                                            <td style={{ padding: '11px 18px', color: 'var(--text-muted)', fontSize: 12 }}>{f.unit}</td>
+                                            <td style={{ padding: '11px 18px', color: 'var(--text-muted)', fontSize: 12, fontFamily: 'monospace' }}>{f.reference}</td>
                                             <td style={{ padding: '11px 18px' }}>
                                                 <span style={{ padding: '4px 12px', borderRadius: 9999, background: sc.bg, color: sc.color, fontSize: 11, fontWeight: 800 }}>
                                                     {f.flag} {sc.label}
                                                 </span>
                                             </td>
-                                            <td style={{ padding: '11px 18px', color: f.deviation_pct ? sc.color : 'rgba(255,255,255,0.25)', fontSize: 12, fontFamily: 'monospace' }}>
+                                            <td style={{ padding: '11px 18px', color: f.deviation_pct ? sc.color : 'var(--text-muted)', fontSize: 12, fontFamily: 'monospace' }}>
                                                 {f.deviation_pct ? `+${f.deviation_pct}%` : '—'}
                                             </td>
                                         </tr>
@@ -229,31 +229,31 @@ export default function ReportAnalyzerPage() {
 
                         {/* Overall status */}
                         <div style={{ background: `${result.overall_color}10`, border: `1px solid ${result.overall_color}30`, borderRadius: 18, padding: '22px', textAlign: 'center' }}>
-                            <div style={{ fontSize: 11, fontWeight: 700, color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 10 }}>Overall CBC Status</div>
+                            <div style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 10 }}>Overall CBC Status</div>
                             <div style={{ fontSize: 24, fontWeight: 900, color: result.overall_color, marginBottom: 6 }}>{result.overall_status}</div>
                             <div style={{ display: 'flex', gap: 16, justifyContent: 'center', marginTop: 10 }}>
                                 <div style={{ textAlign: 'center' }}>
                                     <div style={{ fontSize: 22, fontWeight: 900, color: C.crimson, fontFamily: 'monospace' }}>{result.abnormal_count}</div>
-                                    <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.35)', textTransform: 'uppercase' }}>Abnormal</div>
+                                    <div style={{ fontSize: 10, color: 'var(--text-muted)', textTransform: 'uppercase' }}>Abnormal</div>
                                 </div>
                                 <div style={{ textAlign: 'center' }}>
                                     <div style={{ fontSize: 22, fontWeight: 900, color: C.teal, fontFamily: 'monospace' }}>{result.parameters_tested - result.abnormal_count}</div>
-                                    <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.35)', textTransform: 'uppercase' }}>Normal</div>
+                                    <div style={{ fontSize: 10, color: 'var(--text-muted)', textTransform: 'uppercase' }}>Normal</div>
                                 </div>
                                 <div style={{ textAlign: 'center' }}>
-                                    <div style={{ fontSize: 22, fontWeight: 900, color: '#fff', fontFamily: 'monospace' }}>{result.parameters_tested}</div>
-                                    <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.35)', textTransform: 'uppercase' }}>Tested</div>
+                                    <div style={{ fontSize: 22, fontWeight: 900, color: 'var(--text-primary)', fontFamily: 'monospace' }}>{result.parameters_tested}</div>
+                                    <div style={{ fontSize: 10, color: 'var(--text-muted)', textTransform: 'uppercase' }}>Tested</div>
                                 </div>
                             </div>
                         </div>
 
                         {/* AI Interpretations */}
-                        <div style={{ background: 'rgba(255,255,255,0.025)', border: '1px solid rgba(255,255,255,0.07)', borderRadius: 16, padding: '18px 20px' }}>
-                            <div style={{ fontSize: 11, fontWeight: 700, color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 12, display: 'flex', alignItems: 'center', gap: 6 }}>
+                        <div style={{ background: 'var(--surface-1)', border: '1px solid var(--surface-border)', borderRadius: 16, padding: '18px 20px' }}>
+                            <div style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 12, display: 'flex', alignItems: 'center', gap: 6 }}>
                                 <Info size={12} /> AI Clinical Interpretation
                             </div>
                             {result.interpretations?.map((msg: string, i: number) => (
-                                <div key={i} style={{ display: 'flex', gap: 8, fontSize: 13, color: 'rgba(255,255,255,0.7)', lineHeight: 1.65, marginBottom: 8 }}>
+                                <div key={i} style={{ display: 'flex', gap: 8, fontSize: 13, color: 'var(--text-secondary)', lineHeight: 1.65, marginBottom: 8 }}>
                                     <span style={{ color: C.gold, flexShrink: 0, marginTop: 2 }}>•</span>
                                     <span>{msg}</span>
                                 </div>
@@ -264,25 +264,25 @@ export default function ReportAnalyzerPage() {
                         {result.cardiac_note && (
                             <div style={{ background: `${C.crimson}10`, border: `1px solid ${C.crimson}25`, borderRadius: 14, padding: '14px 18px', display: 'flex', gap: 10, alignItems: 'flex-start' }}>
                                 <AlertTriangle size={15} color={C.crimson} style={{ flexShrink: 0, marginTop: 2 }} />
-                                <div style={{ fontSize: 12.5, color: 'rgba(255,255,255,0.75)', lineHeight: 1.65 }}>{result.cardiac_note}</div>
+                                <div style={{ fontSize: 12.5, color: 'var(--text-primary)', lineHeight: 1.65 }}>{result.cardiac_note}</div>
                             </div>
                         )}
 
                         {/* ML Anomaly */}
                         {result.anomaly_detection?.available && (
-                            <div style={{ background: 'rgba(255,255,255,0.025)', border: '1px solid rgba(255,255,255,0.07)', borderRadius: 14, padding: '14px 18px' }}>
-                                <div style={{ fontSize: 11, fontWeight: 700, color: 'rgba(255,255,255,0.35)', textTransform: 'uppercase', marginBottom: 8 }}>ML Anomaly Detection</div>
+                            <div style={{ background: 'var(--surface-1)', border: '1px solid var(--surface-border)', borderRadius: 14, padding: '14px 18px' }}>
+                                <div style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', marginBottom: 8 }}>ML Anomaly Detection</div>
                                 <div style={{ fontSize: 13.5, fontWeight: 700, color: result.anomaly_detection.is_anomaly ? C.crimson : C.teal }}>{result.anomaly_detection.flag}</div>
-                                <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.25)', marginTop: 4 }}>Isolation Forest score: {result.anomaly_detection.score}</div>
+                                <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 4 }}>Isolation Forest score: {result.anomaly_detection.score}</div>
                             </div>
                         )}
 
                         {/* Cluster */}
                         {result.cluster?.available && (
                             <div style={{ background: `${C.lavender}08`, border: `1px solid ${C.lavender}20`, borderRadius: 14, padding: '14px 18px' }}>
-                                <div style={{ fontSize: 11, fontWeight: 700, color: 'rgba(255,255,255,0.35)', textTransform: 'uppercase', marginBottom: 6 }}>Patient Cluster</div>
+                                <div style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', marginBottom: 6 }}>Patient Cluster</div>
                                 <div style={{ fontSize: 13.5, fontWeight: 700, color: C.lavender }}>{result.cluster.cluster_name}</div>
-                                <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.25)', marginTop: 3 }}>Based on KMeans CBC pattern clustering</div>
+                                <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 3 }}>Based on KMeans CBC pattern clustering</div>
                             </div>
                         )}
                     </div>

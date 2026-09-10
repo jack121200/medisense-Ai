@@ -15,7 +15,7 @@ import { Link } from 'react-router-dom';
 import { useAuthStore } from '../store/authStore';
 
 const RISK_COLORS: Record<string, string> = {
-    CRITICAL: '#E63946', HIGH: '#FF6B6B', MEDIUM: '#FFD166', LOW: '#06D6A0',
+    CRITICAL: 'var(--accent-primary)', HIGH: 'var(--accent-primary-hover)', MEDIUM: 'var(--risk-medium)', LOW: 'var(--risk-low)',
 };
 
 function KpiCard({ kpi, delay }: { kpi: any; delay: number }) {
@@ -32,7 +32,7 @@ function KpiCard({ kpi, delay }: { kpi: any; delay: number }) {
                 {kpi.trend !== undefined && (
                     <div style={{
                         display: 'flex', alignItems: 'center', gap: 4, padding: '3px 8px', borderRadius: 9999,
-                        background: kpi.trend > 0 ? 'rgba(0,255,135,0.10)' : kpi.trend < 0 ? 'rgba(255,45,85,0.10)' : 'rgba(255,255,255,0.05)',
+                        background: kpi.trend > 0 ? 'rgba(62, 142, 126, 0.10)' : kpi.trend < 0 ? 'rgba(179, 64, 46, 0.10)' : 'var(--surface-2)',
                         fontSize: 11, fontWeight: 700,
                         color: kpi.trend > 0 ? 'var(--accent-green)' : kpi.trend < 0 ? 'var(--risk-critical)' : 'var(--text-muted)',
                     }}>
@@ -105,14 +105,14 @@ export default function DashboardPage() {
 
     if (loading) return (
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '60vh', flexDirection: 'column', gap: 16 }}>
-            <div style={{ width: 48, height: 48, borderRadius: '50%', border: '3px solid rgba(0,229,255,0.15)', borderTopColor: 'var(--accent-primary)', animation: 'spin 0.8s linear infinite' }} />
+            <div style={{ width: 48, height: 48, borderRadius: '50%', border: '3px solid rgba(194, 91, 60, 0.15)', borderTopColor: 'var(--accent-primary)', animation: 'spin 0.8s linear infinite' }} />
             <div style={{ color: 'var(--text-muted)', fontSize: 13, fontFamily: 'var(--font-mono)' }}>Loading system overview...</div>
         </div>
     );
 
     const totalPats = dashboard?.totalPatients || 0;
     const riskPieData = (dashboard?.riskDistribution || []).map((r: any) => ({
-        name: r.level, value: r.count, color: RISK_COLORS[r.level] || '#888',
+        name: r.level, value: r.count, color: RISK_COLORS[r.level] || 'var(--text-muted)',
     }));
 
     // Today stats
@@ -126,7 +126,7 @@ export default function DashboardPage() {
         { label: 'High Risk', value: dashboard?.highRiskCount || '0', icon: Shield, color: 'var(--risk-high)', change: 'Monitor closely' },
         { label: "Today's Admissions", value: dashboard?.admissionsToday || '0', icon: Activity, color: 'var(--accent-green)', change: 'New patients today', trend: dashboard?.admissionsToday },
         { label: 'Unresolved Alerts', value: dashboard?.unresolvedAlerts || '0', icon: Bell, color: 'var(--risk-medium)', change: 'Require action' },
-        { label: 'Pending Appointments', value: pendingAppts || '0', icon: Calendar, color: '#6366f1', change: 'Awaiting approval' },
+        { label: 'Pending Appointments', value: pendingAppts || '0', icon: Calendar, color: 'var(--accent-primary)', change: 'Awaiting approval' },
     ];
 
     return (
@@ -143,7 +143,7 @@ export default function DashboardPage() {
                     </p>
                 </div>
                 <div style={{ display: 'flex', gap: 10 }}>
-                    <Link to="/patients/new" className="btn-ghost" style={{ textDecoration: 'none', color: 'var(--accent-primary)', borderColor: 'rgba(0,229,255,0.2)', background: 'rgba(0,229,255,0.04)' }}>
+                    <Link to="/patients/new" className="btn-ghost" style={{ textDecoration: 'none', color: 'var(--accent-primary)', borderColor: 'rgba(194, 91, 60, 0.2)', background: 'rgba(194, 91, 60, 0.04)' }}>
                         <Users size={14} /> New Patient
                     </Link>
                     <Link to="/appointments" className="btn-primary" style={{ textDecoration: 'none' }}>
@@ -160,10 +160,10 @@ export default function DashboardPage() {
             {/* ── Quick Actions ── */}
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 12, marginBottom: 24 }}>
                 {[
-                    { label: '❤️ Heart Risk AI', sub: 'Predict cardiac disease risk', to: '/ml-predictions', color: '#E63946' },
-                    { label: '🩸 CBC Analyzer', sub: 'Analyze blood report', to: '/report-analyzer', color: '#FF6B6B' },
-                    { label: '👥 Cardiac Patients', sub: 'Browse patient registry', to: '/patients', color: '#FFD166' },
-                    { label: '🚨 View Alerts', sub: 'Check cardiac alerts', to: '/alerts', color: '#06D6A0' },
+                    { label: '❤️ Heart Risk AI', sub: 'Predict cardiac disease risk', to: '/ml-predictions', color: 'var(--accent-primary)' },
+                    { label: '🩸 CBC Analyzer', sub: 'Analyze blood report', to: '/report-analyzer', color: 'var(--accent-primary-hover)' },
+                    { label: '👥 Cardiac Patients', sub: 'Browse patient registry', to: '/patients', color: 'var(--risk-medium)' },
+                    { label: '🚨 View Alerts', sub: 'Check cardiac alerts', to: '/alerts', color: 'var(--risk-low)' },
                 ].map(a => (
                     <Link key={a.to} to={a.to} style={{
                         display: 'flex', flexDirection: 'column', gap: 4, background: `${a.color}08`,
@@ -191,7 +191,7 @@ export default function DashboardPage() {
                                     <Pie data={riskPieData} cx="50%" cy="50%" innerRadius={45} outerRadius={68} dataKey="value" paddingAngle={3}>
                                         {riskPieData.map((entry: any, idx: number) => <Cell key={idx} fill={entry.color} />)}
                                     </Pie>
-                                    <Tooltip contentStyle={{ background: 'var(--surface-2)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: 12, color: 'var(--text-primary)', fontSize: 12 }} />
+                                    <Tooltip contentStyle={{ background: 'var(--surface-2)', border: '1px solid var(--surface-border)', borderRadius: 12, color: 'var(--text-primary)', fontSize: 12 }} />
                                 </PieChart>
                             </ResponsiveContainer>
                             <div style={{ display: 'flex', flexWrap: 'wrap', gap: '5px 12px', justifyContent: 'center', marginTop: 6 }}>
@@ -216,7 +216,7 @@ export default function DashboardPage() {
 
                 {/* High Risk Patients */}
                 <div style={{ background: 'var(--surface-1)', border: '1px solid var(--surface-border)', borderRadius: 18, overflow: 'hidden' }}>
-                    <div style={{ padding: '18px 20px 12px', borderBottom: '1px solid rgba(255,255,255,0.04)' }}>
+                    <div style={{ padding: '18px 20px 12px', borderBottom: '1px solid var(--surface-border)' }}>
                         <SectionHeader title="🚨 High Risk Patients" sub="Immediate attention needed" to="/patients" toLabel="All" />
                     </div>
                     <div style={{ padding: '0 4px' }}>
@@ -227,7 +227,7 @@ export default function DashboardPage() {
                         ) : highRisk.map((p: any) => (
                             <Link key={p.id} to={`/patients/${p.id}`} style={{
                                 display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-                                padding: '10px 16px', borderBottom: '1px solid rgba(255,255,255,0.03)',
+                                padding: '10px 16px', borderBottom: '1px solid var(--surface-border)',
                                 textDecoration: 'none', transition: 'background 0.1s',
                             }}>
                                 <div>
@@ -235,10 +235,10 @@ export default function DashboardPage() {
                                     <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 1 }}>{p.patientCode}</div>
                                 </div>
                                 <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                                    <span style={{ fontFamily: 'var(--font-mono)', fontSize: 13, fontWeight: 700, color: RISK_COLORS[p.currentRiskLevel] || '#aaa' }}>
+                                    <span style={{ fontFamily: 'var(--font-mono)', fontSize: 13, fontWeight: 700, color: RISK_COLORS[p.currentRiskLevel] || 'var(--text-muted)' }}>
                                         {p.riskScore?.toFixed(1)}
                                     </span>
-                                    <span style={{ fontSize: 10, fontWeight: 700, padding: '2px 7px', borderRadius: 20, color: RISK_COLORS[p.currentRiskLevel] || '#aaa', background: `${RISK_COLORS[p.currentRiskLevel] || '#aaa'}15`, border: `1px solid ${RISK_COLORS[p.currentRiskLevel] || '#aaa'}25` }}>
+                                    <span style={{ fontSize: 10, fontWeight: 700, padding: '2px 7px', borderRadius: 20, color: RISK_COLORS[p.currentRiskLevel] || 'var(--text-muted)', background: `${RISK_COLORS[p.currentRiskLevel] || 'var(--surface-2)'}15`, border: `1px solid ${RISK_COLORS[p.currentRiskLevel] || 'var(--surface-border)'}25` }}>
                                         {p.currentRiskLevel}
                                     </span>
                                 </div>
@@ -273,7 +273,7 @@ export default function DashboardPage() {
 
                 {/* Recent Alerts */}
                 <div style={{ background: 'var(--surface-1)', border: '1px solid var(--surface-border)', borderRadius: 18, overflow: 'hidden' }}>
-                    <div style={{ padding: '18px 20px 12px', borderBottom: '1px solid rgba(255,255,255,0.04)' }}>
+                    <div style={{ padding: '18px 20px 12px', borderBottom: '1px solid var(--surface-border)' }}>
                         <SectionHeader title="🔔 Recent Alerts" sub="Unresolved system alerts" to="/alerts" toLabel="All" />
                     </div>
                     <div>
@@ -283,10 +283,10 @@ export default function DashboardPage() {
                                 No active alerts
                             </div>
                         ) : alerts.map((a: any) => (
-                            <div key={a.id} style={{ padding: '10px 16px', borderBottom: '1px solid rgba(255,255,255,0.03)', display: 'flex', alignItems: 'flex-start', gap: 10 }}>
+                            <div key={a.id} style={{ padding: '10px 16px', borderBottom: '1px solid var(--surface-border)', display: 'flex', alignItems: 'flex-start', gap: 10 }}>
                                 <div style={{
                                     width: 7, height: 7, borderRadius: '50%', marginTop: 5, flexShrink: 0,
-                                    background: a.severity === 'CRITICAL' ? '#FF2D55' : a.severity === 'WARNING' ? '#FFD166' : '#6366f1',
+                                    background: a.severity === 'CRITICAL' ? 'var(--risk-critical)' : a.severity === 'WARNING' ? 'var(--risk-medium)' : 'var(--accent-primary)',
                                 }} />
                                 <div>
                                     <div style={{ fontSize: 12.5, color: 'var(--text-primary)', fontWeight: 600, lineHeight: 1.3 }}>{a.message?.slice(0, 60)}{a.message?.length > 60 ? '...' : ''}</div>
@@ -302,13 +302,13 @@ export default function DashboardPage() {
 
             {/* ── Pending Appointments Row ── */}
             {apptRequests.length > 0 && (
-                <div style={{ background: 'var(--surface-1)', border: '1px solid rgba(99,102,241,0.2)', borderRadius: 18, overflow: 'hidden' }}>
-                    <div style={{ padding: '16px 22px 10px', borderBottom: '1px solid rgba(255,255,255,0.04)' }}>
+                <div style={{ background: 'var(--surface-1)', border: '1px solid rgba(194, 91, 60, 0.2)', borderRadius: 18, overflow: 'hidden' }}>
+                    <div style={{ padding: '16px 22px 10px', borderBottom: '1px solid var(--surface-border)' }}>
                         <SectionHeader title="📋 Pending Appointment Requests" sub={`${pendingAppts} awaiting review`} to="/appointments" toLabel="Manage All" />
                     </div>
                     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)' }}>
                         {apptRequests.map((r: any) => (
-                            <div key={r.id} style={{ padding: '12px 20px', borderBottom: '1px solid rgba(255,255,255,0.03)', borderRight: '1px solid rgba(255,255,255,0.03)' }}>
+                            <div key={r.id} style={{ padding: '12px 20px', borderBottom: '1px solid var(--surface-border)', borderRight: '1px solid var(--surface-border)' }}>
                                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                                     <div>
                                         <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-primary)' }}>
@@ -320,8 +320,8 @@ export default function DashboardPage() {
                                     </div>
                                     <span style={{
                                         fontSize: 10, fontWeight: 700, padding: '2px 8px', borderRadius: 20,
-                                        color: r.status === 'PENDING' ? '#FFD166' : '#00FF87',
-                                        background: r.status === 'PENDING' ? 'rgba(255,209,102,0.1)' : 'rgba(0,255,135,0.1)',
+                                        color: r.status === 'PENDING' ? 'var(--risk-medium)' : 'var(--risk-low)',
+                                        background: r.status === 'PENDING' ? 'rgba(184, 145, 47, 0.1)' : 'rgba(62, 142, 126, 0.1)',
                                     }}>{r.status}</span>
                                 </div>
                             </div>

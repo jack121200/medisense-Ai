@@ -11,7 +11,7 @@ import toast from 'react-hot-toast';
 import SymptomChecker from '../components/SymptomChecker';
 
 const RISK_COLORS: Record<string, string> = {
-    CRITICAL: '#FF2D55', HIGH: '#FF6B35', MEDIUM: '#FFD166', LOW: '#00FF87',
+    CRITICAL: 'var(--risk-critical)', HIGH: 'var(--risk-high)', MEDIUM: 'var(--risk-medium)', LOW: 'var(--risk-low)',
 };
 const SLOT_LABELS: Record<string, string> = {
     MORNING: '9:00 AM – 12:00 PM',
@@ -25,17 +25,17 @@ function TokenBadge({ n }: { n: number }) {
         <div style={{
             width: 40, height: 40, borderRadius: 12, background: 'linear-gradient(135deg, #00E5FF22, #00E5FF11)',
             border: '1px solid #00E5FF33', display: 'flex', alignItems: 'center', justifyContent: 'center',
-            fontWeight: 900, fontSize: 16, color: '#00E5FF', flexShrink: 0,
+            fontWeight: 900, fontSize: 16, color: 'var(--accent-primary)', flexShrink: 0,
         }}>{n}</div>
     );
 }
 
 function StatusBadge({ status }: { status: string }) {
     const colors: Record<string, string> = {
-        APPROVED: '#00FF87', PATIENT_ACCEPTED: '#00E5FF',
-        IN_PROGRESS: '#FFD166', COMPLETED: '#00FF87',
+        APPROVED: 'var(--risk-low)', PATIENT_ACCEPTED: 'var(--accent-primary)',
+        IN_PROGRESS: 'var(--risk-medium)', COMPLETED: 'var(--risk-low)',
     };
-    const c = colors[status] || '#aaa';
+    const c = colors[status] || 'var(--text-muted)';
     return (
         <span style={{
             fontSize: 10, fontWeight: 700, color: c, background: `${c}15`,
@@ -109,18 +109,18 @@ export default function DoctorDashboardPage() {
             {/* Header */}
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 32 }}>
                 <div>
-                    <div style={{ fontSize: 11, color: '#00E5FF', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 6 }}>
+                    <div style={{ fontSize: 11, color: 'var(--accent-primary)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 6 }}>
                         <Stethoscope size={12} style={{ display: 'inline', marginRight: 6 }} />DOCTOR DASHBOARD
                     </div>
-                    <h1 style={{ fontSize: 28, fontWeight: 900, color: '#fff', letterSpacing: '-0.02em', marginBottom: 4 }}>
+                    <h1 style={{ fontSize: 28, fontWeight: 900, color: 'var(--text-primary)', letterSpacing: '-0.02em', marginBottom: 4 }}>
                         Good {new Date().getHours() < 12 ? 'Morning' : new Date().getHours() < 18 ? 'Afternoon' : 'Evening'}, Dr. {user?.firstName}
                     </h1>
-                    <div style={{ fontSize: 13, color: 'rgba(255,255,255,0.4)' }}>{today}</div>
+                    <div style={{ fontSize: 13, color: 'var(--text-muted)' }}>{today}</div>
                 </div>
                 <button onClick={() => navigate('/my-patients')} style={{
                     display: 'flex', alignItems: 'center', gap: 8, padding: '12px 22px',
-                    background: 'linear-gradient(135deg, #00E5FF, #0096AA)', border: 'none',
-                    borderRadius: 12, color: '#050709', fontWeight: 800, fontSize: 14, cursor: 'pointer',
+                    background: 'linear-gradient(135deg, var(--accent-primary), #0096AA)', border: 'none',
+                    borderRadius: 12, color: 'var(--bg-primary)', fontWeight: 800, fontSize: 14, cursor: 'pointer',
                 }}>
                     <User size={18} /> My Patients
                 </button>
@@ -129,19 +129,19 @@ export default function DoctorDashboardPage() {
             {/* Stats row */}
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: 16, marginBottom: 32 }}>
                 {[
-                    { label: "Today's Queue", val: queueCount, color: '#00E5FF', icon: <Calendar size={18} /> },
-                    { label: 'In Progress', val: inProgressToday, color: '#FFD166', icon: <Activity size={18} /> },
-                    { label: 'Completed Today', val: completedToday, color: '#00FF87', icon: <CheckCircle size={18} /> },
-                    { label: 'Pending Appts', val: appointments.length, color: '#8b5cf6', icon: <FileText size={18} /> },
+                    { label: "Today's Queue", val: queueCount, color: 'var(--accent-primary)', icon: <Calendar size={18} /> },
+                    { label: 'In Progress', val: inProgressToday, color: 'var(--risk-medium)', icon: <Activity size={18} /> },
+                    { label: 'Completed Today', val: completedToday, color: 'var(--risk-low)', icon: <CheckCircle size={18} /> },
+                    { label: 'Pending Appts', val: appointments.length, color: 'var(--accent-magenta)', icon: <FileText size={18} /> },
                 ].map(s => (
                     <div key={s.label} style={{
-                        background: 'rgba(255,255,255,0.03)', border: `1px solid ${s.color}22`,
+                        background: 'var(--surface-1)', border: `1px solid ${s.color}22`,
                         borderRadius: 16, padding: '20px 22px', position: 'relative', overflow: 'hidden',
                     }}>
                         <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 2, background: s.color, opacity: 0.6 }} />
                         <div style={{ color: s.color, marginBottom: 10 }}>{s.icon}</div>
-                        <div style={{ fontSize: 32, fontWeight: 900, color: '#fff', fontFamily: 'monospace' }}>{s.val}</div>
-                        <div style={{ fontSize: 11.5, color: 'rgba(255,255,255,0.4)', marginTop: 4 }}>{s.label}</div>
+                        <div style={{ fontSize: 32, fontWeight: 900, color: 'var(--text-primary)', fontFamily: 'monospace' }}>{s.val}</div>
+                        <div style={{ fontSize: 11.5, color: 'var(--text-muted)', marginTop: 4 }}>{s.label}</div>
                     </div>
                 ))}
             </div>
@@ -152,8 +152,8 @@ export default function DoctorDashboardPage() {
                     <button key={id} onClick={() => setActiveTab(id)}
                         style={{
                             display: 'flex', alignItems: 'center', gap: 7, padding: '9px 18px', borderRadius: 10, border: 'none', cursor: 'pointer', fontWeight: 700, fontSize: 13, transition: 'all 0.15s',
-                            background: activeTab === id ? 'linear-gradient(135deg, #6366f1, #8b5cf6)' : 'rgba(255,255,255,0.05)',
-                            color: activeTab === id ? '#fff' : 'rgba(255,255,255,0.45)',
+                            background: activeTab === id ? 'linear-gradient(135deg, var(--accent-primary), var(--accent-magenta))' : 'var(--surface-2)',
+                            color: activeTab === id ? 'var(--text-primary)' : 'var(--text-secondary)',
                         }}>
                         {icon}{label}
                     </button>
@@ -167,20 +167,20 @@ export default function DoctorDashboardPage() {
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
 
                     {/* Upcoming Approved Appointments (To-Start) */}
-                    <div style={{ background: 'rgba(255,255,255,0.025)', border: '1px solid rgba(255,255,255,0.07)', borderRadius: 20, overflow: 'hidden' }}>
-                        <div style={{ padding: '20px 24px', borderBottom: '1px solid rgba(255,255,255,0.06)', display: 'flex', alignItems: 'center', gap: 10 }}>
-                            <Calendar size={16} style={{ color: '#00E5FF' }} />
-                            <span style={{ fontWeight: 800, fontSize: 15, color: '#fff' }}>Approved Appointments — Start Consultation</span>
-                            <span style={{ marginLeft: 'auto', fontSize: 12, color: 'rgba(255,255,255,0.35)' }}>{appointments.length} pending</span>
+                    <div style={{ background: 'var(--surface-1)', border: '1px solid var(--surface-border)', borderRadius: 20, overflow: 'hidden' }}>
+                        <div style={{ padding: '20px 24px', borderBottom: '1px solid var(--surface-border)', display: 'flex', alignItems: 'center', gap: 10 }}>
+                            <Calendar size={16} style={{ color: 'var(--accent-primary)' }} />
+                            <span style={{ fontWeight: 800, fontSize: 15, color: 'var(--text-primary)' }}>Approved Appointments — Start Consultation</span>
+                            <span style={{ marginLeft: 'auto', fontSize: 12, color: 'var(--text-muted)' }}>{appointments.length} pending</span>
                         </div>
 
                         {loading ? (
-                            <div style={{ padding: 40, textAlign: 'center', color: 'rgba(255,255,255,0.3)', fontSize: 13 }}>Loading...</div>
+                            <div style={{ padding: 40, textAlign: 'center', color: 'var(--text-muted)', fontSize: 13 }}>Loading...</div>
                         ) : appointments.length === 0 ? (
                             <div style={{ padding: 60, textAlign: 'center' }}>
-                                <Calendar size={36} style={{ color: 'rgba(255,255,255,0.12)', margin: '0 auto 12px', display: 'block' }} />
-                                <div style={{ color: 'rgba(255,255,255,0.35)', fontSize: 14 }}>No approved appointments waiting</div>
-                                <div style={{ color: 'rgba(255,255,255,0.2)', fontSize: 12, marginTop: 6 }}>Patients who book an appointment and get receptionist approval will appear here</div>
+                                <Calendar size={36} style={{ color: 'var(--text-muted)', margin: '0 auto 12px', display: 'block' }} />
+                                <div style={{ color: 'var(--text-muted)', fontSize: 14 }}>No approved appointments waiting</div>
+                                <div style={{ color: 'var(--text-muted)', fontSize: 12, marginTop: 6 }}>Patients who book an appointment and get receptionist approval will appear here</div>
                             </div>
                         ) : (
                             appointments.map((appt, idx) => {
@@ -190,18 +190,18 @@ export default function DoctorDashboardPage() {
                                 return (
                                     <div key={appt.id} style={{
                                         display: 'flex', alignItems: 'center', gap: 16, padding: '16px 24px',
-                                        borderBottom: '1px solid rgba(255,255,255,0.04)',
+                                        borderBottom: '1px solid var(--surface-border)',
                                     }}>
                                         <TokenBadge n={idx + 1} />
                                         <div style={{ flex: 1 }}>
                                             <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
-                                                <span style={{ fontWeight: 700, fontSize: 15, color: '#fff' }}>
+                                                <span style={{ fontWeight: 700, fontSize: 15, color: 'var(--text-primary)' }}>
                                                     {p?.firstName} {p?.lastName}
                                                 </span>
-                                                <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.35)' }}>{p?.patientCode}</span>
+                                                <span style={{ fontSize: 11, color: 'var(--text-muted)' }}>{p?.patientCode}</span>
                                                 <StatusBadge status={appt.status} />
                                             </div>
-                                            <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.35)', marginTop: 4 }}>
+                                            <div style={{ fontSize: 12, color: 'var(--text-muted)', marginTop: 4 }}>
                                                 <Clock size={11} style={{ display: 'inline', marginRight: 4 }} />
                                                 {apptDate ? new Date(apptDate).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' }) : 'Date TBD'}
                                                 {' · '}
@@ -209,7 +209,7 @@ export default function DoctorDashboardPage() {
                                                 {appt.reason && <span style={{ marginLeft: 12, fontStyle: 'italic' }}>"{appt.reason}"</span>}
                                             </div>
                                             {p && (
-                                                <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.25)', marginTop: 2 }}>
+                                                <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 2 }}>
                                                     {p.dateOfBirth && `${Math.floor((Date.now() - new Date(p.dateOfBirth).getTime()) / (365.25 * 24 * 3600000))} yrs`}
                                                     {p.gender && ` · ${p.gender}`}
                                                     {p.bloodGroup && ` · ${p.bloodGroup.replace('_', '')}`}
@@ -221,8 +221,8 @@ export default function DoctorDashboardPage() {
                                             disabled={isStarting}
                                             style={{
                                                 display: 'flex', alignItems: 'center', gap: 6,
-                                                padding: '9px 18px', background: 'linear-gradient(135deg, #00E5FF, #0096AA)',
-                                                border: 'none', borderRadius: 10, color: '#050709',
+                                                padding: '9px 18px', background: 'linear-gradient(135deg, var(--accent-primary), #0096AA)',
+                                                border: 'none', borderRadius: 10, color: 'var(--bg-primary)',
                                                 fontWeight: 800, fontSize: 13, cursor: 'pointer', flexShrink: 0,
                                                 opacity: isStarting ? 0.6 : 1,
                                             }}>
@@ -236,36 +236,36 @@ export default function DoctorDashboardPage() {
 
                     {/* Today's Active / Completed Consultations */}
                     {consultations.length > 0 && (
-                        <div style={{ background: 'rgba(255,255,255,0.025)', border: '1px solid rgba(255,255,255,0.07)', borderRadius: 20, overflow: 'hidden' }}>
-                            <div style={{ padding: '20px 24px', borderBottom: '1px solid rgba(255,255,255,0.06)', display: 'flex', alignItems: 'center', gap: 10 }}>
-                                <Stethoscope size={16} style={{ color: '#00FF87' }} />
-                                <span style={{ fontWeight: 800, fontSize: 15, color: '#fff' }}>Today's Consultations</span>
-                                <span style={{ marginLeft: 'auto', fontSize: 12, color: 'rgba(255,255,255,0.35)' }}>{consultations.length} total</span>
+                        <div style={{ background: 'var(--surface-1)', border: '1px solid var(--surface-border)', borderRadius: 20, overflow: 'hidden' }}>
+                            <div style={{ padding: '20px 24px', borderBottom: '1px solid var(--surface-border)', display: 'flex', alignItems: 'center', gap: 10 }}>
+                                <Stethoscope size={16} style={{ color: 'var(--risk-low)' }} />
+                                <span style={{ fontWeight: 800, fontSize: 15, color: 'var(--text-primary)' }}>Today's Consultations</span>
+                                <span style={{ marginLeft: 'auto', fontSize: 12, color: 'var(--text-muted)' }}>{consultations.length} total</span>
                             </div>
                             {consultations.map((c, idx) => {
-                                const riskColor = RISK_COLORS[c.patient?.currentRiskLevel] || '#aaa';
-                                const statusColor = c.status === 'COMPLETED' ? '#00FF87' : c.status === 'IN_PROGRESS' ? '#FFD166' : '#aaa';
+                                const riskColor = RISK_COLORS[c.patient?.currentRiskLevel] || 'var(--text-muted)';
+                                const statusColor = c.status === 'COMPLETED' ? 'var(--risk-low)' : c.status === 'IN_PROGRESS' ? 'var(--risk-medium)' : 'var(--text-muted)';
                                 return (
                                     <div key={c.id}
                                         onClick={() => navigate(`/consultation/${c.id}`)}
-                                        style={{ display: 'flex', alignItems: 'center', gap: 16, padding: '16px 24px', borderBottom: '1px solid rgba(255,255,255,0.04)', cursor: 'pointer' }}
-                                        onMouseOver={e => (e.currentTarget as HTMLDivElement).style.background = 'rgba(255,255,255,0.04)'}
+                                        style={{ display: 'flex', alignItems: 'center', gap: 16, padding: '16px 24px', borderBottom: '1px solid var(--surface-border)', cursor: 'pointer' }}
+                                        onMouseOver={e => (e.currentTarget as HTMLDivElement).style.background = 'var(--surface-1)'}
                                         onMouseOut={e => (e.currentTarget as HTMLDivElement).style.background = 'transparent'}
                                     >
                                         <TokenBadge n={idx + 1} />
                                         <div style={{ flex: 1 }}>
                                             <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
-                                                <span style={{ fontWeight: 700, fontSize: 15, color: '#fff' }}>
+                                                <span style={{ fontWeight: 700, fontSize: 15, color: 'var(--text-primary)' }}>
                                                     {c.patient?.firstName} {c.patient?.lastName}
                                                 </span>
-                                                <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.35)' }}>{c.patient?.patientCode}</span>
+                                                <span style={{ fontSize: 11, color: 'var(--text-muted)' }}>{c.patient?.patientCode}</span>
                                                 {c.patient?.currentRiskLevel && (
                                                     <span style={{ fontSize: 10, fontWeight: 700, color: riskColor, background: `${riskColor}15`, padding: '2px 8px', borderRadius: 6, border: `1px solid ${riskColor}30` }}>
                                                         {c.patient?.currentRiskLevel}
                                                     </span>
                                                 )}
                                             </div>
-                                            <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.35)', marginTop: 3 }}>
+                                            <div style={{ fontSize: 12, color: 'var(--text-muted)', marginTop: 3 }}>
                                                 <Clock size={11} style={{ display: 'inline', marginRight: 4 }} />
                                                 {new Date(c.createdAt).toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' })}
                                                 {c.diagnosis && <span style={{ marginLeft: 12 }}>Dx: {c.diagnosis}</span>}
@@ -275,7 +275,7 @@ export default function DoctorDashboardPage() {
                                             <span style={{ fontSize: 11, fontWeight: 700, color: statusColor, background: `${statusColor}15`, padding: '4px 10px', borderRadius: 20, border: `1px solid ${statusColor}30` }}>
                                                 {c.status.replace('_', ' ')}
                                             </span>
-                                            <ChevronRight size={16} style={{ color: 'rgba(255,255,255,0.2)' }} />
+                                            <ChevronRight size={16} style={{ color: 'var(--text-muted)' }} />
                                         </div>
                                     </div>
                                 );

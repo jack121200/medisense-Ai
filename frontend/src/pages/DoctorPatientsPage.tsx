@@ -18,8 +18,8 @@ function ComorbidityTag({ label }: { label: string }) {
     return (
         <span style={{
             fontSize: 11, padding: '2px 9px', borderRadius: 20,
-            background: 'rgba(255,107,53,0.1)', color: '#FF6B35',
-            border: '1px solid rgba(255,107,53,0.25)', fontWeight: 600,
+            background: 'rgba(204, 107, 61, 0.1)', color: 'var(--risk-high)',
+            border: '1px solid rgba(204, 107, 61, 0.25)', fontWeight: 600,
         }}>{label}</span>
     );
 }
@@ -73,17 +73,17 @@ export default function DoctorPatientsPage() {
             <div style={{ marginBottom: 28 }}>
                 <button onClick={() => navigate('/doctor-dashboard')} style={{
                     display: 'flex', alignItems: 'center', gap: 6, background: 'none', border: 'none',
-                    color: 'rgba(255,255,255,0.4)', fontSize: 13, cursor: 'pointer', marginBottom: 16,
+                    color: 'var(--text-muted)', fontSize: 13, cursor: 'pointer', marginBottom: 16,
                 }}>
                     <ArrowLeft size={15} /> Back to Dashboard
                 </button>
-                <div style={{ fontSize: 11, color: '#00E5FF', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 6 }}>
+                <div style={{ fontSize: 11, color: 'var(--accent-primary)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 6 }}>
                     MY PATIENTS
                 </div>
-                <h1 style={{ fontSize: 26, fontWeight: 900, color: '#fff', marginBottom: 4 }}>
+                <h1 style={{ fontSize: 26, fontWeight: 900, color: 'var(--text-primary)', marginBottom: 4 }}>
                     Your Appointment Patients
                 </h1>
-                <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.4)' }}>
+                <p style={{ fontSize: 13, color: 'var(--text-muted)' }}>
                     Patients who have booked an appointment with you — {patients.length} total
                 </p>
             </div>
@@ -95,17 +95,17 @@ export default function DoctorPatientsPage() {
                 placeholder="🔍 Search by name, patient code, phone..."
                 style={{
                     width: '100%', padding: '12px 18px', borderRadius: 12, marginBottom: 24,
-                    border: '1px solid rgba(255,255,255,0.1)', background: 'rgba(255,255,255,0.04)',
-                    color: '#fff', fontSize: 13, outline: 'none', boxSizing: 'border-box',
+                    border: '1px solid var(--surface-border-md)', background: 'var(--surface-1)',
+                    color: 'var(--text-primary)', fontSize: 13, outline: 'none', boxSizing: 'border-box',
                 }}
             />
 
             {loading ? (
-                <div style={{ textAlign: 'center', padding: 60, color: 'rgba(255,255,255,0.3)' }}>Loading patients...</div>
+                <div style={{ textAlign: 'center', padding: 60, color: 'var(--text-muted)' }}>Loading patients...</div>
             ) : filtered.length === 0 ? (
                 <div style={{ textAlign: 'center', padding: 60 }}>
-                    <User size={40} style={{ color: 'rgba(255,255,255,0.12)', margin: '0 auto 16px', display: 'block' }} />
-                    <div style={{ color: 'rgba(255,255,255,0.35)', fontSize: 14 }}>
+                    <User size={40} style={{ color: 'var(--text-muted)', margin: '0 auto 16px', display: 'block' }} />
+                    <div style={{ color: 'var(--text-muted)', fontSize: 14 }}>
                         {search ? 'No patients match your search' : 'No patients have booked appointments with you yet'}
                     </div>
                 </div>
@@ -128,18 +128,18 @@ export default function DoctorPatientsPage() {
                                 key={p.id}
                                 onClick={() => navigate(`/my-patients/${p.id}`)}
                                 style={{
-                                    background: 'rgba(255,255,255,0.03)',
-                                    border: '1px solid rgba(255,255,255,0.08)',
+                                    background: 'var(--surface-1)',
+                                    border: '1px solid var(--surface-border)',
                                     borderRadius: 18, padding: 20, cursor: 'pointer',
                                     transition: 'all 0.2s ease',
                                 }}
                                 onMouseEnter={e => {
-                                    (e.currentTarget as HTMLDivElement).style.border = '1px solid rgba(0,229,255,0.2)';
-                                    (e.currentTarget as HTMLDivElement).style.background = 'rgba(255,255,255,0.05)';
+                                    (e.currentTarget as HTMLDivElement).style.border = '1px solid rgba(194, 91, 60, 0.2)';
+                                    (e.currentTarget as HTMLDivElement).style.background = 'var(--surface-1)';
                                 }}
                                 onMouseLeave={e => {
-                                    (e.currentTarget as HTMLDivElement).style.border = '1px solid rgba(255,255,255,0.08)';
-                                    (e.currentTarget as HTMLDivElement).style.background = 'rgba(255,255,255,0.03)';
+                                    (e.currentTarget as HTMLDivElement).style.border = '1px solid var(--surface-border)';
+                                    (e.currentTarget as HTMLDivElement).style.background = 'var(--surface-1)';
                                 }}
                             >
                                 {/* Avatar + Name */}
@@ -147,27 +147,27 @@ export default function DoctorPatientsPage() {
                                     <div style={{
                                         width: 50, height: 50, borderRadius: 14, flexShrink: 0,
                                         background: 'linear-gradient(135deg, #00E5FF22, #6366f122)',
-                                        border: '1px solid rgba(0,229,255,0.2)',
+                                        border: '1px solid rgba(194, 91, 60, 0.2)',
                                         display: 'flex', alignItems: 'center', justifyContent: 'center',
-                                        fontSize: 18, fontWeight: 800, color: '#00E5FF',
+                                        fontSize: 18, fontWeight: 800, color: 'var(--accent-primary)',
                                     }}>
                                         {(p.firstName || '?')[0]}{(p.lastName || '?')[0]}
                                     </div>
                                     <div style={{ flex: 1, minWidth: 0 }}>
-                                        <div style={{ fontSize: 15, fontWeight: 800, color: '#fff', marginBottom: 2 }}>
+                                        <div style={{ fontSize: 15, fontWeight: 800, color: 'var(--text-primary)', marginBottom: 2 }}>
                                             {p.firstName} {p.lastName}
                                         </div>
-                                        <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.35)', fontFamily: 'monospace' }}>
+                                        <div style={{ fontSize: 11, color: 'var(--text-muted)', fontFamily: 'monospace' }}>
                                             {p.patientCode}
                                         </div>
                                     </div>
-                                    <div style={{ fontSize: 10, fontWeight: 700, color: '#00E5FF', background: 'rgba(0,229,255,0.1)', padding: '3px 10px', borderRadius: 20, border: '1px solid rgba(0,229,255,0.2)', flexShrink: 0 }}>
+                                    <div style={{ fontSize: 10, fontWeight: 700, color: 'var(--accent-primary)', background: 'rgba(194, 91, 60, 0.1)', padding: '3px 10px', borderRadius: 20, border: '1px solid rgba(194, 91, 60, 0.2)', flexShrink: 0 }}>
                                         {appts.length} appt{appts.length !== 1 ? 's' : ''}
                                     </div>
                                 </div>
 
                                 {/* Info row */}
-                                <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.4)', marginBottom: 12, display: 'flex', flexWrap: 'wrap', gap: 10 }}>
+                                <div style={{ fontSize: 12, color: 'var(--text-muted)', marginBottom: 12, display: 'flex', flexWrap: 'wrap', gap: 10 }}>
                                     {p.dateOfBirth && <span>👤 {getAge(p.dateOfBirth)} yrs</span>}
                                     {p.gender && <span>{p.gender}</span>}
                                     {p.bloodGroup && <span>🩸 {p.bloodGroup.replace('_', '')}</span>}
@@ -179,19 +179,19 @@ export default function DoctorPatientsPage() {
                                     <div style={{ display: 'flex', flexWrap: 'wrap', gap: 5, marginBottom: 12 }}>
                                         {comorbidities.slice(0, 3).map(c => <ComorbidityTag key={c} label={c} />)}
                                         {comorbidities.length > 3 && (
-                                            <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.3)', padding: '2px 9px' }}>+{comorbidities.length - 3} more</span>
+                                            <span style={{ fontSize: 11, color: 'var(--text-muted)', padding: '2px 9px' }}>+{comorbidities.length - 3} more</span>
                                         )}
                                     </div>
                                 )}
 
                                 {/* Latest appointment */}
                                 {p.latestAppointment && (
-                                    <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.25)', borderTop: '1px solid rgba(255,255,255,0.05)', paddingTop: 10, display: 'flex', alignItems: 'center', gap: 6 }}>
+                                    <div style={{ fontSize: 11, color: 'var(--text-muted)', borderTop: '1px solid var(--surface-border)', paddingTop: 10, display: 'flex', alignItems: 'center', gap: 6 }}>
                                         <Calendar size={10} />
                                         {new Date(p.latestAppointment.requestedDate || p.latestAppointment.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}
                                         {' · '}
                                         {SLOT_LABELS[p.latestAppointment.timeSlot] || p.latestAppointment.timeSlot}
-                                        <span style={{ marginLeft: 'auto', color: p.latestAppointment.status === 'APPROVED' ? '#00FF87' : 'rgba(255,255,255,0.25)' }}>
+                                        <span style={{ marginLeft: 'auto', color: p.latestAppointment.status === 'APPROVED' ? 'var(--risk-low)' : 'var(--text-muted)' }}>
                                             {p.latestAppointment.status}
                                         </span>
                                     </div>

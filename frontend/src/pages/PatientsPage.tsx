@@ -7,7 +7,7 @@ import toast from 'react-hot-toast';
 
 const RISK_LEVELS = ['', 'LOW', 'MEDIUM', 'HIGH', 'CRITICAL'];
 const RISK_COLORS: Record<string, string> = {
-    CRITICAL: '#FF2D55', HIGH: '#FF6B35', MEDIUM: '#FFD166', LOW: '#00FF87',
+    CRITICAL: 'var(--risk-critical)', HIGH: 'var(--risk-high)', MEDIUM: 'var(--risk-medium)', LOW: 'var(--risk-low)',
 };
 
 export default function PatientsPage() {
@@ -73,11 +73,11 @@ export default function PatientsPage() {
                 <form onSubmit={handleSearch} style={{ flex: 1, display: 'flex', gap: 10, minWidth: 260 }}>
                     <div style={{
                         flex: 1, display: 'flex', alignItems: 'center', gap: 9,
-                        background: 'rgba(255,255,255,0.04)', border: '1px solid var(--surface-border)',
+                        background: 'var(--surface-1)', border: '1px solid var(--surface-border)',
                         borderRadius: 10, padding: '8px 12px',
                         transition: 'all 0.2s',
                     }}
-                        onFocus={e => (e.currentTarget as HTMLDivElement).style.borderColor = 'rgba(0,229,255,0.3)'}
+                        onFocus={e => (e.currentTarget as HTMLDivElement).style.borderColor = 'rgba(194, 91, 60, 0.3)'}
                         onBlur={e => (e.currentTarget as HTMLDivElement).style.borderColor = 'var(--surface-border)'}
                     >
                         <Search size={14} color="var(--text-muted)" style={{ flexShrink: 0 }} />
@@ -108,7 +108,7 @@ export default function PatientsPage() {
                                 style={{
                                     padding: '5px 12px', borderRadius: 9999,
                                     border: `1px solid ${isActive ? color + '50' : 'var(--surface-border)'}`,
-                                    background: isActive ? `${color}15` : 'rgba(255,255,255,0.03)',
+                                    background: isActive ? `${color}15` : 'var(--surface-2)',
                                     color: isActive ? color : 'var(--text-muted)',
                                     fontSize: 11, fontWeight: 700, cursor: 'pointer',
                                     transition: 'all 0.15s',
@@ -132,7 +132,7 @@ export default function PatientsPage() {
                     <div style={{ display: 'flex', justifyContent: 'center', padding: 60 }}>
                         <div style={{
                             width: 36, height: 36, borderRadius: '50%',
-                            border: '3px solid rgba(0,229,255,0.15)',
+                            border: '3px solid rgba(194, 91, 60, 0.15)',
                             borderTopColor: 'var(--accent-primary)',
                             animation: 'spin 0.8s linear infinite',
                         }} />
@@ -182,7 +182,7 @@ export default function PatientsPage() {
                                                         {p.riskScore?.toFixed(1)}
                                                     </span>
                                                     {p.riskScore > 0 && (
-                                                        <div style={{ width: 40, height: 4, borderRadius: 2, background: 'rgba(255,255,255,0.05)', overflow: 'hidden' }}>
+                                                        <div style={{ width: 40, height: 4, borderRadius: 2, background: 'var(--surface-1)', overflow: 'hidden' }}>
                                                             <div style={{
                                                                 height: '100%', borderRadius: 2,
                                                                 width: `${Math.min(100, p.riskScore)}%`,
@@ -200,9 +200,9 @@ export default function PatientsPage() {
                                                     <span style={{
                                                         display: 'inline-flex', alignItems: 'center', gap: 4,
                                                         padding: '2px 9px', borderRadius: 9999,
-                                                        background: 'rgba(255,45,85,0.10)',
+                                                        background: 'rgba(179, 64, 46, 0.10)',
                                                         color: 'var(--risk-critical)', fontWeight: 700, fontSize: 12,
-                                                        border: '1px solid rgba(255,45,85,0.20)',
+                                                        border: '1px solid rgba(179, 64, 46, 0.20)',
                                                     }}>
                                                         {p.alerts.length}
                                                     </span>
@@ -250,12 +250,12 @@ export default function PatientsPage() {
                 {pagination && (
                     <div style={{
                         display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-                        padding: '14px 20px', borderTop: '1px solid rgba(255,255,255,0.04)',
-                        background: 'rgba(255,255,255,0.01)',
+                        padding: '14px 20px', borderTop: '1px solid var(--surface-border)',
+                        background: 'var(--surface-1)',
                     }}>
                         <span style={{ fontSize: 11.5, color: 'var(--text-muted)' }}>
                             Page <strong style={{ color: 'var(--text-secondary)' }}>{pagination.page}</strong> of {pagination.totalPages}
-                            <span style={{ marginLeft: 8, color: 'var(--surface-border-md)' }}>·</span>
+                            <span style={{ marginLeft: 8, color: 'var(--text-secondary)' }}>·</span>
                             <span style={{ marginLeft: 8 }}>{pagination.total?.toLocaleString()} patients</span>
                         </span>
                         <div style={{ display: 'flex', gap: 8 }}>

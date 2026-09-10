@@ -7,10 +7,10 @@ import { useVitalsStore } from '../store/vitalsStore';
 import { format } from 'date-fns';
 
 const VITALS_CONFIG = [
-    { key: 'HR', label: 'Heart Rate', unit: 'bpm', color: '#FF4D6D', criticalLow: 40, criticalHigh: 130, icon: '❤️' },
-    { key: 'SpO2', label: 'SpO₂', unit: '%', color: '#00E5FF', criticalLow: 88, criticalHigh: 101, icon: '🫁' },
-    { key: 'SBP', label: 'Systolic BP', unit: 'mmHg', color: '#BF5AF2', criticalLow: 70, criticalHigh: 180, icon: '🩸' },
-    { key: 'Temp', label: 'Temperature', unit: '°C', color: '#FF9F0A', criticalLow: 35, criticalHigh: 39.5, icon: '🌡️' },
+    { key: 'HR', label: 'Heart Rate', unit: 'bpm', color: 'var(--risk-critical)', criticalLow: 40, criticalHigh: 130, icon: '❤️' },
+    { key: 'SpO2', label: 'SpO₂', unit: '%', color: 'var(--accent-primary)', criticalLow: 88, criticalHigh: 101, icon: '🫁' },
+    { key: 'SBP', label: 'Systolic BP', unit: 'mmHg', color: 'var(--vitals-bp)', criticalLow: 70, criticalHigh: 180, icon: '🩸' },
+    { key: 'Temp', label: 'Temperature', unit: '°C', color: 'var(--vitals-temp)', criticalLow: 35, criticalHigh: 39.5, icon: '🌡️' },
 ];
 
 export default function VitalsMonitorPage() {
@@ -62,7 +62,7 @@ export default function VitalsMonitorPage() {
             <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '60vh', flexDirection: 'column', gap: 16 }}>
                 <div style={{
                     width: 48, height: 48, borderRadius: '50%',
-                    border: '3px solid rgba(0,229,255,0.15)',
+                    border: '3px solid rgba(194, 91, 60, 0.15)',
                     borderTopColor: 'var(--accent-primary)',
                     animation: 'spin 0.8s linear infinite',
                 }} />
@@ -84,8 +84,8 @@ export default function VitalsMonitorPage() {
                     </h1>
                     <div style={{
                         display: 'flex', alignItems: 'center', gap: 5, padding: '4px 10px',
-                        background: 'rgba(0,255,135,0.08)', borderRadius: 9999,
-                        border: '1px solid rgba(0,255,135,0.20)',
+                        background: 'rgba(62, 142, 126, 0.08)', borderRadius: 9999,
+                        border: '1px solid rgba(62, 142, 126, 0.20)',
                         fontSize: 11, fontWeight: 700, color: 'var(--accent-green)', marginLeft: 4,
                     }}>
                         <div className="live-dot" style={{ width: 6, height: 6, borderRadius: '50%', background: 'var(--accent-green)' }} />
@@ -101,10 +101,10 @@ export default function VitalsMonitorPage() {
                 {/* Patient list */}
                 <div style={{ background: 'var(--surface-1)', border: '1px solid var(--surface-border)', borderRadius: 16, overflow: 'hidden' }}>
                     <div style={{
-                        padding: '12px 16px', borderBottom: '1px solid rgba(255,255,255,0.04)',
+                        padding: '12px 16px', borderBottom: '1px solid var(--surface-border)',
                         fontSize: 10.5, fontWeight: 700, color: 'var(--text-muted)',
                         textTransform: 'uppercase', letterSpacing: '0.08em',
-                        background: 'rgba(255,255,255,0.02)',
+                        background: 'var(--surface-1)',
                     }}>
                         High-Risk Patients
                     </div>
@@ -118,8 +118,8 @@ export default function VitalsMonitorPage() {
                                 onClick={() => setSelectedId(p.id)}
                                 style={{
                                     padding: '12px 14px', cursor: 'pointer',
-                                    borderBottom: '1px solid rgba(255,255,255,0.03)',
-                                    background: isSelected ? 'rgba(0,229,255,0.06)' : 'transparent',
+                                    borderBottom: '1px solid var(--surface-border)',
+                                    background: isSelected ? 'rgba(194, 91, 60, 0.06)' : 'transparent',
                                     borderLeft: `3px solid ${isSelected ? 'var(--accent-primary)' : 'transparent'}`,
                                     transition: 'all 0.15s',
                                     position: 'relative',
@@ -169,9 +169,9 @@ export default function VitalsMonitorPage() {
                         }}>
                             <div style={{
                                 width: 40, height: 40, borderRadius: 12,
-                                background: 'linear-gradient(135deg, #00E5FF, #0096C7)',
+                                background: 'linear-gradient(135deg, var(--accent-primary), var(--accent-primary-dim))',
                                 display: 'flex', alignItems: 'center', justifyContent: 'center',
-                                fontWeight: 800, fontSize: 14, color: '#050709', flexShrink: 0,
+                                fontWeight: 800, fontSize: 14, color: 'var(--bg-primary)', flexShrink: 0,
                             }}>
                                 {selectedPatient.firstName[0]}{selectedPatient.lastName[0]}
                             </div>
@@ -189,8 +189,8 @@ export default function VitalsMonitorPage() {
                             {latestForSelected?.isAnomaly && (
                                 <div style={{
                                     display: 'flex', alignItems: 'center', gap: 6, padding: '5px 12px',
-                                    background: 'rgba(255,45,85,0.10)', borderRadius: 9999,
-                                    border: '1px solid rgba(255,45,85,0.25)', fontSize: 11, fontWeight: 700, color: 'var(--risk-critical)',
+                                    background: 'rgba(179, 64, 46, 0.10)', borderRadius: 9999,
+                                    border: '1px solid rgba(179, 64, 46, 0.25)', fontSize: 11, fontWeight: 700, color: 'var(--risk-critical)',
                                 }} className="pulse-critical">
                                     <AlertTriangle size={12} /> ANOMALY DETECTED
                                 </div>
@@ -253,11 +253,11 @@ export default function VitalsMonitorPage() {
                             </div>
                             <ResponsiveContainer width="100%" height={75}>
                                 <LineChart data={chartData}>
-                                    <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.04)" vertical={false} />
+                                    <CartesianGrid strokeDasharray="3 3" stroke="var(--text-muted)" vertical={false} />
                                     <XAxis dataKey="time" tick={{ fontSize: 9, fill: 'var(--text-muted)' }} axisLine={false} tickLine={false} interval={Math.floor(chartData.length / 4)} />
                                     <YAxis tick={{ fontSize: 9, fill: 'var(--text-muted)' }} axisLine={false} tickLine={false} width={26} />
                                     <Tooltip
-                                        contentStyle={{ background: 'var(--surface-2)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 10, fontSize: 11 }}
+                                        contentStyle={{ background: 'var(--surface-2)', border: '1px solid var(--surface-border-md)', borderRadius: 10, fontSize: 11 }}
                                     />
                                     <Line type="monotone" dataKey={vc.key} stroke={vc.color} strokeWidth={2.5} dot={false} isAnimationActive={false} />
                                 </LineChart>
@@ -270,7 +270,7 @@ export default function VitalsMonitorPage() {
             {/* Alerts section */}
             {alerts.length > 0 && (
                 <div style={{
-                    background: 'var(--surface-1)', border: '1px solid rgba(255,45,85,0.20)',
+                    background: 'var(--surface-1)', border: '1px solid rgba(179, 64, 46, 0.20)',
                     borderRadius: 18, padding: '22px 24px', marginTop: 24,
                 }}>
                     <div style={{ position: 'relative', top: 0, left: 0, right: 0, height: 2, background: 'var(--risk-critical)', borderRadius: '18px 18px 0 0', opacity: 0.6 }} />
@@ -282,13 +282,13 @@ export default function VitalsMonitorPage() {
                             <div key={a.id} style={{
                                 display: 'flex', gap: 14, alignItems: 'center',
                                 padding: '10px 14px', borderRadius: 10,
-                                background: 'rgba(255,255,255,0.02)',
-                                border: '1px solid rgba(255,255,255,0.04)',
+                                background: 'var(--surface-1)',
+                                border: '1px solid var(--surface-border)',
                             }}>
                                 <div style={{
                                     width: 8, height: 8, borderRadius: '50%', flexShrink: 0,
                                     background: a.severity === 'CRITICAL' ? 'var(--risk-critical)' : 'var(--risk-medium)',
-                                    ...(a.severity === 'CRITICAL' ? { boxShadow: '0 0 8px rgba(255,45,85,0.6)' } : {}),
+                                    ...(a.severity === 'CRITICAL' ? { boxShadow: '0 0 8px rgba(179, 64, 46, 0.6)' } : {}),
                                 }} />
                                 <span style={{ fontSize: 12, fontWeight: 700, color: a.severity === 'CRITICAL' ? 'var(--risk-critical)' : 'var(--risk-medium)' }}>
                                     [{a.severity}]

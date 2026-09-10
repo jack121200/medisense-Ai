@@ -92,12 +92,12 @@ export default function AddPatientPage() {
         return (
             <div className="page-enter" style={{ maxWidth: 560, margin: '0 auto', paddingTop: 20 }}>
                 <div style={{
-                    background: 'var(--surface-1)', border: '1px solid rgba(0,255,135,0.20)',
+                    background: 'var(--surface-1)', border: '1px solid rgba(62, 142, 126, 0.20)',
                     borderRadius: 20, padding: '36px 32px', textAlign: 'center',
                 }}>
                     <div style={{
                         width: 72, height: 72, borderRadius: '50%', margin: '0 auto 20px',
-                        background: 'rgba(0,255,135,0.12)', border: '2px solid rgba(0,255,135,0.30)',
+                        background: 'rgba(62, 142, 126, 0.12)', border: '2px solid rgba(62, 142, 126, 0.30)',
                         display: 'flex', alignItems: 'center', justifyContent: 'center',
                     }}>
                         <CheckCircle2 size={36} color="var(--accent-green)" />
@@ -111,15 +111,15 @@ export default function AddPatientPage() {
 
                     {/* Patient ID Card */}
                     <div style={{
-                        background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)',
+                        background: 'var(--surface-1)', border: '1px solid var(--surface-border)',
                         borderRadius: 14, padding: '16px 20px', marginBottom: 20,
                         display: 'flex', gap: 14, alignItems: 'center', textAlign: 'left',
                     }}>
                         <div style={{
                             width: 48, height: 48, borderRadius: 14,
-                            background: 'linear-gradient(135deg, #00E5FF 0%, #0096C7 100%)',
+                            background: 'linear-gradient(135deg, var(--accent-primary) 0%, var(--accent-primary-dim) 100%)',
                             display: 'flex', alignItems: 'center', justifyContent: 'center',
-                            fontWeight: 800, fontSize: 16, color: '#050709', flexShrink: 0,
+                            fontWeight: 800, fontSize: 16, color: 'var(--bg-primary)', flexShrink: 0,
                         }}>
                             {form.firstName[0]}{form.lastName[0]}
                         </div>
@@ -139,7 +139,7 @@ export default function AddPatientPage() {
                     {/* SMS simulation */}
                     {smsSent && (
                         <div style={{
-                            background: 'rgba(0,229,255,0.04)', border: '1px solid rgba(0,229,255,0.15)',
+                            background: 'rgba(194, 91, 60, 0.04)', border: '1px solid rgba(194, 91, 60, 0.15)',
                             borderRadius: 14, padding: '16px 20px', marginBottom: 24, textAlign: 'left',
                         }}>
                             <div style={{
@@ -149,7 +149,7 @@ export default function AddPatientPage() {
                                 📱 SMS Sent to {form.phone}
                             </div>
                             <div style={{
-                                background: 'rgba(255,255,255,0.04)', borderRadius: 10, padding: '12px 14px',
+                                background: 'var(--surface-1)', borderRadius: 10, padding: '12px 14px',
                                 fontSize: 13, color: 'var(--text-secondary)', lineHeight: 1.6,
                                 fontFamily: 'var(--font-mono)', borderLeft: '3px solid var(--accent-primary)',
                             }}>
@@ -173,7 +173,7 @@ export default function AddPatientPage() {
                         <button
                             onClick={() => navigate('/appointments?new=1&patientId=' + createdPatient.id)}
                             className="btn-ghost"
-                            style={{ background: 'rgba(0,229,255,0.06)', border: '1px solid rgba(0,229,255,0.20)' }}
+                            style={{ background: 'rgba(194, 91, 60, 0.06)', border: '1px solid rgba(194, 91, 60, 0.20)' }}
                         >
                             Book Appointment
                         </button>
@@ -323,7 +323,7 @@ export default function AddPatientPage() {
                 {/* ── SMS NOTICE ── */}
                 <div style={{
                     display: 'flex', alignItems: 'center', gap: 10, padding: '14px 18px',
-                    background: 'rgba(0,229,255,0.05)', border: '1px solid rgba(0,229,255,0.15)',
+                    background: 'rgba(194, 91, 60, 0.05)', border: '1px solid rgba(194, 91, 60, 0.15)',
                     borderRadius: 12, margin: '20px 0',
                 }}>
                     <MessageSquare size={16} color="var(--accent-primary)" />

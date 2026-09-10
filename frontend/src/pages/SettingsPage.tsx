@@ -18,7 +18,7 @@ function Section({ icon: Icon, title, children }: { icon: any; title: string; ch
             <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 22 }}>
                 <div style={{
                     width: 34, height: 34, borderRadius: 10,
-                    background: 'rgba(0,229,255,0.08)', border: '1px solid rgba(0,229,255,0.15)',
+                    background: 'rgba(194, 91, 60, 0.08)', border: '1px solid rgba(194, 91, 60, 0.15)',
                     display: 'flex', alignItems: 'center', justifyContent: 'center',
                 }}>
                     <Icon size={16} color="var(--accent-primary)" />
@@ -78,17 +78,17 @@ export default function SettingsPage() {
 
             {/* User avatar card */}
             <div style={{
-                background: 'linear-gradient(135deg, rgba(0,229,255,0.06) 0%, rgba(255,44,245,0.03) 100%)',
-                border: '1px solid rgba(0,229,255,0.12)', borderRadius: 18,
+                background: 'linear-gradient(135deg, rgba(194, 91, 60, 0.06) 0%, rgba(255,44,245,0.03) 100%)',
+                border: '1px solid rgba(194, 91, 60, 0.12)', borderRadius: 18,
                 padding: '24px 28px', marginBottom: 20,
                 display: 'flex', alignItems: 'center', gap: 20,
             }}>
                 <div style={{
                     width: 64, height: 64, borderRadius: '50%',
-                    background: 'linear-gradient(135deg, #00E5FF 0%, #0096C7 100%)',
+                    background: 'linear-gradient(135deg, var(--accent-primary) 0%, var(--accent-primary-dim) 100%)',
                     display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    fontWeight: 800, fontSize: 22, color: '#050709', flexShrink: 0,
-                    boxShadow: '0 0 24px rgba(0,229,255,0.35)',
+                    fontWeight: 800, fontSize: 22, color: 'var(--bg-primary)', flexShrink: 0,
+                    boxShadow: '0 0 24px rgba(194, 91, 60, 0.35)',
                 }}>
                     {user?.firstName?.[0]}{user?.lastName?.[0]}
                 </div>
@@ -100,7 +100,7 @@ export default function SettingsPage() {
                     <div style={{
                         display: 'inline-flex', alignItems: 'center', gap: 5, marginTop: 8,
                         padding: '3px 10px', borderRadius: 9999,
-                        background: 'rgba(0,229,255,0.10)', border: '1px solid rgba(0,229,255,0.20)',
+                        background: 'rgba(194, 91, 60, 0.10)', border: '1px solid rgba(194, 91, 60, 0.20)',
                         fontSize: 11, fontWeight: 800, color: 'var(--accent-primary)', letterSpacing: '0.06em',
                     }}>
                         <Zap size={10} /> {user?.role}
@@ -175,8 +175,8 @@ export default function SettingsPage() {
                         { label: 'Real-time', value: 'Socket.IO', icon: Zap },
                     ].map(({ label, value, icon: ItemIcon }) => (
                         <div key={label} style={{
-                            background: 'rgba(255,255,255,0.03)', padding: '12px 16px',
-                            borderRadius: 12, border: '1px solid rgba(255,255,255,0.05)',
+                            background: 'var(--surface-1)', padding: '12px 16px',
+                            borderRadius: 12, border: '1px solid var(--surface-border)',
                             display: 'flex', gap: 10, alignItems: 'flex-start',
                         }}>
                             <ItemIcon size={14} style={{ color: 'var(--accent-primary)', marginTop: 2, flexShrink: 0 }} />
