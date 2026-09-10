@@ -8,7 +8,12 @@ let io: SocketIOServer | null = null;
 export function initSocketIO(server: HTTPServer): SocketIOServer {
     io = new SocketIOServer(server, {
         cors: {
-            origin: [env.FRONTEND_URL, 'http://localhost:3000', 'http://localhost:3001', 'http://localhost:5173'],
+            // Dev origins only outside production — this previously allowed
+            // localhost through even on a deployed instance, unlike app.ts
+            // which already gated them.
+            origin: env.NODE_ENV === 'production'
+                ? [env.FRONTEND_URL]
+                : [env.FRONTEND_URL, 'http://localhost:3000', 'http://localhost:3001', 'http://localhost:5173'],
             methods: ['GET', 'POST'],
             credentials: true,
         },

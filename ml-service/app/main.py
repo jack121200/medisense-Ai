@@ -179,11 +179,22 @@ def _load_manifest_versions() -> Dict[str, str]:
             manifest = json.load(f)
         versions = {}
         for name, entry in manifest.get("models", {}).items():
-            if entry.get("status") == "trained":
-                hashes = [a["sha256"][:12] for a in entry.get("artifacts", {}).values()]
-                versions[name] = hashes[0] if hashes else "unknown"
-            else:
+            status = entry.get("status")
+            if status not in ("trained", "built"):
                 versions[name] = "not_trained"
+                continue
+            hashes = [a["sha256"][:12] for a in entry.get("artifacts", {}).values()]
+            if hashes:
+                versions[name] = hashes[0]
+            else:
+                # Not every entry has a artifact file to hash. The RAG index is
+                # built in-process from the JSON corpus, so its identity is the
+                # corpus size and build date, not a pickle digest.
+                meta = entry.get("meta", {})
+                if meta.get("n_documents"):
+                    versions[name] = f"{meta['n_documents']}docs@{str(meta.get('built_at', ''))[:10]}"
+                else:
+                    versions[name] = str(status)
         return versions
     except Exception:
         return {}

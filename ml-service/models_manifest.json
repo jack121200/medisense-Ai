@@ -408,6 +408,12 @@
           "tp": 1272
         },
         "note": "Replaces the reconstruction-error autoencoder as the primary detector. The autoencoder measured 0.75 ROC-AUC / 0.26 recall because it was trained only on normal beats and never used the available abnormal labels. Still a binary morphology screen \u2014 it does not classify specific arrhythmia types."
+      },
+      "artifacts": {
+        "ecg_classifier.pt": {
+          "sha256": "e9bf2a2a408d94e8604c4647aa7605889569ae0aeab3dc7840cfd947a847224a",
+          "size_bytes": 153321
+        }
       }
     }
   }

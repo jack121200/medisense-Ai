@@ -25,4 +25,8 @@ USER appuser
 
 EXPOSE 8000
 
-CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000", "--workers", "2"]
+# Shell form so ${PORT} expands: Render/Railway inject the port to bind and
+# ignore EXPOSE. Exec form would pass "$PORT" through as a literal string.
+# Single worker — a free-tier container does not have the memory for two
+# copies of XGBoost, pgmpy and PyTorch.
+CMD uvicorn app.main:app --host 0.0.0.0 --port ${PORT:-8000} --workers ${WEB_CONCURRENCY:-1}
