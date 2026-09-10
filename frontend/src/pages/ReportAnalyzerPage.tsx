@@ -1,5 +1,5 @@
 /**
- * CBC Blood Report Analyzer — CardioSense AI
+ * CBC Blood Report Analyzer — MediSense AI
  * ===========================================
  * Full-page CBC analyzer for lab technicians and doctors.
  * Supports manual input OR table-guided entry for all 15 CBC parameters.

@@ -34,7 +34,7 @@ const PageLoader = () => (
         <div className="text-center">
             <div className="pulse-critical mb-4 inline-flex w-12 h-12 rounded-full"
                 style={{ background: 'var(--accent-primary)', opacity: 0.9 }} />
-            <div style={{ color: 'var(--text-secondary)', fontSize: 13 }}>Loading CardioSense AI...</div>
+            <div style={{ color: 'var(--text-secondary)', fontSize: 13 }}>Loading MediSense AI...</div>
         </div>
     </div>
 );

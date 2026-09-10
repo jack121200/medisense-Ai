@@ -65,7 +65,7 @@ export default function PatientPortalPage() {
 
     // Chat
     const [chatMessages, setChatMessages] = useState<Array<{ role: 'user' | 'bot'; text: string }>>([
-        { role: 'bot', text: 'Hello! I\'m your CardioSense AI Health Assistant. How are you feeling today? Describe your symptoms and I\'ll help you understand them.\n\nYou can also ask me about booking appointments! 🏥' }
+        { role: 'bot', text: 'Hello! I\'m your MediSense AI Health Assistant. How are you feeling today? Describe your symptoms and I\'ll help you understand them.\n\nYou can also ask me about booking appointments! 🏥' }
     ]);
     const [chatInput, setChatInput] = useState('');
 
@@ -517,7 +517,7 @@ export default function PatientPortalPage() {
                     <div style={{ padding: '16px 24px', borderBottom: '1px solid rgba(255,255,255,0.06)', display: 'flex', gap: 10, alignItems: 'center' }}>
                         <div style={{ width: 32, height: 32, borderRadius: 10, background: 'linear-gradient(135deg, #10b98122, #6366f122)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 16 }}>🤖</div>
                         <div>
-                            <div style={{ fontWeight: 800, color: '#fff', fontSize: 14 }}>CardioSense Health Assistant</div>
+                            <div style={{ fontWeight: 800, color: '#fff', fontSize: 14 }}>MediSense Health Assistant</div>
                             <div style={{ fontSize: 11, color: '#00FF87' }}>● AI Online</div>
                         </div>
                     </div>

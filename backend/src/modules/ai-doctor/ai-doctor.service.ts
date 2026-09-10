@@ -455,8 +455,13 @@ export const aiDoctorService = {
                     messages: [{ role: 'system', content: systemPrompt }],
                 },
                 voice: {
-                    provider: 'azure',
-                    voiceId: 'hi-IN-MadhurNeural', // Native High-Quality Indian Hindi Male Doctor Voice
+                    // Configurable via AI_DOCTOR_TTS_PROVIDER / AI_DOCTOR_TTS_VOICE_ID —
+                    // defaults to the Azure Hindi Neural voice already in use, but a
+                    // capstone budget should try Vapi's own bundled voices or Deepgram
+                    // Aura first (both cheaper/free vs. Azure's per-character billing)
+                    // before spending real money here.
+                    provider: env.AI_DOCTOR_TTS_PROVIDER,
+                    voiceId: env.AI_DOCTOR_TTS_VOICE_ID,
                 },
                 transcriber: {
                     provider: 'deepgram',

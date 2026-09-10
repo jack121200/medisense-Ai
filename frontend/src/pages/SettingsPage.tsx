@@ -167,7 +167,7 @@ export default function SettingsPage() {
             <Section icon={Shield} title="System Information">
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
                     {[
-                        { label: 'Platform', value: 'CardioSense AI v1.0.0', icon: Heart },
+                        { label: 'Platform', value: 'MediSense AI v1.0.0', icon: Heart },
                         { label: 'Backend', value: 'Node.js + Express + TypeScript', icon: Globe },
                         { label: 'ML Service', value: 'Python + FastAPI + XGBoost', icon: Cpu },
                         { label: 'Database', value: 'PostgreSQL + TimescaleDB', icon: Database },

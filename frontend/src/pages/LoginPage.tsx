@@ -130,7 +130,7 @@ const LoginPage = () => {
                 <div style={{ textAlign: 'center', marginBottom: 40 }}>
                     <div style={{ display: 'inline-flex', alignItems: 'center', gap: 10, marginBottom: 16 }}>
                         <div style={{ width: 40, height: 40, background: 'linear-gradient(135deg, #E63946, #A4161A)', borderRadius: 10, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 20 }}>🫀</div>
-                        <span style={{ fontSize: 22, fontWeight: 800, letterSpacing: '-0.03em' }}><span style={{ background: 'linear-gradient(90deg, #E63946, #FF6B6B)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>CardioSense</span> <span style={{ color: '#E63946' }}>AI</span></span>
+                        <span style={{ fontSize: 22, fontWeight: 800, letterSpacing: '-0.03em' }}><span style={{ background: 'linear-gradient(90deg, #E63946, #FF6B6B)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>MediSense</span> <span style={{ color: '#E63946' }}>AI</span></span>
                     </div>
                     <h1 style={{ fontSize: step === 'role' ? 32 : 26, fontWeight: 700, color: '#fff', margin: 0, letterSpacing: '-0.5px' }}>
                         {step === 'role' ? 'Who are you?' : `Sign in as ${selectedRoleData?.label}`}

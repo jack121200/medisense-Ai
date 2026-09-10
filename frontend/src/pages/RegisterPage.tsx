@@ -153,7 +153,7 @@ export default function RegisterPage() {
                     <div style={{ textAlign: 'center', marginBottom: 40 }}>
                         <div style={{ display: 'inline-flex', alignItems: 'center', gap: 10, marginBottom: 14 }}>
                             <div style={{ width: 40, height: 40, background: 'linear-gradient(135deg, #E63946, #A4161A)', borderRadius: 12, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 20 }}>🫀</div>
-                            <span style={{ fontSize: 22, fontWeight: 900, background: 'linear-gradient(90deg, #E63946, #FF6B6B)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>CardioSense AI</span>
+                            <span style={{ fontSize: 22, fontWeight: 900, background: 'linear-gradient(90deg, #E63946, #FF6B6B)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>MediSense AI</span>
                         </div>
                         <h1 style={{ fontSize: 28, fontWeight: 900, color: '#fff', marginBottom: 8 }}>Register As</h1>
                         <p style={{ fontSize: 14, color: 'rgba(255,255,255,0.45)' }}>Choose your role to get started</p>
@@ -219,7 +219,7 @@ export default function RegisterPage() {
                 <div style={{ textAlign: 'center', marginBottom: 28 }}>
                     <div style={{ display: 'inline-flex', alignItems: 'center', gap: 10, marginBottom: 10 }}>
                         <div style={{ width: 36, height: 36, background: 'linear-gradient(135deg, #E63946, #A4161A)', borderRadius: 10, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 18 }}>🫀</div>
-                        <span style={{ fontSize: 18, fontWeight: 900, background: 'linear-gradient(90deg, #E63946, #FF6B6B)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>CardioSense AI</span>
+                        <span style={{ fontSize: 18, fontWeight: 900, background: 'linear-gradient(90deg, #E63946, #FF6B6B)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>MediSense AI</span>
                     </div>
                     <div style={{ display: 'inline-flex', alignItems: 'center', gap: 8, padding: '5px 14px', borderRadius: 20, background: `${accentColor}15`, border: `1px solid ${accentColor}40`, marginBottom: 10 }}>
                         <span style={{ fontSize: 16 }}>{roleObj?.icon}</span>
@@ -340,7 +340,7 @@ export default function RegisterPage() {
                                 <div style={{ fontSize: 40, marginBottom: 8 }}>🫀</div>
                                 <div style={{ fontSize: 18, fontWeight: 900, color: '#E63946', marginBottom: 6 }}>Cardiologist</div>
                                 <div style={{ fontSize: 13, color: 'rgba(255,255,255,0.5)', lineHeight: 1.7 }}>
-                                    All doctors in CardioSense AI are registered as Cardiologists.<br />
+                                    All doctors in MediSense AI are registered as Cardiologists.<br />
                                     Your specialization is set automatically upon account creation.
                                 </div>
                             </div>

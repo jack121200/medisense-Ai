@@ -185,7 +185,7 @@ export default function ConsultationPage() {
             </style></head><body>
             <div class="header">
                 <div>
-                    <h1>🏥 CardioSense AI</h1>
+                    <h1>🏥 MediSense AI</h1>
                     <div class="sub">Digital Prescription</div>
                 </div>
                 <div style="text-align:right">
@@ -213,7 +213,7 @@ export default function ConsultationPage() {
             </div>
             ${labList ? `<div class="section"><h3>Lab Tests Ordered</h3><ul style="font-size:13px">${labList}</ul></div>` : ''}
             <div class="footer">
-                <div><p style="font-size:11px;color:#aaa">⚠️ This prescription is generated digitally via CardioSense AI.<br/>This is not valid without the doctor's physical signature.</p></div>
+                <div><p style="font-size:11px;color:#aaa">⚠️ This prescription is generated digitally via MediSense AI.<br/>This is not valid without the doctor's physical signature.</p></div>
                 <div class="sig"><div class="line">Dr. ${consultation?.doctor?.firstName || ''} ${consultation?.doctor?.lastName || ''}<br>Signature & Stamp</div></div>
             </div>
             </body></html>`);

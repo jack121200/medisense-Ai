@@ -153,7 +153,7 @@ export default function AddPatientPage() {
                                 fontSize: 13, color: 'var(--text-secondary)', lineHeight: 1.6,
                                 fontFamily: 'var(--font-mono)', borderLeft: '3px solid var(--accent-primary)',
                             }}>
-                                Dear {form.firstName}, welcome to CardioSense Cardiac Hospital.
+                                Dear {form.firstName}, welcome to MediSense AI.
                                 Your patient ID is <strong style={{ color: 'var(--text-primary)' }}>
                                     {createdPatient.patientCode || createdPatient.id?.slice(0, 8).toUpperCase()}
                                 </strong>.

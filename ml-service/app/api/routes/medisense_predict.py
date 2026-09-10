@@ -1,5 +1,5 @@
 """
-CardioSense AI — Core ML Prediction Endpoints
+MediSense AI — Core ML Prediction Endpoints
 ==============================================
 POST /api/medisense/predict-disease  — symptom list → disease + alternatives
 POST /api/medisense/predict-risk     — 14 cardiac features → heart risk (LOW/MEDIUM/HIGH)
@@ -270,7 +270,7 @@ def predict_heart_risk(req: HeartRiskRequest):
 #  MODEL STATUS
 # ══════════════════════════════════════════════════════════════════
 
-@router.get("/model-status", summary="Check training status of all CardioSense ML models")
+@router.get("/model-status", summary="Check training status of all MediSense ML models")
 def model_status():
     models_info = {
         "disease_model": {

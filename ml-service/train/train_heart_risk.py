@@ -92,7 +92,7 @@ def encode(df: pd.DataFrame):
 
 def train():
     print("=" * 60)
-    print("  CardioSense AI — Heart Disease Risk Model Training")
+    print("  MediSense AI — Heart Disease Risk Model Training")
     print("=" * 60)
 
     # ── Load & clean ──────────────────────────────────────────────────────────

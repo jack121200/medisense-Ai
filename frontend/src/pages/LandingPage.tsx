@@ -224,7 +224,7 @@ export default function LandingPage() {
             }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
                     <div style={{ width: 36, height: 36, borderRadius: 10, background: `linear-gradient(135deg, ${CRIMSON}, #A4161A)`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 18 }}>🫀</div>
-                    <span style={{ fontWeight: 900, fontSize: 19, letterSpacing: '-0.02em', background: `linear-gradient(90deg, ${CRIMSON}, ${ROSE})`, WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>CardioSense AI</span>
+                    <span style={{ fontWeight: 900, fontSize: 19, letterSpacing: '-0.02em', background: `linear-gradient(90deg, ${CRIMSON}, ${ROSE})`, WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>MediSense AI</span>
                 </div>
                 <div style={{ display: 'flex', gap: 8 }}>
                     <button onClick={() => navigate('/login')} style={{ padding: '8px 22px', borderRadius: 10, border: `1px solid ${CRIMSON}35`, background: `${CRIMSON}0A`, color: CRIMSON, fontWeight: 700, fontSize: 13, cursor: 'pointer', transition: 'all 0.15s' }}
@@ -261,7 +261,7 @@ export default function LandingPage() {
                 </div>
 
                 <p style={{ maxWidth: 620, fontSize: 17.5, color: 'rgba(255,255,255,0.52)', lineHeight: 1.8, marginBottom: 44, animation: 'fadeUp 0.5s ease-out 160ms both' }}>
-                    CardioSense AI is a full-stack cardiac hospital management platform combining <strong style={{ color: 'rgba(255,255,255,0.8)' }}>Heart Disease Risk AI</strong>, <strong style={{ color: 'rgba(255,255,255,0.8)' }}>CBC Blood Analyzer</strong>, and <strong style={{ color: 'rgba(255,255,255,0.8)' }}>AI Symptom Checker</strong> — built exclusively for heart patients.
+                    MediSense AI is a full-stack cardiac hospital management platform combining <strong style={{ color: 'rgba(255,255,255,0.8)' }}>Heart Disease Risk AI</strong>, <strong style={{ color: 'rgba(255,255,255,0.8)' }}>CBC Blood Analyzer</strong>, and <strong style={{ color: 'rgba(255,255,255,0.8)' }}>AI Symptom Checker</strong> — built exclusively for heart patients.
                 </p>
 
                 <div style={{ display: 'flex', gap: 14, flexWrap: 'wrap', justifyContent: 'center', animation: 'fadeUp 0.5s ease-out 240ms both' }}>
@@ -384,7 +384,7 @@ export default function LandingPage() {
                     <span style={{ background: `linear-gradient(135deg, ${CRIMSON}, ${ROSE})`, WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>Every Heart?</span>
                 </h2>
                 <p style={{ color: 'rgba(255,255,255,0.42)', fontSize: 16, marginBottom: 44 }}>
-                    Join CardioSense AI — register as a patient, cardiologist, receptionist, or lab technician.
+                    Join MediSense AI — register as a patient, cardiologist, receptionist, or lab technician.
                 </p>
                 <div style={{ display: 'flex', gap: 14, justifyContent: 'center', flexWrap: 'wrap' }}>
                     <button onClick={() => navigate('/register')}
@@ -404,7 +404,7 @@ export default function LandingPage() {
             <footer style={{ borderTop: '1px solid rgba(255,255,255,0.05)', padding: '28px 48px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 14 }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
                     <div style={{ width: 28, height: 28, borderRadius: 8, background: `linear-gradient(135deg, ${CRIMSON}, #A4161A)`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 14 }}>🫀</div>
-                    <span style={{ fontWeight: 800, fontSize: 14.5, color: 'rgba(255,255,255,0.6)' }}>CardioSense AI</span>
+                    <span style={{ fontWeight: 800, fontSize: 14.5, color: 'rgba(255,255,255,0.6)' }}>MediSense AI</span>
                 </div>
                 <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.22)' }}>
                     React · Node.js · Python FastAPI · Scikit-learn · XGBoost · Docker

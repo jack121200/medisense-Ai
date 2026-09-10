@@ -25,6 +25,12 @@ const envSchema = z.object({
     // this backend, so ml-service can stop trusting "reachable == allowed"
     // now that it's no longer exposed on a host port (Phase 1.8).
     ML_SERVICE_INTERNAL_KEY: z.string().min(1),
+    // AI Doctor TTS provider — configurable so a capstone budget can A/B
+    // test cost/latency against Vapi's own bundled voices or Deepgram Aura
+    // before committing to paid Azure Neural voices. Defaults preserve the
+    // exact voice already in production use.
+    AI_DOCTOR_TTS_PROVIDER: z.string().default('azure'),
+    AI_DOCTOR_TTS_VOICE_ID: z.string().default('hi-IN-MadhurNeural'),
 });
 
 const parsed = envSchema.safeParse(process.env);

@@ -1,5 +1,5 @@
 """
-CBC Blood Analysis API Routes — CardioSense AI
+CBC Blood Analysis API Routes — MediSense AI
 ===============================================
 POST /api/cbc/analyze       — analyze CBC values, return flagged results + AI interpretation
 GET  /api/cbc/ranges        — return normal reference ranges for all parameters  

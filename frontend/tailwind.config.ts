@@ -3,41 +3,44 @@ export default {
     content: ['./index.html', './src/**/*.{js,ts,jsx,tsx}'],
     theme: {
         extend: {
+            // Every color here resolves to the CSS variables defined in
+            // src/index.css rather than restating hex values. This file
+            // previously carried its own (cyan/navy) palette that silently
+            // disagreed with index.css's — one source of truth means a
+            // theme change can never again land in only half the app.
             colors: {
-                // Exact palette from spec
-                'bg-primary': '#0A0E1A',
-                'bg-secondary': '#0F1629',
-                'bg-tertiary': '#151E35',
-                'surface-1': '#1A2340',
-                'surface-2': '#1F2B4D',
-                'surface-border': '#2A3A5C',
-                'accent-primary': '#00B4D8',
-                'accent-secondary': '#48CAE4',
-                'risk-critical': '#FF2D55',
-                'risk-high': '#FF6B35',
-                'risk-medium': '#FFD166',
-                'risk-low': '#06D6A0',
-                'alert-emergency': '#FF2D55',
-                'alert-warning': '#FFD166',
-                'text-primary': '#F0F4FF',
-                'text-secondary': '#8E9DC4',
-                'text-muted': '#4A5680',
-                'vitals-heart': '#FF4B6E',
-                'vitals-oxygen': '#00B4D8',
-                'vitals-bp': '#A855F7',
-                'vitals-temp': '#F97316',
-                'vitals-glucose': '#22C55E',
-                // Generic status names — the design tokens above (risk-*,
-                // alert-*) are domain-specific to clinical severity, but a
-                // shared component (Button, Badge, Toast) needs a
-                // vocabulary that isn't cardiology-specific. These are
-                // aliases onto the same palette, not new colors, so a
-                // status color and a risk color painted at the same
+                'bg-primary': 'var(--bg-primary)',
+                'bg-secondary': 'var(--bg-secondary)',
+                'bg-tertiary': 'var(--bg-tertiary)',
+                'surface-1': 'var(--surface-1)',
+                'surface-2': 'var(--surface-2)',
+                'surface-border': 'var(--surface-border)',
+                'accent-primary': 'var(--accent-primary)',
+                'accent-secondary': 'var(--accent-magenta)',
+                'risk-critical': 'var(--risk-critical)',
+                'risk-high': 'var(--risk-high)',
+                'risk-medium': 'var(--risk-medium)',
+                'risk-low': 'var(--risk-low)',
+                'alert-emergency': 'var(--risk-critical)',
+                'alert-warning': 'var(--risk-medium)',
+                'text-primary': 'var(--text-primary)',
+                'text-secondary': 'var(--text-secondary)',
+                'text-muted': 'var(--text-muted)',
+                'vitals-heart': 'var(--vitals-heart)',
+                'vitals-oxygen': 'var(--vitals-oxygen)',
+                'vitals-bp': 'var(--vitals-bp)',
+                'vitals-temp': 'var(--vitals-temp)',
+                'vitals-glucose': 'var(--vitals-glucose)',
+                // Generic status names — the risk-*/alert-* tokens above are
+                // domain-specific to clinical severity, but a shared
+                // component (Button, Badge, Toast) needs a vocabulary that
+                // isn't cardiology-specific. Aliases onto the same palette,
+                // so a status color and a risk color painted at the same
                 // semantic level always match.
-                success: '#06D6A0',
-                warning: '#FFD166',
-                danger: '#FF2D55',
-                info: '#00B4D8',
+                success: 'var(--risk-low)',
+                warning: 'var(--risk-medium)',
+                danger: 'var(--risk-critical)',
+                info: 'var(--accent-primary)',
             },
             fontFamily: {
                 display: ['"DM Sans"', 'sans-serif'],
@@ -90,15 +93,15 @@ export default {
                     '100%': { opacity: '1', transform: 'translateY(0)' },
                 },
                 glow: {
-                    '0%': { boxShadow: '0 0 10px rgba(0,180,216,0.2)' },
-                    '100%': { boxShadow: '0 0 25px rgba(0,180,216,0.5)' },
+                    '0%': { boxShadow: '0 0 10px rgba(194,91,60,0.15)' },
+                    '100%': { boxShadow: '0 0 25px rgba(194,91,60,0.35)' },
                 },
             },
             boxShadow: {
-                card: '0 4px 24px rgba(0,0,0,0.4)',
-                elevated: '0 8px 40px rgba(0,0,0,0.6)',
-                'glow-blue': '0 0 20px rgba(0,180,216,0.3)',
-                'glow-red': '0 0 20px rgba(255,45,85,0.3)',
+                card: 'var(--shadow-sm)',
+                elevated: 'var(--shadow-md)',
+                'glow-accent': 'var(--glow-cyan)',
+                'glow-red': 'var(--glow-red)',
             },
         },
     },

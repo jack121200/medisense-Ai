@@ -23,8 +23,8 @@ export default function Topbar({ onOpenNotifications }: TopbarProps) {
     return (
         <header style={{
             height: 58,
-            background: 'rgba(8, 11, 16, 0.95)',
-            borderBottom: '1px solid rgba(255,255,255,0.05)',
+            background: 'var(--bg-glass)',
+            borderBottom: '1px solid var(--surface-border)',
             display: 'flex', alignItems: 'center', padding: '0 24px', gap: 14,
             flexShrink: 0, position: 'sticky', top: 0, zIndex: 100,
             backdropFilter: 'blur(20px)',
@@ -34,19 +34,17 @@ export default function Topbar({ onOpenNotifications }: TopbarProps) {
                 role="search"
                 style={{
                 flex: 1, display: 'flex', alignItems: 'center', gap: 10,
-                background: 'rgba(255,255,255,0.04)',
-                border: '1px solid rgba(255,255,255,0.07)',
+                background: 'var(--surface-0)',
+                border: '1px solid var(--surface-border-md)',
                 borderRadius: 10, padding: '7px 14px', maxWidth: 400,
                 transition: 'all 0.2s ease',
             }}
                 onFocus={e => {
-                    (e.currentTarget as HTMLDivElement).style.borderColor = 'rgba(0,229,255,0.3)';
-                    (e.currentTarget as HTMLDivElement).style.background = 'rgba(0,229,255,0.04)';
-                    (e.currentTarget as HTMLDivElement).style.boxShadow = '0 0 0 3px rgba(0,229,255,0.07)';
+                    (e.currentTarget as HTMLDivElement).style.borderColor = 'var(--accent-primary)';
+                    (e.currentTarget as HTMLDivElement).style.boxShadow = '0 0 0 3px rgba(194,91,60,0.12)';
                 }}
                 onBlur={e => {
-                    (e.currentTarget as HTMLDivElement).style.borderColor = 'rgba(255,255,255,0.07)';
-                    (e.currentTarget as HTMLDivElement).style.background = 'rgba(255,255,255,0.04)';
+                    (e.currentTarget as HTMLDivElement).style.borderColor = 'var(--surface-border-md)';
                     (e.currentTarget as HTMLDivElement).style.boxShadow = 'none';
                 }}
             >
@@ -72,8 +70,8 @@ export default function Topbar({ onOpenNotifications }: TopbarProps) {
                 {/* Live system status */}
                 <div style={{
                     display: 'flex', alignItems: 'center', gap: 6, padding: '5px 12px',
-                    background: 'rgba(0,255,135,0.06)', borderRadius: 9999,
-                    border: '1px solid rgba(0,255,135,0.15)',
+                    background: 'var(--risk-low-bg)', borderRadius: 9999,
+                    border: '1px solid var(--accent-green-glow)',
                 }}>
                     <div style={{
                         width: 6, height: 6, borderRadius: '50%',
@@ -89,15 +87,15 @@ export default function Topbar({ onOpenNotifications }: TopbarProps) {
                     fontFamily: 'var(--font-mono)', fontSize: 12,
                     color: 'var(--text-secondary)',
                     padding: '5px 12px',
-                    background: 'rgba(255,255,255,0.03)',
-                    border: '1px solid rgba(255,255,255,0.06)',
+                    background: 'var(--surface-2)',
+                    border: '1px solid var(--surface-border)',
                     borderRadius: 8,
                     display: 'flex', gap: 6, alignItems: 'center',
                 }}>
                     <span style={{ color: 'var(--text-muted)', fontSize: 10.5 }}>
                         {format(now, 'EEE, MMM d')}
                     </span>
-                    <span style={{ color: 'rgba(255,255,255,0.2)' }}>·</span>
+                    <span style={{ color: 'var(--text-muted)' }}>·</span>
                     <span style={{ color: 'var(--accent-primary)', fontWeight: 700 }}>
                         {format(now, 'HH:mm:ss')}
                     </span>
@@ -109,8 +107,8 @@ export default function Topbar({ onOpenNotifications }: TopbarProps) {
                     aria-label={unreadCount > 0 ? `Notifications, ${unreadCount} unread` : 'Notifications'}
                     style={{
                         position: 'relative', padding: '7px 8px', display: 'flex',
-                        background: unreadCount > 0 ? 'rgba(255,45,85,0.08)' : 'rgba(255,255,255,0.04)',
-                        border: `1px solid ${unreadCount > 0 ? 'rgba(255,45,85,0.20)' : 'rgba(255,255,255,0.07)'}`,
+                        background: unreadCount > 0 ? 'var(--risk-critical-bg)' : 'var(--surface-2)',
+                        border: `1px solid ${unreadCount > 0 ? 'var(--risk-critical-border)' : 'var(--surface-border)'}`,
                         borderRadius: 10, transition: 'all 0.15s ease', cursor: 'pointer',
                     }}
                 >
@@ -121,7 +119,7 @@ export default function Topbar({ onOpenNotifications }: TopbarProps) {
                             background: 'var(--risk-critical)',
                             color: 'white', borderRadius: 9999, fontSize: 8.5, fontWeight: 800,
                             width: 15, height: 15, display: 'flex', alignItems: 'center', justifyContent: 'center',
-                            boxShadow: '0 0 8px rgba(255,45,85,0.6)',
+                            boxShadow: 'var(--glow-red)',
                         }}>
                             {unreadCount > 9 ? '9+' : unreadCount}
                         </span>
@@ -134,10 +132,10 @@ export default function Topbar({ onOpenNotifications }: TopbarProps) {
                         to="/settings"
                         style={{
                             width: 34, height: 34, borderRadius: '50%', flexShrink: 0,
-                            background: 'linear-gradient(135deg, #00E5FF 0%, #0096C7 100%)',
+                            background: 'linear-gradient(135deg, var(--accent-primary) 0%, var(--accent-primary-dim) 100%)',
                             display: 'flex', alignItems: 'center', justifyContent: 'center',
-                            fontWeight: 800, fontSize: 12, color: '#050709', textDecoration: 'none',
-                            boxShadow: '0 0 12px rgba(0,229,255,0.30)',
+                            fontWeight: 800, fontSize: 12, color: '#fff', textDecoration: 'none',
+                            boxShadow: 'var(--glow-cyan-sm)',
                             fontFamily: 'var(--font-display)',
                         }}
                     >

@@ -2,7 +2,7 @@ import React from 'react';
 
 export interface CardProps extends React.HTMLAttributes<HTMLDivElement> {
     elevated?: boolean;
-    hoverGlow?: 'cyan' | 'red' | 'green' | 'none';
+    hoverGlow?: 'accent' | 'critical' | 'success' | 'none';
 }
 
 /** Wraps the existing .glass-card / .glass-card-elevated tokens. */

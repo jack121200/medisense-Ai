@@ -58,7 +58,7 @@ export function Modal({ open, onClose, title, children, maxWidth = 480 }: ModalP
         <div
             style={{
                 position: 'fixed', inset: 0, zIndex: 1000,
-                background: 'rgba(0,0,0,0.75)', backdropFilter: 'blur(6px)',
+                background: 'var(--bg-overlay)', backdropFilter: 'blur(6px)',
                 display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20,
             }}
             onMouseDown={(e) => { if (e.target === e.currentTarget) onClose(); }}

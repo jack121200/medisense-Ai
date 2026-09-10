@@ -88,9 +88,12 @@ const ROLE_LABELS: Record<string, string> = {
     NURSE: 'Nurse',
     ANALYST: 'Analyst',
 };
+// Role accents drawn from the warm palette in index.css — each role gets a
+// distinguishable hue, but all of them sit in the same warm family so the
+// shell never fights the page content.
 const ROLE_COLORS: Record<string, string> = {
-    RECEPTIONIST: '#FFD166', DOCTOR: '#E63946', LAB_TECHNICIAN: '#FF6B6B',
-    PATIENT: '#06D6A0', ADMIN: '#C77DFF', SUPER_ADMIN: '#C77DFF',
+    RECEPTIONIST: '#B8912F', DOCTOR: '#C25B3C', LAB_TECHNICIAN: '#CC6B3D',
+    PATIENT: '#3E8E7E', ADMIN: '#8E6BA8', SUPER_ADMIN: '#8E6BA8',
 };
 
 export default function Sidebar() {
@@ -108,25 +111,25 @@ export default function Sidebar() {
 
     const role = user?.role || 'DOCTOR';
     const navItems = NAV_BY_ROLE[role] || NAV_BY_ROLE['DOCTOR'];
-    const roleColor = ROLE_COLORS[role] || '#00E5FF';
+    const roleColor = ROLE_COLORS[role] || 'var(--accent-primary)';
     const W = collapsed ? 68 : 236;
 
     return (
-        <aside style={{ width: W, minHeight: '100vh', background: 'var(--bg-secondary)', borderRight: '1px solid rgba(255,255,255,0.05)', display: 'flex', flexDirection: 'column', transition: 'width 0.25s cubic-bezier(0.4,0,0.2,1)', flexShrink: 0, position: 'relative', zIndex: 20, overflow: 'hidden' }}>
+        <aside style={{ width: W, minHeight: '100vh', background: 'var(--bg-secondary)', borderRight: '1px solid var(--surface-border)', display: 'flex', flexDirection: 'column', transition: 'width 0.25s cubic-bezier(0.4,0,0.2,1)', flexShrink: 0, position: 'relative', zIndex: 20, overflow: 'hidden' }}>
             {/* Logo */}
-            <div style={{ padding: collapsed ? '24px 0' : '24px 20px', display: 'flex', alignItems: 'center', gap: 12, borderBottom: '1px solid rgba(230,57,70,0.12)', justifyContent: collapsed ? 'center' : 'flex-start', flexShrink: 0 }}>
-                <div style={{ width: 36, height: 36, borderRadius: 10, background: 'linear-gradient(135deg, #E63946, #A4161A)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, fontSize: 18 }}>🫀</div>
+            <div style={{ padding: collapsed ? '24px 0' : '24px 20px', display: 'flex', alignItems: 'center', gap: 12, borderBottom: '1px solid var(--surface-border)', justifyContent: collapsed ? 'center' : 'flex-start', flexShrink: 0 }}>
+                <div style={{ width: 36, height: 36, borderRadius: 10, background: 'linear-gradient(135deg, var(--accent-primary), var(--accent-primary-dim))', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, fontSize: 18 }}>🩺</div>
                 {!collapsed && (
                     <div>
-                        <div style={{ fontWeight: 900, fontSize: 15.5, background: 'linear-gradient(90deg, #E63946, #FF6B6B)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', letterSpacing: '-0.02em' }}>CardioSense</div>
-                        <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.35)', letterSpacing: '0.1em', textTransform: 'uppercase' }}>AI Cardiology</div>
+                        <div style={{ fontWeight: 900, fontSize: 15.5, color: 'var(--text-primary)', letterSpacing: '-0.02em' }}>MediSense <span style={{ color: 'var(--accent-primary)' }}>AI</span></div>
+                        <div style={{ fontSize: 10, color: 'var(--text-muted)', letterSpacing: '0.1em', textTransform: 'uppercase' }}>Health Platform</div>
                     </div>
                 )}
             </div>
 
             {/* Role badge */}
             {!collapsed && (
-                <div style={{ padding: '12px 16px', borderBottom: '1px solid rgba(255,255,255,0.04)' }}>
+                <div style={{ padding: '12px 16px', borderBottom: '1px solid var(--surface-border)' }}>
                     <div style={{ background: `${roleColor}12`, border: `1px solid ${roleColor}25`, borderRadius: 10, padding: '8px 12px', display: 'flex', alignItems: 'center', gap: 8 }}>
                         <div style={{ width: 7, height: 7, borderRadius: '50%', background: roleColor, flexShrink: 0 }} />
                         <span style={{ fontSize: 11.5, fontWeight: 700, color: roleColor }}>{ROLE_LABELS[role] || role}</span>
@@ -146,15 +149,15 @@ export default function Sidebar() {
                                 justifyContent: collapsed ? 'center' : 'flex-start',
                                 margin: '2px 8px', borderRadius: 12,
                                 textDecoration: 'none', transition: 'all 0.15s',
-                                background: isActive ? `${roleColor}18` : 'transparent',
-                                color: isActive ? roleColor : 'rgba(255,255,255,0.5)',
+                                background: isActive ? `${roleColor}1A` : 'transparent',
+                                color: isActive ? roleColor : 'var(--text-secondary)',
                                 borderLeft: isActive ? `3px solid ${roleColor}` : '3px solid transparent',
                             })}
                         >
                             <div style={{ position: 'relative', flexShrink: 0 }}>
                                 <Icon size={18} />
                                 {item.badge && unreadCount > 0 && (
-                                    <div style={{ position: 'absolute', top: -4, right: -4, width: 14, height: 14, borderRadius: '50%', background: '#FF2D55', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 8, fontWeight: 700, color: '#fff' }}>{unreadCount > 9 ? '9+' : unreadCount}</div>
+                                    <div style={{ position: 'absolute', top: -4, right: -4, width: 14, height: 14, borderRadius: '50%', background: 'var(--risk-critical)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 8, fontWeight: 700, color: '#fff' }}>{unreadCount > 9 ? '9+' : unreadCount}</div>
                                 )}
                             </div>
                             {!collapsed && <span style={{ fontSize: 13.5, fontWeight: 600 }}>{item.label}</span>}
@@ -164,14 +167,14 @@ export default function Sidebar() {
             </nav>
 
             {/* User info + logout */}
-            <div style={{ padding: collapsed ? '16px 8px' : '16px', borderTop: '1px solid rgba(255,255,255,0.05)', flexShrink: 0 }}>
+            <div style={{ padding: collapsed ? '16px 8px' : '16px', borderTop: '1px solid var(--surface-border)', flexShrink: 0 }}>
                 {!collapsed && user && (
-                    <div style={{ marginBottom: 10, padding: '10px 12px', background: 'rgba(255,255,255,0.03)', borderRadius: 12, border: '1px solid rgba(255,255,255,0.06)' }}>
-                        <div style={{ fontSize: 13, fontWeight: 700, color: '#fff', marginBottom: 2 }}>{user.firstName} {user.lastName}</div>
-                        <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.35)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{user.email}</div>
+                    <div style={{ marginBottom: 10, padding: '10px 12px', background: 'var(--surface-1)', borderRadius: 12, border: '1px solid var(--surface-border)' }}>
+                        <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-primary)', marginBottom: 2 }}>{user.firstName} {user.lastName}</div>
+                        <div style={{ fontSize: 11, color: 'var(--text-muted)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{user.email}</div>
                     </div>
                 )}
-                <button onClick={handleLogout} aria-label="Sign out" style={{ width: '100%', display: 'flex', alignItems: 'center', gap: 10, padding: collapsed ? '10px 0' : '10px 12px', justifyContent: collapsed ? 'center' : 'flex-start', background: 'rgba(255,45,85,0.08)', border: '1px solid rgba(255,45,85,0.15)', borderRadius: 10, color: '#FF2D55', cursor: 'pointer', fontSize: 13, fontWeight: 700, transition: 'background 0.15s' }}>
+                <button onClick={handleLogout} aria-label="Sign out" className="btn-danger" style={{ width: '100%', justifyContent: collapsed ? 'center' : 'flex-start', padding: collapsed ? '10px 0' : '10px 12px' }}>
                     <LogOut size={16} aria-hidden="true" />
                     {!collapsed && 'Sign Out'}
                 </button>
@@ -182,7 +185,7 @@ export default function Sidebar() {
                 onClick={() => setCollapsed(!collapsed)}
                 aria-label={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
                 aria-expanded={!collapsed}
-                style={{ position: 'absolute', top: 28, right: -12, width: 24, height: 24, borderRadius: '50%', background: 'var(--bg-secondary)', border: '1px solid rgba(255,255,255,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', color: 'rgba(255,255,255,0.4)', zIndex: 10 }}
+                style={{ position: 'absolute', top: 28, right: -12, width: 24, height: 24, borderRadius: '50%', background: 'var(--surface-0)', border: '1px solid var(--surface-border-md)', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', color: 'var(--text-secondary)', boxShadow: 'var(--shadow-sm)', zIndex: 10 }}
             >
                 {collapsed ? <ChevronRight size={13} aria-hidden="true" /> : <ChevronLeft size={13} aria-hidden="true" />}
             </button>

@@ -20,7 +20,7 @@ const RISK_COLORS: Record<string, string> = {
 
 function KpiCard({ kpi, delay }: { kpi: any; delay: number }) {
     return (
-        <div className="stat-card card-hover-cyan" style={{ animation: `fadeUp 0.4s ease-out ${delay}ms both` }}>
+        <div className="stat-card card-hover-accent" style={{ animation: `fadeUp 0.4s ease-out ${delay}ms both` }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 14 }}>
                 <div style={{
                     width: 40, height: 40, borderRadius: 12,

@@ -204,6 +204,17 @@ function PreCallModal({
     const [reportText, setReportText] = useState('');
     const fileRef = useRef<HTMLInputElement>(null);
 
+    // Ask for mic permission the moment this form opens, not after the user
+    // clicks "Proceed" — the OS permission dialog (and any user hesitation
+    // answering it) previously sat directly in the critical path right
+    // before the call connected. Doing it here overlaps that latency with
+    // the time the patient spends typing their reason for the visit.
+    useEffect(() => {
+        navigator.mediaDevices?.getUserMedia({ audio: true })
+            .then(stream => stream.getTracks().forEach(track => track.stop()))
+            .catch(() => { /* surfaced again, with a clear error, at actual call start */ });
+    }, []);
+
     const handleFile = async (file: File) => {
         setPdfFile(file);
         setUploading(true);

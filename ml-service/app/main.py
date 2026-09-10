@@ -145,7 +145,7 @@ async def metrics_middleware(request: Request, call_next):
 
 
 # ── Routers ───────────────────────────────────────────────────────────────────
-app.include_router(medisense_predict.router, prefix="/api/medisense", tags=["CardioSense ML"])
+app.include_router(medisense_predict.router, prefix="/api/medisense", tags=["MediSense ML"])
 app.include_router(cbc_analyze.router,       prefix="/api/cbc",       tags=["CBC Analyzer"])
 app.include_router(hypothesis.router,        tags=["Research & Analytics"])
 app.include_router(pdf_extract.router,       tags=["PDF Extraction"])

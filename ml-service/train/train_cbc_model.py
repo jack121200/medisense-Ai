@@ -104,7 +104,7 @@ def load_and_clean(path: str) -> pd.DataFrame:
 
 def train():
     print("=" * 60)
-    print("  CardioSense AI — CBC Blood Analysis Model Training")
+    print("  MediSense AI — CBC Blood Analysis Model Training")
     print("=" * 60)
 
     df = load_and_clean(EXCEL_PATH)
