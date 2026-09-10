@@ -357,6 +357,58 @@
         "note": "Lexical retrieval, not dense embeddings. Chosen so the service stays within free-tier memory alongside XGBoost, pgmpy and the PyTorch autoencoder; at ~50 curated documents with domain-specific vocabulary, keyword overlap is a strong signal and dense retrieval would not earn its memory cost. Corpus keywords carry Hindi/Hinglish terms so patient phrasing retrieves correctly. Safety documents are force-included when they match, so red-flag criteria reach the prompt alongside any remedy for the same complaint. Retrieval quality is regression-tested in tests/test_rag_retrieval.py.",
         "index_build_time_ms": 32
       }
+    },
+    "ecg_beat_classifier": {
+      "status": "trained",
+      "training_script": "train/train_ecg_classifier.py",
+      "meta": {
+        "architecture": "1D-CNN: Conv(1->32,k7)-BN-ReLU-Pool / Conv(32->64,k5)-BN-ReLU-Pool / Conv(64->128,k3)-BN-ReLU-GAP / Dropout(0.3) / Linear(128->1)",
+        "task": "Binary beat classification \u2014 normal vs abnormal morphology",
+        "evaluation": "INTER-PATIENT: whole records held out. Beats from one patient are highly correlated, so a random beat-level split leaks patient identity and overstates performance on unseen patients.",
+        "train_records": [
+          "100",
+          "101",
+          "103",
+          "112",
+          "115",
+          "208",
+          "217"
+        ],
+        "val_records": [
+          "108",
+          "200"
+        ],
+        "test_records": [
+          "106",
+          "213",
+          "223"
+        ],
+        "n_train": 15868,
+        "n_val": 4362,
+        "n_test": 7881,
+        "decision_threshold": 0.95,
+        "threshold_method": "highest precision holding validation recall >= 0.9 \u2014 a screening objective, not F1. F1 weights a missed abnormal beat the same as a false alarm, which is the wrong trade for a triage aid.",
+        "model_selection_metric": "validation ROC-AUC (threshold-independent)",
+        "class_weighting": "pos_weight=3.70 (abnormal is the minority class)",
+        "epochs_run": 25,
+        "best_epoch": 16,
+        "seed": 42,
+        "model_selection": "weights from the epoch with the best validation F1, not the final epoch \u2014 train loss keeps falling after validation plateaus",
+        "dataset": "PhysioNet MIT-BIH Arrhythmia Database",
+        "precision": 0.5864,
+        "recall": 0.7527,
+        "f1": 0.6592,
+        "roc_auc": 0.8992,
+        "average_precision": 0.8205,
+        "specificity": 0.8551,
+        "confusion": {
+          "tn": 5294,
+          "fp": 897,
+          "fn": 418,
+          "tp": 1272
+        },
+        "note": "Replaces the reconstruction-error autoencoder as the primary detector. The autoencoder measured 0.75 ROC-AUC / 0.26 recall because it was trained only on normal beats and never used the available abnormal labels. Still a binary morphology screen \u2014 it does not classify specific arrhythmia types."
+      }
     }
   }
 }

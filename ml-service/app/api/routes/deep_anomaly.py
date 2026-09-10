@@ -44,6 +44,22 @@ def _load_model():
     return _cache["ecg_autoencoder"]
 
 
+def _load_classifier():
+    """
+    Supervised beat classifier — the primary detector. Kept separate from the
+    autoencoder loader so a missing classifier degrades to the autoencoder
+    rather than failing the route.
+    """
+    if "ecg_classifier" not in _cache:
+        path = MODELS_DIR / "ecg_classifier.pt"
+        if not path.exists():
+            _cache["ecg_classifier"] = None
+        else:
+            from app.ml.ecg_classifier import load_classifier
+            _cache["ecg_classifier"] = load_classifier(path)
+    return _cache["ecg_classifier"]
+
+
 def _load_meta():
     if "ecg_meta" not in _cache:
         path = MODELS_DIR / "ecg_autoencoder_meta.json"
@@ -104,6 +120,48 @@ def _resample_to_window(signal: List[float], target_len: int = WINDOW_LEN) -> np
     return np.interp(x_new, x_old, signal).astype(np.float32)
 
 
+def _manifest_meta(model_key: str) -> dict:
+    """
+    Read a model's recorded metrics from models_manifest.json rather than
+    hardcoding them here, so a retrain cannot leave the API quoting numbers
+    the model no longer achieves.
+    """
+    if "manifest" not in _cache:
+        path = MODELS_DIR.parent.parent / "models_manifest.json"
+        try:
+            _cache["manifest"] = json.loads(path.read_text(encoding="utf-8"))
+        except Exception:
+            _cache["manifest"] = {}
+    return _cache["manifest"].get("models", {}).get(model_key, {}).get("meta", {})
+
+
+def _eval_metrics(detector: str, meta: dict) -> dict:
+    """
+    Report whichever model actually produced the verdict. Quoting the
+    autoencoder's numbers while the classifier decides would misrepresent
+    the result.
+    """
+    if detector == "supervised_1d_cnn_classifier":
+        clf = _manifest_meta("ecg_beat_classifier")
+        return {
+            "precision": clf.get("precision"),
+            "recall": clf.get("recall"),
+            "f1": clf.get("f1"),
+            "roc_auc": clf.get("roc_auc"),
+            "specificity": clf.get("specificity"),
+            "evaluation": clf.get("evaluation"),
+            "note": clf.get("note"),
+        }
+    return {
+        "precision": meta.get("eval_precision"),
+        "recall": meta.get("eval_recall"),
+        "f1": meta.get("eval_f1"),
+        "roc_auc": meta.get("eval_roc_auc"),
+        "note": "Autoencoder fallback — the supervised classifier is not loaded. "
+                "See ecg_autoencoder_meta.json for the full run.",
+    }
+
+
 @router.post("/anomaly-stream", summary="ECG Anomaly Detection via 1D-CNN Autoencoder")
 def analyze_deep_waveform(req: SignalVectorRequest):
     """
@@ -147,7 +205,24 @@ def analyze_deep_waveform(req: SignalVectorRequest):
     reconstructed = (reconstructed_norm * sigma + mu).tolist()
 
     threshold = float(meta["threshold"])
-    is_anomaly = mse_loss > threshold
+    reconstruction_flag = mse_loss > threshold
+
+    # The supervised classifier is the primary detector. The autoencoder,
+    # trained only on normal beats, measured 0.75 ROC-AUC / 0.26 recall — it
+    # missed roughly three of every four abnormal beats — so it now serves as
+    # a secondary unsupervised signal rather than the verdict.
+    classifier = _load_classifier()
+    if classifier is not None:
+        clf_model, clf_threshold = classifier
+        with torch.no_grad():
+            logit = clf_model(torch.tensor(normalized, dtype=torch.float32).view(1, 1, WINDOW_LEN))
+            abnormal_probability = float(torch.sigmoid(logit).item())
+        is_anomaly = abnormal_probability >= clf_threshold
+        detector = "supervised_1d_cnn_classifier"
+    else:
+        abnormal_probability = None
+        is_anomaly = reconstruction_flag
+        detector = "reconstruction_error_autoencoder"
 
     # Attention heatmap: per-sample squared error, scaled by the threshold
     # so a value near/over 1.0 marks the samples actually driving the flag.
@@ -172,7 +247,10 @@ def analyze_deep_waveform(req: SignalVectorRequest):
         "data": {
             "model_architecture": meta.get("architecture", "1D-CNN autoencoder (PyTorch)"),
             "data_source": data_source,
+            "detector": detector,
+            "abnormal_probability": round(abnormal_probability, 4) if abnormal_probability is not None else None,
             "reconstruction_loss_mse": round(mse_loss, 6),
+            "reconstruction_flag": reconstruction_flag,
             "threshold": round(threshold, 6),
             "threshold_method": meta.get("threshold_method"),
             "is_anomaly": is_anomaly,
@@ -183,12 +261,6 @@ def analyze_deep_waveform(req: SignalVectorRequest):
             "raw_signal_samples": [round(float(v), 4) for v in windowed[:60]],
             "reconstructed_samples": [round(float(v), 4) for v in reconstructed[:60]],
             "attention_heatmap": attention_heatmap[:60],
-            "model_eval_metrics": {
-                "precision": meta.get("eval_precision"),
-                "recall": meta.get("eval_recall"),
-                "f1": meta.get("eval_f1"),
-                "roc_auc": meta.get("eval_roc_auc"),
-                "note": "Held-out evaluation from training — see ecg_autoencoder_meta.json for the full run.",
-            },
+            "model_eval_metrics": _eval_metrics(detector, meta),
         },
     }
