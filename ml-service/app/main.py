@@ -29,7 +29,7 @@ from fastapi.middleware.gzip import GZipMiddleware
 from fastapi.responses import JSONResponse
 
 from app.core.config import settings
-from app.api.routes import medisense_predict, cbc_analyze, hypothesis, pdf_extract, lipid_analyze, bayesian_engine, fuzzy_dosing, deep_anomaly
+from app.api.routes import medisense_predict, cbc_analyze, hypothesis, pdf_extract, lipid_analyze, bayesian_engine, fuzzy_dosing, deep_anomaly, rag_retrieve
 
 # ── In-memory metrics ─────────────────────────────────────────────────────────
 _metrics: Dict[str, Any] = {
@@ -68,6 +68,16 @@ def _preload_models():
     with _metrics_lock:
         _metrics["models_ready"] = (ready == CORE_MODEL_FILES)
     print(f"Models pre-checked: {sorted(ready)}")
+
+    # Warm the RAG index here rather than on the first consultation: it is
+    # built in-process from JSON (no artifact file), and ~30ms of work is
+    # better spent at boot than in a call-setup request.
+    try:
+        from app.rag.retriever import get_retriever
+        r = get_retriever()
+        print(f"RAG knowledge base ready: {len(r.documents)} documents")
+    except Exception as exc:
+        print(f"RAG knowledge base failed to build: {exc}")
     missing = CORE_MODEL_FILES - ready
     if missing:
         print(f"Missing models (run training scripts): {missing}")
@@ -153,6 +163,7 @@ app.include_router(lipid_analyze.router,     prefix="/api/lipid",     tags=["Lip
 app.include_router(bayesian_engine.router,   tags=["Bayesian Engine"])
 app.include_router(fuzzy_dosing.router,      tags=["Fuzzy Dosing Engine"])
 app.include_router(deep_anomaly.router,      tags=["Deep Waveform Autoencoder"])
+app.include_router(rag_retrieve.router,      prefix="/api/rag",      tags=["Knowledge Retrieval"])
 
 
 def _load_manifest_versions() -> Dict[str, str]:

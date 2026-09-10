@@ -9,6 +9,7 @@ import {
     scanRecommendationsForContraindications,
 } from './herbInteractions';
 import { detectEmergencyKeywords } from './emergencyDetection';
+import { retrieveKnowledge, renderKnowledgeBlock } from './knowledgeRetrieval';
 import { emitNewAlert } from '../../config/socket';
 
 // ── Vapi REST client ─────────────────────────────────────────────────────────
@@ -124,7 +125,8 @@ async function fetchPatientByUserId(userId: string) {
 
 function buildPatientContextString(
     patient: Awaited<ReturnType<typeof fetchPatientByUserId>>,
-    preCallData?: { reason?: string; reportText?: string; additionalNotes?: string }
+    preCallData?: { reason?: string; reportText?: string; additionalNotes?: string },
+    knowledgeBlock = ''
 ): string {
     const age = patient.dateOfBirth
         ? Math.floor((Date.now() - new Date(patient.dateOfBirth).getTime()) / (365.25 * 24 * 3600 * 1000))
@@ -291,14 +293,25 @@ async function generateDoctorSuggestions(callId: string, transcript: any[], pati
         return;
     }
 
+    // Same knowledge base the live call was grounded in — without this the
+    // post-call report freelances its recommended_actions from model memory,
+    // which is exactly the gap the herb-interaction backstop keeps catching.
+    const reportKnowledge = await retrieveKnowledge(transcriptText.slice(0, 2000));
+    const knowledgeSection = reportKnowledge.promptBlock
+        ? `
+VERIFIED KNOWLEDGE BASE — prefer these over recalled knowledge, and keep the stated doses and cautions:
+${reportKnowledge.promptBlock}
+`
+        : '';
+
     const prompt = `You are Dr. Priya Sharma, senior Integrative & General Physician reviewing an OPD consultation transcript.
 
 Patient Name: ${patientName}
 
 TRANSCRIPT:
 ${transcriptText}
-
-Based on ONLY the transcript, generate a structured clinical assessment JSON focusing on natural, Ayurvedic, diet and home remedies.
+${knowledgeSection}
+Based on the transcript, generate a structured clinical assessment JSON focusing on natural, Ayurvedic, diet and home remedies.
 
 JSON FORMAT:
 {
@@ -428,7 +441,23 @@ export const aiDoctorService = {
         additionalNotes?: string;
     }) {
         const patient = await fetchPatientByUserId(userId);
-        const patientContext = buildPatientContextString(patient, preCallData);
+
+        // Ground the assistant in the curated knowledge base for what the
+        // patient actually came in with. Keyed on the stated reason plus
+        // their known conditions, so a diabetic asking about a cough also
+        // pulls the diabetes-relevant cautions.
+        const retrievalQuery = [
+            preCallData?.reason,
+            patient.hasDiabetes && 'diabetes',
+            patient.hasHypertension && 'high blood pressure',
+            patient.hasHeartDisease && 'heart disease',
+        ].filter(Boolean).join(' ');
+        const knowledge = await retrieveKnowledge(retrievalQuery);
+        if (knowledge.documentIds.length) {
+            logger.info(`[RAG] Grounded call for patient ${patient.id} with: ${knowledge.documentIds.join(', ')}`);
+        }
+
+        const patientContext = buildPatientContextString(patient, preCallData, renderKnowledgeBlock(knowledge));
         const systemPrompt = buildSystemPrompt(patientContext);
 
         logger.info(`AI Doctor call config built for patient ${patient.id}`);

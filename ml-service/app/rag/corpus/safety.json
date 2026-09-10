@@ -1,0 +1,196 @@
+{
+  "collection": "safety",
+  "note": "Red-flag entries. These exist so retrieval surfaces the escalation rule alongside any remedy for the same complaint — the assistant should never discuss chest pain or breathlessness without the emergency criteria being in context. Mirrors the deterministic patterns in backend/src/modules/ai-doctor/emergencyDetection.ts.",
+  "documents": [
+    {
+      "id": "red-cardiac",
+      "title": "RED FLAG — possible heart attack",
+      "keywords": [
+        "chest pain",
+        "seene mein dard",
+        "chest tightness",
+        "left arm pain",
+        "jaw pain",
+        "sweating",
+        "pasina",
+        "crushing pain",
+        "heart attack",
+        "dil ka daura",
+        "angina",
+        "seene mein jakdan",
+        "dil mein dard",
+        "baayan haath"
+      ],
+      "text": "Chest pain or heaviness that comes with sweating, nausea, breathlessness, or pain radiating to the left arm, jaw, neck or back must be treated as a possible heart attack until proven otherwise. Risk is higher over age 40 and in anyone with diabetes, hypertension, smoking history or a family history of cardiac disease. Diabetics and women may present atypically, with fatigue, breathlessness or upper-abdominal discomfort rather than classic chest pain.",
+      "action": "STOP the consultation and tell the patient to call 108 immediately. Do not offer home remedies. Advise chewing aspirin only if a doctor has previously instructed them to. They should not drive themselves.",
+      "escalate": "EMERGENCY — ambulance 108",
+      "source": "Standard emergency triage criteria"
+    },
+    {
+      "id": "red-breathless",
+      "title": "RED FLAG — severe breathlessness",
+      "keywords": [
+        "cannot breathe",
+        "saans nahi",
+        "severe breathlessness",
+        "gasping",
+        "blue lips",
+        "suffocating",
+        "dam ghut",
+        "breathless at rest"
+      ],
+      "text": "Breathlessness at rest, inability to complete a sentence in one breath, blue lips or fingertips, or a reliever inhaler that is no longer working are all emergency findings. Sudden breathlessness with chest pain can indicate a pulmonary embolism or heart failure.",
+      "action": "STOP and direct to emergency care via 108. Sit the patient upright. Do not delay for home remedies or steam.",
+      "escalate": "EMERGENCY — ambulance 108",
+      "source": "Standard emergency triage criteria"
+    },
+    {
+      "id": "red-stroke",
+      "title": "RED FLAG — stroke (BE-FAST)",
+      "keywords": [
+        "face droop",
+        "slurred speech",
+        "weakness one side",
+        "numbness",
+        "lakwa",
+        "paralysis",
+        "cannot speak",
+        "sudden vision loss",
+        "loss of balance",
+        "stroke",
+        "muh tedha",
+        "bolne mein dikkat",
+        "haath pair sun"
+      ],
+      "text": "Sudden facial droop, arm or leg weakness on one side, slurred or confused speech, sudden vision loss, severe imbalance, or a sudden worst-ever headache indicate a possible stroke. Treatment is time-critical — clot-dissolving therapy has a narrow window, so minutes genuinely change the outcome.",
+      "action": "STOP and call 108 immediately. Note the exact time symptoms began, as that determines eligibility for treatment. Give nothing by mouth.",
+      "escalate": "EMERGENCY — ambulance 108",
+      "source": "BE-FAST stroke recognition; standard emergency triage"
+    },
+    {
+      "id": "red-gi-bleed",
+      "title": "RED FLAG — gastrointestinal bleeding",
+      "keywords": [
+        "blood in vomit",
+        "khoon ki ulti",
+        "black stool",
+        "kala pakhana",
+        "blood in stool",
+        "coffee ground vomit",
+        "melena",
+        "bleeding"
+      ],
+      "text": "Vomiting blood or coffee-ground material, or passing black tarry stools, indicates upper gastrointestinal bleeding. Fresh blood in stool needs assessment too. This can deteriorate quickly and is not a situation for home remedies.",
+      "action": "STOP and direct to emergency care immediately. Nothing by mouth until assessed.",
+      "escalate": "EMERGENCY — hospital now",
+      "source": "Standard emergency triage criteria"
+    },
+    {
+      "id": "red-fever-confusion",
+      "title": "RED FLAG — fever with confusion or neck stiffness",
+      "keywords": [
+        "fever confusion",
+        "neck stiffness",
+        "gardan akadna",
+        "drowsy fever",
+        "unconscious",
+        "behosh",
+        "seizure",
+        "fits",
+        "meningitis",
+        "rash with fever"
+      ],
+      "text": "High fever with confusion, drowsiness, neck stiffness, seizures, or a rash that does not fade under pressure suggests meningitis, encephalitis or sepsis. In children, poor feeding, unusual drowsiness or a bulging fontanelle are equivalent warning signs.",
+      "action": "STOP and direct to emergency care via 108. Do not wait to see if the fever settles.",
+      "escalate": "EMERGENCY — ambulance 108",
+      "source": "Standard emergency triage criteria"
+    },
+    {
+      "id": "red-pregnancy",
+      "title": "Caution — pregnancy and breastfeeding",
+      "keywords": [
+        "pregnant",
+        "pregnancy",
+        "garbhvati",
+        "breastfeeding",
+        "expecting",
+        "trying to conceive",
+        "missed period"
+      ],
+      "text": "Pregnancy changes what is safe. Several common Ayurvedic herbs are contraindicated: ashwagandha, triphala, neem, medicinal-dose fenugreek and high-dose tulsi among them. Ginger is acceptable in culinary and small medicinal amounts for nausea. Any bleeding, severe abdominal pain, severe headache with visual disturbance, reduced fetal movement or swelling of face and hands needs same-day obstetric assessment.",
+      "action": "Do not suggest herbal remedies in pregnancy or breastfeeding. Route to an obstetrician. Diet and lifestyle guidance is fine; herbs are not.",
+      "escalate": "Obstetric review before any herbal remedy",
+      "source": "AYUSH safety guidance; standard obstetric practice"
+    },
+    {
+      "id": "red-paediatric",
+      "title": "Caution — children and infants",
+      "keywords": [
+        "child",
+        "baby",
+        "infant",
+        "bachcha",
+        "newborn",
+        "toddler",
+        "paediatric",
+        "kid"
+      ],
+      "text": "Adult herbal doses do not scale down safely to children, and infants under one year must never be given honey because of the risk of infant botulism. Warning signs in a child are poor feeding, unusual drowsiness or floppiness, fewer wet nappies, fast or laboured breathing, a non-blanching rash, or a fever in an infant under three months.",
+      "action": "Do not give adult herbal doses to children. Any unwell infant under three months, or a child with the warning signs above, needs a paediatrician the same day.",
+      "escalate": "Paediatric review",
+      "source": "AYUSH safety guidance; standard paediatric practice"
+    },
+    {
+      "id": "red-mental-health",
+      "title": "RED FLAG — mental health crisis",
+      "keywords": [
+        "suicide",
+        "self harm",
+        "end my life",
+        "khudkushi",
+        "hopeless",
+        "want to die",
+        "harm myself",
+        "severe depression"
+      ],
+      "text": "Any mention of self-harm, suicidal thinking or hopelessness with intent is an emergency, regardless of what else the consultation was about. It is never appropriate to respond to this with herbal or lifestyle advice.",
+      "action": "Respond with warmth, stay with the person, and route them to immediate human help. In India: Tele-MANAS 14416 (24x7, free), or the mental-health helpline 9152987821. Encourage them to reach someone they trust right now and not to be alone.",
+      "escalate": "EMERGENCY — Tele-MANAS 14416",
+      "source": "Standard mental-health crisis guidance (India)"
+    },
+    {
+      "id": "safety-scope",
+      "title": "Scope of this assistant",
+      "keywords": [
+        "scope",
+        "limitation",
+        "disclaimer",
+        "not a doctor",
+        "are you ai",
+        "diagnosis",
+        "prescription",
+        "can you diagnose"
+      ],
+      "text": "This assistant is an AI health companion, not a licensed physician, and cannot diagnose disease or prescribe medication. It discusses symptoms, gives general lifestyle, diet and traditional self-care guidance, and produces a structured summary for a qualified doctor to review. It does not name or recommend allopathic drugs. If asked directly whether it is an AI, it must say so plainly.",
+      "action": "Stay inside this scope. When a complaint needs diagnosis, imaging, tests or prescription medicine, say so and route to a doctor rather than improvising.",
+      "escalate": "Refer to a qualified physician",
+      "source": "Product scope definition"
+    },
+    {
+      "id": "safety-never-stop-medication",
+      "title": "Never advise stopping prescribed medication",
+      "keywords": [
+        "stop medicine",
+        "dawa band",
+        "replace medication",
+        "instead of tablet",
+        "quit medicine",
+        "allopathy chhod"
+      ],
+      "text": "Patients frequently ask whether a herb can replace their blood-pressure, diabetes, thyroid or cardiac medication. The answer is always no. Traditional remedies here are adjuncts. Stopping prescribed treatment — particularly antihypertensives, insulin or oral hypoglycaemics, thyroid replacement, anticoagulants or cardiac drugs — can be immediately dangerous.",
+      "action": "Never suggest reducing or stopping a prescribed medicine. Any change to prescribed treatment is a decision for the prescribing doctor alone.",
+      "escalate": "Prescribing physician only",
+      "source": "Product safety policy; standard clinical practice"
+    }
+  ]
+}

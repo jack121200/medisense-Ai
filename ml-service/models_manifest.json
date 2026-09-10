@@ -338,6 +338,25 @@
           "modified_at": "2026-09-08T09:21:51.551865+00:00"
         }
       }
+    },
+    "rag_knowledge_base": {
+      "status": "built",
+      "training_script": "app/rag/retriever.py (built in-process at startup)",
+      "meta": {
+        "retrieval": "TF-IDF (word 1-2 grams, sublinear tf, Hinglish stopwords) + cosine similarity",
+        "n_documents": 53,
+        "n_features": 7416,
+        "documents_by_collection": {
+          "conditions": 20,
+          "herbs": 14,
+          "lifestyle": 9,
+          "safety": 10
+        },
+        "built_at": "2026-09-10T20:16:11.370083+00:00",
+        "corpus": "app/rag/corpus/*.json \u2014 curated Ayurvedic pharmacology, complaint-level self-care, red-flag triage criteria and lifestyle guidance",
+        "note": "Lexical retrieval, not dense embeddings. Chosen so the service stays within free-tier memory alongside XGBoost, pgmpy and the PyTorch autoencoder; at ~50 curated documents with domain-specific vocabulary, keyword overlap is a strong signal and dense retrieval would not earn its memory cost. Corpus keywords carry Hindi/Hinglish terms so patient phrasing retrieves correctly. Safety documents are force-included when they match, so red-flag criteria reach the prompt alongside any remedy for the same complaint. Retrieval quality is regression-tested in tests/test_rag_retrieval.py.",
+        "index_build_time_ms": 32
+      }
     }
   }
 }

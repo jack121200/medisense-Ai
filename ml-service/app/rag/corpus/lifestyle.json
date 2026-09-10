@@ -1,0 +1,157 @@
+{
+  "collection": "lifestyle",
+  "note": "Diet, routine and practice entries. These carry the advice the assistant gives at the end of most consultations, so it is grounded in a consistent source rather than reinvented per call.",
+  "documents": [
+    {
+      "id": "life-dinacharya",
+      "title": "Daily routine (dinacharya)",
+      "keywords": [
+        "routine",
+        "dinacharya",
+        "daily habits",
+        "schedule",
+        "lifestyle",
+        "waking early",
+        "discipline"
+      ],
+      "text": "Ayurveda treats a regular daily rhythm as treatment in itself, not as background advice. The core is consistency: waking and sleeping at the same times, eating at the same times, and putting the heaviest meal at midday when digestive capacity is considered strongest. Irregular timing is one of the most common drivers behind the digestive, sleep and energy complaints seen in general practice.",
+      "practice": "Wake at a fixed time, ideally before sunrise. Warm water on rising. Pass stool before breakfast. Largest meal at midday, lightest at night by 7-8 pm. Fixed sleep time. Some daily movement — walk, yoga or exercise.",
+      "source": "Classical Ayurvedic texts; AYUSH lifestyle guidance"
+    },
+    {
+      "id": "life-diet-principles",
+      "title": "General diet principles",
+      "keywords": [
+        "diet",
+        "khana",
+        "food",
+        "eating habits",
+        "nutrition",
+        "what to eat",
+        "meal",
+        "ahar"
+      ],
+      "text": "Traditional dietary guidance emphasises freshly cooked, warm, seasonal food eaten at regular times and in a settled state of mind, over any particular superfood. The practical version for most patients: fewer packaged and fried items, more whole grains and vegetables, adequate protein, and an early dinner. How and when someone eats often matters as much as what is on the plate.",
+      "practice": "Freshly cooked warm food. Eat to about three-quarters full. Chew properly and eat without screens. Sip warm water with meals rather than large cold drinks. Dinner by 7-8 pm and at least three hours before sleep. Cut maida, sugar, packaged snacks and deep-fried food.",
+      "source": "Classical Ayurvedic texts; AYUSH lifestyle guidance"
+    },
+    {
+      "id": "life-pranayama",
+      "title": "Pranayama and breathing practice",
+      "keywords": [
+        "pranayama",
+        "breathing",
+        "anulom vilom",
+        "bhramari",
+        "kapalbhati",
+        "saans",
+        "breathing exercise",
+        "meditation"
+      ],
+      "text": "Breathing practice is the most commonly prescribed non-drug intervention in this system, used for stress, sleep, blood pressure, anxiety and respiratory conditioning. Anulom-vilom (alternate nostril) is the general-purpose calming practice; bhramari (humming) suits sleep and anxiety; kapalbhati is energising but is not for everyone.",
+      "practice": "Anulom-vilom 10-15 minutes daily, ideally morning on an empty stomach. Bhramari 5-10 rounds at bedtime for sleep and anxiety. Kapalbhati only if well — avoid in pregnancy, hypertension, heart disease, hernia and during menstruation. Never strain; practice should feel easy.",
+      "source": "Classical yoga texts; AYUSH guidance"
+    },
+    {
+      "id": "life-yoga",
+      "title": "Yoga for common complaints",
+      "keywords": [
+        "yoga",
+        "asana",
+        "exercise",
+        "stretching",
+        "surya namaskar",
+        "vyayam",
+        "physical activity",
+        "posture"
+      ],
+      "text": "Specific asanas are traditionally matched to complaints: bhujangasana and marjariasana for back pain, vajrasana after meals for digestion, supta baddha konasana for menstrual cramps, shavasana for stress and sleep. Surya namaskar serves as a general daily practice covering strength, flexibility and circulation.",
+      "practice": "Start with 10-15 minutes daily rather than an ambitious session that will not last. Surya namaskar 6-12 rounds as a base. Vajrasana 5 minutes after meals. Shavasana 10 minutes for stress. Avoid inversions and strong twists in pregnancy, uncontrolled hypertension and acute back injury.",
+      "source": "Classical yoga texts; AYUSH guidance"
+    },
+    {
+      "id": "life-sleep",
+      "title": "Sleep hygiene",
+      "keywords": [
+        "sleep",
+        "neend",
+        "sleep hygiene",
+        "bedtime",
+        "screen",
+        "rest",
+        "insomnia habits"
+      ],
+      "text": "Sleep quality responds more reliably to routine than to remedies. The main levers are a fixed sleep and wake time, a dark cool room, no screens for the last hour, no caffeine after mid-afternoon, and an early light dinner. Alcohol is a common false friend here — it shortens time to fall asleep but fragments the second half of the night.",
+      "practice": "Fixed sleep and wake time including weekends. Screens off an hour before bed. Warm oil foot massage or warm milk at night. Dark, cool, quiet room. No caffeine after 4 pm. If awake beyond 20 minutes, get up and do something calm rather than lying there.",
+      "source": "AYUSH lifestyle guidance; standard sleep-medicine practice"
+    },
+    {
+      "id": "life-hydration",
+      "title": "Hydration",
+      "keywords": [
+        "water",
+        "pani",
+        "hydration",
+        "how much water",
+        "dehydration",
+        "fluids",
+        "thirst"
+      ],
+      "text": "Most adults do well on roughly 2.5-3 litres of fluid daily, more in heat or with physical work, less where a doctor has restricted fluids for heart or kidney disease. Traditional guidance favours warm or room-temperature water over chilled, particularly for people with weak digestion. Urine colour is the simplest practical marker: pale straw is adequate, dark yellow is not.",
+      "practice": "Warm water on waking. Sip through the day rather than large volumes at once. Warm or room-temperature water with meals. Increase in summer and with exertion. Restrict only if a doctor has advised it for cardiac or renal reasons.",
+      "source": "AYUSH lifestyle guidance; standard practice"
+    },
+    {
+      "id": "life-ritucharya",
+      "title": "Seasonal routine (ritucharya)",
+      "keywords": [
+        "season",
+        "ritucharya",
+        "summer",
+        "winter",
+        "monsoon",
+        "garmi",
+        "sardi",
+        "barsat",
+        "weather change"
+      ],
+      "text": "Traditional practice adjusts diet and routine by season: cooling, light food and extra fluids in summer; warm, nourishing, oil-rich food in winter; careful food hygiene and light digestible meals in the monsoon, when gastrointestinal infection is most common. Seasonal transitions are when respiratory and digestive complaints cluster.",
+      "practice": "Summer: coconut water, buttermilk, cucumber, avoid midday sun and excess spice. Monsoon: freshly cooked food only, avoid raw salads and street food, boiled or filtered water. Winter: warm cooked food, sesame oil massage, adequate sunlight for vitamin D.",
+      "source": "Classical Ayurvedic texts; AYUSH lifestyle guidance"
+    },
+    {
+      "id": "life-tobacco-alcohol",
+      "title": "Tobacco and alcohol",
+      "keywords": [
+        "smoking",
+        "tobacco",
+        "gutka",
+        "cigarette",
+        "alcohol",
+        "sharab",
+        "drinking",
+        "quit smoking",
+        "addiction"
+      ],
+      "text": "Stopping tobacco is the single highest-value change available for cardiovascular, respiratory and cancer risk — larger than any dietary or herbal intervention. Smokeless tobacco (gutka, khaini) carries substantial oral-cancer risk and is often not recognised as tobacco use by patients. Alcohol contributes to hypertension, liver disease and sleep disruption.",
+      "practice": "Set a quit date rather than tapering indefinitely. Identify trigger situations and plan a substitute. In India the National Tobacco Quitline is 1800-11-2356. Any non-healing mouth ulcer, white patch or difficulty opening the mouth in a tobacco user needs urgent dental or ENT review.",
+      "source": "AYUSH lifestyle guidance; national tobacco-control guidance"
+    },
+    {
+      "id": "life-preventive-checks",
+      "title": "Preventive health checks",
+      "keywords": [
+        "checkup",
+        "screening",
+        "prevention",
+        "jaanch",
+        "blood test",
+        "annual check",
+        "preventive"
+      ],
+      "text": "Many conditions common in India — hypertension, type 2 diabetes, anaemia, thyroid disorder — are symptomless in their early stages and are found only by measurement. Traditional consultation pairs well with a simple screening schedule, particularly where there is a family history.",
+      "practice": "Blood pressure at least annually from age 30, more often with a family history. Fasting glucose or HbA1c from age 30, or earlier with obesity or family history. Haemoglobin for women of reproductive age. Lipid profile from age 40. Dental and eye review annually. Do not wait for symptoms.",
+      "source": "AYUSH preventive guidance; standard primary-care screening"
+    }
+  ]
+}

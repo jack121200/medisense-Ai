@@ -1,0 +1,286 @@
+{
+  "collection": "herbs",
+  "note": "Traditional Ayurvedic single-herb entries. Dosages are commonly cited traditional ranges for adults, not prescriptions — every entry assumes a qualified practitioner confirms suitability. Contraindication text here is the same knowledge the deterministic guard in backend/src/modules/ai-doctor/herbInteractions.ts enforces, so retrieval and the safety backstop cannot drift apart.",
+  "documents": [
+    {
+      "id": "herb-ashwagandha",
+      "title": "Ashwagandha (Withania somnifera)",
+      "keywords": [
+        "ashwagandha",
+        "stress",
+        "anxiety",
+        "insomnia",
+        "fatigue",
+        "weakness",
+        "low energy",
+        "thyroid",
+        "adaptogen",
+        "tanav",
+        "thakan",
+        "neend"
+      ],
+      "text": "Ashwagandha is the classical Ayurvedic rasayana for stress, nervous exhaustion and poor sleep. It is used where a person reports persistent tiredness despite rest, anxiety with restlessness, difficulty falling asleep, or general debility during recovery from illness. Traditional preparation is the root powder taken with warm milk at night, which is also considered to support the sleep benefit.",
+      "dosage": "3-5 g of root powder (churna) in 200 ml warm milk once at night, or 300-600 mg of standardised extract daily. Traditionally taken for 4-8 weeks, then reassessed.",
+      "contraindications": "Avoid in pregnancy. Use caution with thyroid medication — ashwagandha can raise thyroid hormone levels and may compound thyroxine. It may add to the effect of sedatives and anti-anxiety drugs. Caution in autoimmune conditions and before surgery.",
+      "source": "Classical Ayurvedic pharmacopoeia; AYUSH monographs"
+    },
+    {
+      "id": "herb-triphala",
+      "title": "Triphala (Amalaki, Bibhitaki, Haritaki)",
+      "keywords": [
+        "triphala",
+        "constipation",
+        "kabz",
+        "digestion",
+        "bowel",
+        "detox",
+        "gas",
+        "bloating",
+        "pet saaf"
+      ],
+      "text": "Triphala is a three-fruit combination used for sluggish bowels, irregular digestion and general gut cleansing. It is the first-line traditional answer to chronic constipation that is not caused by an obstruction, and is regarded as gentle enough for long-term use, unlike stimulant laxatives. It also has a mild role in eye health and as a general tonic.",
+      "dosage": "1 teaspoon (about 3-5 g) of powder in warm water at bedtime, or one tablet at night. Start at half a teaspoon if the gut is sensitive.",
+      "contraindications": "Avoid in pregnancy and during acute diarrhoea. May reduce absorption of other medicines taken at the same time — separate doses by two hours. Stop and seek review if constipation is accompanied by severe pain, vomiting or blood in stool.",
+      "source": "Classical Ayurvedic pharmacopoeia; AYUSH monographs"
+    },
+    {
+      "id": "herb-giloy",
+      "title": "Giloy / Guduchi (Tinospora cordifolia)",
+      "keywords": [
+        "giloy",
+        "guduchi",
+        "immunity",
+        "fever",
+        "bukhar",
+        "recurrent infection",
+        "viral",
+        "platelet",
+        "weakness after fever"
+      ],
+      "text": "Giloy is used as an immunomodulator, most commonly during and after recurrent fevers and viral illness, and in convalescence when someone feels weak after an infection has passed. It is traditionally given for low-grade recurring fever and as a general resistance builder.",
+      "dosage": "Fresh stem decoction (kadha) 20-30 ml twice daily, or 1-3 g powder twice daily with warm water, typically for 2-4 weeks.",
+      "contraindications": "Use caution in autoimmune disease — as an immune stimulant it may worsen conditions such as rheumatoid arthritis or lupus. Caution with immunosuppressant medication. Rare reports of liver injury with prolonged unsupervised use; avoid in known liver disease and stop if jaundice, dark urine or right-upper-abdominal pain appear.",
+      "source": "AYUSH monographs; classical Ayurvedic texts"
+    },
+    {
+      "id": "herb-brahmi",
+      "title": "Brahmi (Bacopa monnieri)",
+      "keywords": [
+        "brahmi",
+        "memory",
+        "concentration",
+        "focus",
+        "anxiety",
+        "mental fatigue",
+        "studying",
+        "yaadasht",
+        "dhyan"
+      ],
+      "text": "Brahmi is used for memory, concentration and mental fatigue, and secondarily for anxiety with an overactive mind. It is a slow-acting herb — benefit is traditionally expected over weeks, not days — and is commonly taken by students and by older adults concerned about forgetfulness.",
+      "dosage": "300-600 mg of standardised extract daily, or 1-2 g of powder with warm milk or water, usually in the morning. Give it at least 8-12 weeks before judging effect.",
+      "contraindications": "May add to the effect of sedatives and thyroid medication. Can slow heart rate — use caution with beta blockers and other rate-lowering drugs. May aggravate acidity or nausea if taken on an empty stomach.",
+      "source": "Classical Ayurvedic pharmacopoeia; AYUSH monographs"
+    },
+    {
+      "id": "herb-arjuna",
+      "title": "Arjuna (Terminalia arjuna)",
+      "keywords": [
+        "arjuna",
+        "heart",
+        "cardiac",
+        "blood pressure",
+        "bp",
+        "palpitation",
+        "chest",
+        "dil",
+        "hriday",
+        "cholesterol"
+      ],
+      "text": "Arjuna bark is the classical Ayurvedic cardiac tonic, used traditionally to support heart function, mild blood-pressure control and cholesterol balance. It is important to be clear that Arjuna is supportive care only — it does not replace prescribed cardiac medication, and anyone with diagnosed heart disease should continue their prescribed treatment.",
+      "dosage": "1-3 g of bark powder with warm milk or water once or twice daily, or as a decoction (arjuna ksheerapaka) at night.",
+      "contraindications": "Can lower blood pressure and heart rate — combined with antihypertensives or beta blockers it may cause dizziness or excessive drops in BP. Never a substitute for prescribed cardiac drugs. Requires physician oversight in anyone already on heart medication.",
+      "source": "Classical Ayurvedic pharmacopoeia; AYUSH monographs"
+    },
+    {
+      "id": "herb-shatavari",
+      "title": "Shatavari (Asparagus racemosus)",
+      "keywords": [
+        "shatavari",
+        "women",
+        "menstrual",
+        "period",
+        "pcos",
+        "hormonal",
+        "lactation",
+        "menopause",
+        "mahila",
+        "masik"
+      ],
+      "text": "Shatavari is the principal Ayurvedic herb for women's reproductive health — irregular or painful periods, perimenopausal symptoms, and traditionally to support lactation. It is regarded as cooling and nourishing, and is also used in general debility and dryness.",
+      "dosage": "3-5 g of root powder with warm milk once or twice daily, or 500 mg extract twice daily.",
+      "contraindications": "Avoid in people with a history of hormone-sensitive conditions without physician guidance. Caution in those with kidney disease or on diuretics. Avoid if there is a known asparagus allergy.",
+      "source": "Classical Ayurvedic pharmacopoeia; AYUSH monographs"
+    },
+    {
+      "id": "herb-punarnava",
+      "title": "Punarnava (Boerhavia diffusa)",
+      "keywords": [
+        "punarnava",
+        "swelling",
+        "oedema",
+        "edema",
+        "water retention",
+        "kidney",
+        "urine",
+        "sujan",
+        "puffiness"
+      ],
+      "text": "Punarnava is used for fluid retention and puffiness, particularly around the ankles and face, and traditionally as a kidney and urinary support herb. Any new or worsening swelling should first be evaluated medically, because it can indicate heart, kidney or liver disease that needs proper diagnosis.",
+      "dosage": "1-3 g of powder twice daily with warm water, or 20-30 ml decoction twice daily.",
+      "contraindications": "Has a diuretic action — combined with prescribed diuretics (furosemide, hydrochlorothiazide) it can cause dehydration and electrolyte disturbance. Caution in established kidney disease and in those on lithium. New unexplained swelling needs medical evaluation first, not self-treatment.",
+      "source": "AYUSH monographs; classical Ayurvedic texts"
+    },
+    {
+      "id": "herb-neem",
+      "title": "Neem (Azadirachta indica)",
+      "keywords": [
+        "neem",
+        "skin",
+        "acne",
+        "pimple",
+        "eczema",
+        "infection",
+        "blood purifier",
+        "twacha",
+        "kharish",
+        "itching",
+        "diabetes"
+      ],
+      "text": "Neem is used for skin complaints — acne, itching, fungal infection and eczema — both internally and as an external paste or wash. It is also traditionally used as a blood purifier and has a mild blood-sugar-lowering effect.",
+      "dosage": "External: neem leaf paste applied to affected skin, or boiled neem-leaf water used as a wash. Internal: 1-2 g leaf powder daily, short courses only.",
+      "contraindications": "Avoid in pregnancy and while trying to conceive. Can lower blood sugar — combined with antidiabetic medication (metformin, glimepiride, insulin) it may cause hypoglycaemia. Avoid prolonged high-dose internal use, which has been associated with liver stress. Not for infants and young children internally.",
+      "source": "AYUSH monographs; classical Ayurvedic texts"
+    },
+    {
+      "id": "herb-tulsi",
+      "title": "Tulsi / Holy Basil (Ocimum sanctum)",
+      "keywords": [
+        "tulsi",
+        "cough",
+        "cold",
+        "khansi",
+        "sardi",
+        "throat",
+        "respiratory",
+        "immunity",
+        "kadha",
+        "fever"
+      ],
+      "text": "Tulsi is the everyday household remedy for cough, cold, sore throat and mild respiratory congestion, usually taken as a leaf decoction or in tea. It is also used as a general immunity and stress-support herb.",
+      "dosage": "5-10 fresh leaves boiled in 200 ml water as a kadha, once or twice daily; or tulsi tea 1-2 cups a day. Often combined with ginger, black pepper and honey for cough.",
+      "contraindications": "May have a mild blood-thinning effect — caution with warfarin or other anticoagulants and before surgery. May lower blood sugar, so watch for interaction with diabetes medication. Avoid high doses in pregnancy.",
+      "source": "AYUSH monographs; classical Ayurvedic texts"
+    },
+    {
+      "id": "herb-haldi-turmeric",
+      "title": "Haldi / Turmeric (Curcuma longa)",
+      "keywords": [
+        "haldi",
+        "turmeric",
+        "curcumin",
+        "inflammation",
+        "joint pain",
+        "pain",
+        "swelling",
+        "wound",
+        "cough",
+        "golden milk",
+        "doodh"
+      ],
+      "text": "Turmeric is the most widely used household anti-inflammatory in Indian homes, taken in warm milk for joint pain, cough and general inflammation, and applied externally on wounds and bruises. Absorption is poor on its own, which is why it is traditionally paired with black pepper and a fat such as ghee or milk.",
+      "dosage": "1 teaspoon turmeric with a pinch of black pepper and 1 teaspoon ghee in 200 ml warm milk at night. External: turmeric paste on the affected area.",
+      "contraindications": "In high supplemental doses it may increase bleeding risk — caution with warfarin, aspirin and other blood thinners, and stop two weeks before surgery. Can worsen symptoms in gallstone disease or bile duct obstruction. May aggravate acidity in some people. Culinary amounts are generally safe.",
+      "source": "AYUSH monographs; classical Ayurvedic texts"
+    },
+    {
+      "id": "herb-adrak-ginger",
+      "title": "Adrak / Ginger (Zingiber officinale)",
+      "keywords": [
+        "ginger",
+        "adrak",
+        "nausea",
+        "vomiting",
+        "indigestion",
+        "gas",
+        "cough",
+        "cold",
+        "motion sickness",
+        "ulti",
+        "pet"
+      ],
+      "text": "Ginger is used for nausea, indigestion, gas and bloating, and as part of cough and cold remedies. It is one of the best-supported traditional remedies for nausea, including morning sickness and motion sickness, and stimulates weak digestion.",
+      "dosage": "1-2 g fresh ginger daily — as ginger tea, or a small piece chewed before meals for weak digestion. For cough: ginger juice with honey, twice daily.",
+      "contraindications": "May increase bleeding risk at high doses — caution with anticoagulants. Can aggravate acid reflux and gastritis in some people. Keep to under 1 g/day in pregnancy and discuss with a doctor. May lower blood sugar and blood pressure slightly.",
+      "source": "AYUSH monographs; classical Ayurvedic texts"
+    },
+    {
+      "id": "herb-methi-fenugreek",
+      "title": "Methi / Fenugreek (Trigonella foenum-graecum)",
+      "keywords": [
+        "methi",
+        "fenugreek",
+        "diabetes",
+        "blood sugar",
+        "cholesterol",
+        "sugar",
+        "lactation",
+        "joint",
+        "madhumeh"
+      ],
+      "text": "Fenugreek seeds are traditionally used to help control blood sugar and cholesterol, and to support lactation. Soaked seeds taken on an empty stomach are the common household preparation for raised blood sugar, alongside — never instead of — prescribed diabetes treatment.",
+      "dosage": "1 teaspoon of seeds soaked overnight in water, taken with the water on an empty stomach in the morning; or 5 g powder daily.",
+      "contraindications": "Lowers blood sugar — combined with metformin, sulfonylureas or insulin it can cause hypoglycaemia, so sugar levels must be monitored. Avoid medicinal doses in pregnancy (may stimulate uterine contractions). May increase bleeding risk with anticoagulants.",
+      "source": "AYUSH monographs; classical Ayurvedic texts"
+    },
+    {
+      "id": "herb-amla",
+      "title": "Amla / Indian Gooseberry (Emblica officinalis)",
+      "keywords": [
+        "amla",
+        "amalaki",
+        "vitamin c",
+        "immunity",
+        "hair",
+        "acidity",
+        "digestion",
+        "anaemia",
+        "eyes",
+        "baal"
+      ],
+      "text": "Amla is one of the richest natural sources of vitamin C and is used as a daily rasayana for immunity, hair and skin quality, mild acidity, and as a general tonic. It is a component of Triphala and is considered cooling, which is why it suits people with a heat or acidity tendency.",
+      "dosage": "One fresh fruit daily, 20-30 ml fresh juice, or 3-5 g powder with water in the morning.",
+      "contraindications": "May increase bleeding risk at high doses — caution with anticoagulants and before surgery. Can lower blood sugar. Its cooling nature may aggravate a persistent cold or loose stools in some people.",
+      "source": "Classical Ayurvedic pharmacopoeia; AYUSH monographs"
+    },
+    {
+      "id": "herb-mulethi-licorice",
+      "title": "Mulethi / Licorice (Glycyrrhiza glabra)",
+      "keywords": [
+        "mulethi",
+        "licorice",
+        "yashtimadhu",
+        "sore throat",
+        "cough",
+        "acidity",
+        "ulcer",
+        "gala",
+        "kharash",
+        "hoarseness"
+      ],
+      "text": "Licorice root is used for sore throat, dry irritating cough, hoarseness and for soothing acidity and gastric irritation. A small piece of the root is traditionally chewed for throat symptoms.",
+      "dosage": "1-3 g of root powder or a small piece of root chewed, up to twice daily. Short courses only — typically not beyond 4-6 weeks continuously.",
+      "contraindications": "Important: licorice raises blood pressure and causes potassium loss and fluid retention. It must be avoided in hypertension and in anyone on antihypertensive medication, diuretics or digoxin. Avoid in kidney disease, heart failure and pregnancy. This is one of the most clinically significant herb interactions in common household use.",
+      "source": "AYUSH monographs; classical Ayurvedic texts"
+    }
+  ]
+}
