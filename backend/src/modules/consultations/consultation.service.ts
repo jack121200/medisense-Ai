@@ -160,13 +160,17 @@ export const consultationService = {
         return prescription;
     },
 
-    async closeAndBill(consultationId: string, patientId: string) {
+    async closeAndBill(consultationId: string) {
         const consultation = await prisma.consultation.findUnique({
             where: { id: consultationId },
             include: { labTestRequests: true, invoice: true },
         });
         if (!consultation) throw new AppError('Consultation not found', 404, 'NOT_FOUND');
         if (consultation.invoice) return consultation.invoice;
+        // Bill the consultation's own patient. This used to take the patient
+        // from the request body, so a wrong or tampered ID raised the invoice
+        // against someone else's account.
+        const { patientId } = consultation;
 
         // Build invoice items
         const LAB_FEES: Record<string, number> = {

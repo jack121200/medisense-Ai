@@ -2,6 +2,7 @@ import React, { Suspense, lazy } from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { useAuthStore } from './store/authStore';
 import AppLayout from './layouts/AppLayout';
+import { roleHome } from './utils/roleHome';
 
 // Pages — lazy loaded
 const LandingPage = lazy(() => import('./pages/LandingPage'));
@@ -45,12 +46,29 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
     return <>{children}</>;
 }
 
-// Role-based route guard — redirects unauthorised roles to dashboard
+// Who may open each page. Each group mirrors the backend rule for that page's
+// data, so no role is shown a page whose every request comes back 403.
+const STAFF = ['SUPER_ADMIN', 'ADMIN', 'DOCTOR', 'NURSE', 'RECEPTIONIST', 'LAB_TECHNICIAN', 'ANALYST'];
+const HOSPITAL_DASHBOARD = ['SUPER_ADMIN', 'ADMIN', 'DOCTOR', 'NURSE', 'RECEPTIONIST', 'ANALYST'];
+const PATIENT_MANAGE = ['SUPER_ADMIN', 'ADMIN', 'DOCTOR', 'NURSE', 'RECEPTIONIST'];
+const SCHEDULING = ['SUPER_ADMIN', 'ADMIN', 'RECEPTIONIST', 'DOCTOR'];
+const BILLING = ['SUPER_ADMIN', 'ADMIN', 'DOCTOR', 'RECEPTIONIST'];
+const ADMINS = ['ADMIN', 'SUPER_ADMIN'];
+const CLINICAL_CARE = ['SUPER_ADMIN', 'ADMIN', 'DOCTOR', 'NURSE'];
+const RESEARCH = ['DOCTOR', 'ADMIN', 'SUPER_ADMIN', 'ANALYST'];
+const LAB = ['LAB_TECHNICIAN', 'ADMIN', 'SUPER_ADMIN'];
+
+// Role-based route guard. An unauthorised role goes to its own home page, not
+// a fixed one: a fixed /dashboard sent patients to a staff page they could
+// not load.
 function RoleRoute({ allowed, children }: { allowed: string[]; children: React.ReactNode }) {
     const { user } = useAuthStore();
-    if (!user || !allowed.includes(user.role)) return <Navigate to="/dashboard" replace />;
+    if (!user) return <Navigate to="/login" replace />;
+    if (!allowed.includes(user.role)) return <Navigate to={roleHome(user.role)} replace />;
     return <>{children}</>;
 }
+
+const guard = (allowed: string[], page: React.ReactNode) => <RoleRoute allowed={allowed}>{page}</RoleRoute>;
 
 export default function App() {
     return (
@@ -72,55 +90,36 @@ export default function App() {
                         page and bounced every logged-out visitor to /login. */}
 
                     {/* Shared / Receptionist */}
-                    <Route path="/dashboard" element={<DashboardPage />} />
-                    <Route path="/patients" element={<PatientsPage />} />
-                    <Route path="/patients/new" element={<AddPatientPage />} />
-                    <Route path="/patients/:id" element={<PatientDetailPage />} />
+                    <Route path="/dashboard" element={guard(HOSPITAL_DASHBOARD, <DashboardPage />)} />
+                    <Route path="/patients" element={guard(STAFF, <PatientsPage />)} />
+                    <Route path="/patients/new" element={guard(PATIENT_MANAGE, <AddPatientPage />)} />
+                    <Route path="/patients/:id" element={guard(STAFF, <PatientDetailPage />)} />
                     {/* Unified appointments page — replaces old /appointment-requests */}
-                    <Route path="/appointments" element={<AppointmentsPage />} />
+                    <Route path="/appointments" element={guard(SCHEDULING, <AppointmentsPage />)} />
                     <Route path="/appointment-requests" element={<Navigate to="/appointments" replace />} />
-                    <Route path="/billing" element={<BillingPage />} />
-                    <Route path="/users" element={<UsersPage />} />
+                    <Route path="/billing" element={guard(BILLING, <BillingPage />)} />
+                    <Route path="/users" element={guard(ADMINS, <UsersPage />)} />
                     <Route path="/settings" element={<SettingsPage />} />
 
                     {/* Doctor */}
-                    <Route path="/doctor-dashboard" element={<DoctorDashboardPage />} />
-                    <Route path="/my-patients" element={<DoctorPatientsPage />} />
-                    <Route path="/my-patients/:id" element={<DoctorPatientDetail />} />
-                    <Route path="/consultation/:id" element={<ConsultationPage />} />
-                    {/* ML features — Doctor and Patient ONLY */}
-                    <Route path="/ml-predictions" element={
-                        <RoleRoute allowed={['DOCTOR', 'PATIENT', 'ADMIN', 'SUPER_ADMIN']}>
-                            <MLPredictionsPage />
-                        </RoleRoute>
-                    } />
-                    <Route path="/report-analyzer" element={
-                        <RoleRoute allowed={['DOCTOR', 'ADMIN', 'SUPER_ADMIN']}>
-                            <ReportAnalyzerPage />
-                        </RoleRoute>
-                    } />
-                    {/* Research & Analytics — Doctor ONLY */}
-                    <Route path="/research-analytics" element={
-                        <RoleRoute allowed={['DOCTOR', 'ADMIN', 'SUPER_ADMIN']}>
-                            <ResearchAnalyticsPage />
-                        </RoleRoute>
-                    } />
-                    <Route path="/vitals" element={<VitalsMonitorPage />} />
-                    <Route path="/analytics" element={<AnalyticsPage />} />
-                    <Route path="/alerts" element={<AlertsPage />} />
+                    <Route path="/doctor-dashboard" element={guard(['DOCTOR'], <DoctorDashboardPage />)} />
+                    <Route path="/my-patients" element={guard(['DOCTOR'], <DoctorPatientsPage />)} />
+                    <Route path="/my-patients/:id" element={guard(['DOCTOR'], <DoctorPatientDetail />)} />
+                    <Route path="/consultation/:id" element={guard(CLINICAL_CARE, <ConsultationPage />)} />
+                    {/* AI tools — the page itself narrows which tools a patient sees */}
+                    <Route path="/ml-predictions" element={guard(['DOCTOR', 'PATIENT', 'ADMIN', 'SUPER_ADMIN'], <MLPredictionsPage />)} />
+                    <Route path="/report-analyzer" element={guard(['DOCTOR', 'ADMIN', 'SUPER_ADMIN'], <ReportAnalyzerPage />)} />
+                    <Route path="/research-analytics" element={guard(RESEARCH, <ResearchAnalyticsPage />)} />
+                    <Route path="/vitals" element={guard(CLINICAL_CARE, <VitalsMonitorPage />)} />
+                    <Route path="/analytics" element={guard(HOSPITAL_DASHBOARD, <AnalyticsPage />)} />
+                    <Route path="/alerts" element={guard(STAFF, <AlertsPage />)} />
 
                     {/* Lab Technician */}
-                    <Route path="/lab-dashboard" element={<LabTechDashboardPage />} />
+                    <Route path="/lab-dashboard" element={guard(LAB, <LabTechDashboardPage />)} />
 
-                    {/* Patient Portal */}
-                    <Route path="/patient-portal" element={<PatientPortalPage />} />
-
-                    {/* AI Doctor — PATIENT only */}
-                    <Route path="/ai-doctor" element={
-                        <RoleRoute allowed={['PATIENT']}>
-                            <AiDoctorPage />
-                        </RoleRoute>
-                    } />
+                    {/* Patient */}
+                    <Route path="/patient-portal" element={guard(['PATIENT'], <PatientPortalPage />)} />
+                    <Route path="/ai-doctor" element={guard(['PATIENT'], <AiDoctorPage />)} />
                 </Route>
 
                 <Route path="*" element={<Navigate to="/" replace />} />
@@ -128,4 +127,3 @@ export default function App() {
         </Suspense>
     );
 }
-

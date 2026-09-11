@@ -33,9 +33,14 @@ router.get('/patient/:patientId', requireOwnership('consultation', { allowRoles:
     try { sendSuccess(res, await consultationService.getByPatient(req.params.patientId)); } catch (e) { next(e); }
 });
 
-// Update (add symptoms, diagnosis, notes, AI result) — clinical staff only
+// Update (add symptoms, diagnosis, notes, AI result) — clinical staff only.
+// Only these fields: the body used to go straight to Prisma, so a caller
+// could reassign the consultation's patient or doctor.
 router.patch('/:id', requireRole(...CLINICAL_STAFF), async (req, res, next) => {
-    try { sendSuccess(res, await consultationService.update(req.params.id, req.body)); } catch (e) { next(e); }
+    try {
+        const { symptoms, notes, diagnosis, aiDiseasePred, status } = req.body;
+        sendSuccess(res, await consultationService.update(req.params.id, { symptoms, notes, diagnosis, aiDiseasePred, status }));
+    } catch (e) { next(e); }
 });
 
 // Save prescription — clinical staff only
@@ -49,7 +54,7 @@ router.post('/:id/prescription', requireRole(...CLINICAL_STAFF), async (req, res
 // Close consultation and auto-generate bill — clinical staff only
 router.post('/:id/close', requireRole(...CLINICAL_STAFF), async (req, res, next) => {
     try {
-        const data = await consultationService.closeAndBill(req.params.id, req.body.patientId);
+        const data = await consultationService.closeAndBill(req.params.id);
         sendSuccess(res, data, 'Consultation closed and bill generated');
     } catch (e) { next(e); }
 });

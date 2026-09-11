@@ -81,7 +81,13 @@ export const mlController = {
     analyzeCBC: async (req: Request, res: Response) => {
         try {
             const { labRequestId, ...cbcValues } = req.body;
-            const result = await mlService.analyzeCBC(cbcValues, labRequestId);
+            // Only lab and clinical staff may write the analysis into a lab
+            // record. Anyone else — a patient checking their own report — gets
+            // the analysis back unsaved, so a request ID in the body cannot
+            // overwrite another patient's result.
+            const role = (req as any).user?.role;
+            const mayPersist = ['LAB_TECHNICIAN', 'DOCTOR', 'NURSE', 'ADMIN', 'SUPER_ADMIN'].includes(role);
+            const result = await mlService.analyzeCBC(cbcValues, mayPersist ? labRequestId : undefined);
             sendSuccess(res, result);
         } catch (err: any) {
             const status = err?.response?.status || err?.statusCode || 503;
@@ -172,7 +178,7 @@ export const mlController = {
 
     /**
      * POST /api/v1/ml/deep-stream
-     * Runs Deep LSTM Autoencoder & 1D-CNN Rhythm Analyzer
+     * ECG beat screening — supervised 1D-CNN verdict, autoencoder as a secondary signal
      * Proxies to ml-service: POST /api/deep/anomaly-stream
      */
     runDeepAnomalyStream: async (req: Request, res: Response) => {

@@ -1,13 +1,21 @@
 import { Router } from 'express';
 import { mlController } from './ml.controller';
 import { authenticate } from '../../middleware/auth.middleware';
-import { requireOwnership } from '../../middleware/rbac.middleware';
+import { requireOwnership, requireRole } from '../../middleware/rbac.middleware';
 import { uploadPdfMemory } from '../../middleware/upload.middleware';
 
 const router = Router();
 
 // All ML routes require authentication
 router.use(authenticate);
+
+// A Bayesian risk network, a drug-dosing calculator and a single-beat ECG
+// screen are inputs to a clinician's judgement, not results a patient can act
+// on. The patient UI no longer offers them; this stops a direct API call from
+// reaching them too.
+const CLINICAL = ['SUPER_ADMIN', 'ADMIN', 'DOCTOR', 'NURSE'] as const;
+// Population-level research views (Research & Analytics).
+const RESEARCH = ['SUPER_ADMIN', 'ADMIN', 'DOCTOR', 'NURSE', 'ANALYST'] as const;
 
 /**
  * POST /api/v1/ml/predict-disease
@@ -39,7 +47,7 @@ router.get('/model-status', mlController.getModelStatus);
 /**
  * POST /api/v1/ml/cbc-analyze
  * Body: { labRequestId?, WBC, HGB, RBC, PLT, ... }
- * Analyze CBC blood values; optionally saves to lab_test_results
+ * Analyze CBC blood values; lab/clinical staff may save the result to a lab request
  * Proxies to: POST /api/cbc/analyze
  */
 router.post('/cbc-analyze', mlController.analyzeCBC);
@@ -54,31 +62,31 @@ router.get('/cbc-ranges', mlController.getCBCRanges);
  * GET /api/v1/ml/hypothesis-test?question=1-4
  * Run a pre-built statistical hypothesis test
  */
-router.get('/hypothesis-test', mlController.runHypothesisTest);
+router.get('/hypothesis-test', requireRole(...RESEARCH), mlController.runHypothesisTest);
 
 /**
  * GET /api/v1/ml/population-stats
  * Get big data analytics / population risk stats
  */
-router.get('/population-stats', mlController.getPopulationStats);
+router.get('/population-stats', requireRole(...RESEARCH), mlController.getPopulationStats);
 
 /**
  * POST /api/v1/ml/bayesian-infer
  * Run Bayesian Clinical Decision & Epistemic Uncertainty Engine
  */
-router.post('/bayesian-infer', mlController.runBayesianInference);
+router.post('/bayesian-infer', requireRole(...CLINICAL), mlController.runBayesianInference);
 
 /**
  * POST /api/v1/ml/fuzzy-dose
  * Run Mamdani Fuzzy Logic Controller for Drug Dosing & Triage
  */
-router.post('/fuzzy-dose', mlController.runFuzzyDosing);
+router.post('/fuzzy-dose', requireRole(...CLINICAL), mlController.runFuzzyDosing);
 
 /**
  * POST /api/v1/ml/deep-stream
- * Run Deep LSTM Autoencoder & 1D-CNN Waveform Signal Analyzer
+ * ECG beat screening — supervised 1D-CNN verdict, autoencoder as a secondary signal
  */
-router.post('/deep-stream', mlController.runDeepAnomalyStream);
+router.post('/deep-stream', requireRole(...CLINICAL), mlController.runDeepAnomalyStream);
 
 /**
  * POST /api/v1/ml/lipid-analyze

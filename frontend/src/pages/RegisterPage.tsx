@@ -1,45 +1,18 @@
 import React, { useState } from 'react';
-import { useNavigate, useSearchParams, Link } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import api from '../api/axiosInstance';
+
 const BLOOD_GROUPS = ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'];
 const GENDERS = ['Male', 'Female', 'Other'];
 const SMOKING = ['Never', 'Former', 'Current'];
 const ALCOHOL = ['Never', 'Occasional', 'Regular', 'Heavy'];
-
-const ROLES = [
-    {
-        id: 'PATIENT',
-        label: 'Patient',
-        icon: '🫀',
-        desc: 'Book appointments, view cardiac reports, manage your heart health records',
-        color: 'var(--risk-low-text)',
-        endpoint: '/auth/patient-register',
-    },
-    {
-        id: 'DOCTOR',
-        label: 'Cardiologist',
-        icon: '🩺',
-        desc: 'Access patient cardiac records, view AI diagnostics, run heart risk analysis',
-        color: 'var(--accent-primary)',
-        endpoint: '/auth/register',
-    },
-    {
-        id: 'RECEPTIONIST',
-        label: 'Receptionist',
-        icon: '📋',
-        desc: 'Manage appointments, handle patient intake and scheduling',
-        color: 'var(--risk-medium-text)',
-        endpoint: '/auth/register',
-    },
-    {
-        id: 'LAB_TECHNICIAN',
-        label: 'Lab Technician',
-        icon: '🧪',
-        desc: 'Upload CBC reports, extract lab values, link reports to patient records',
-        color: 'var(--accent-primary-hover)',
-        endpoint: '/auth/register',
-    },
-];
+// Saved to the patient record, where the AI Doctor reads them for its
+// herb-interaction checks and knowledge retrieval.
+const CONDITIONS = [
+    ['hasDiabetes', 'Diabetes'], ['hasHypertension', 'High blood pressure'], ['hasHeartDisease', 'Heart disease'],
+    ['hasCKD', 'Chronic kidney disease'], ['hasAsthma', 'Asthma'], ['hasCOPD', 'COPD'], ['hasObesity', 'Obesity'],
+] as const;
+const STEPS = ['Basic info', 'Medical history', 'Emergency contact'];
 
 const inputStyle: React.CSSProperties = {
     width: '100%', padding: '11px 14px', borderRadius: 10, border: '1px solid var(--surface-border-md)',
@@ -48,90 +21,65 @@ const inputStyle: React.CSSProperties = {
 const labelStyle: React.CSSProperties = {
     display: 'block', fontSize: 13, color: 'var(--text-secondary)', marginBottom: 6, fontWeight: 500,
 };
+const pair: React.CSSProperties = { display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: 14, marginBottom: 14 };
+const errorBox: React.CSSProperties = {
+    marginTop: 14, padding: '10px 14px', background: 'rgba(200, 67, 75, 0.1)', border: '1px solid rgba(200, 67, 75, 0.25)',
+    borderRadius: 8, fontSize: 13, color: 'var(--risk-critical-text)',
+};
 
+/**
+ * Patient self-registration only. Staff accounts are created by an admin on
+ * the Users page. The public staff sign-up this page used to offer created
+ * active accounts in any staff role for anyone, while telling them an admin
+ * would review it first.
+ */
 export default function RegisterPage() {
     const navigate = useNavigate();
-    const [searchParams] = useSearchParams();
-    const preselected = searchParams.get('role');
-
-    const [selectedRole, setSelectedRole] = useState<string | null>(preselected);
-    const [step, setStep] = useState(preselected ? 1 : 0); // 0=role picker, 1=basic, 2=medical/extra, 3=emergency/confirm
+    const [step, setStep] = useState(0);
     const [submitting, setSubmitting] = useState(false);
     const [error, setError] = useState('');
     const [form, setForm] = useState({
         firstName: '', lastName: '', email: '', password: '', confirmPassword: '',
-        dateOfBirth: '', gender: '', phone: '', address: '', city: '',
-        // Medical history (patient only)
+        dateOfBirth: '', gender: '', phone: '', city: '',
         bloodGroup: '', allergies: '', medicalHistory: '', currentMedications: '',
         smokingStatus: 'Never', alcoholUse: 'Never',
         hasDiabetes: false, hasHypertension: false, hasHeartDisease: false,
         hasCKD: false, hasAsthma: false, hasCOPD: false, hasObesity: false,
-        // Emergency contact
         emergencyContactName: '', emergencyContactPhone: '', emergencyContactRel: '',
     });
+    const update = (key: string, value: string | boolean) => setForm(prev => ({ ...prev, [key]: value }));
 
-    const update = (key: string, value: any) => setForm(prev => ({ ...prev, [key]: value }));
-    const roleObj = ROLES.find(r => r.id === selectedRole);
-    const isPatient = selectedRole === 'PATIENT';
-    const isDoctor = selectedRole === 'DOCTOR';
-
-    // How many data steps for this role (not counting role picker as step)
-    const totalSteps = isPatient ? 3 : 1;
-    // Data step labels
-    const stepLabels = isPatient
-        ? ['Basic Info', 'Medical History', 'Emergency Contact']
-        : ['Basic Info'];
-
-    function validateStep() {
-        if (step === 1) {
-            if (!form.firstName || !form.lastName) return 'Enter your full name';
-            if (!form.email) return 'Email is required';
-            if (!form.password || form.password.length < 8) return 'Password must be at least 8 characters';
-            if (form.password !== form.confirmPassword) return 'Passwords do not match';
-            if (!form.dateOfBirth) return 'Date of birth is required';
-            if (!form.gender) return 'Please select gender';
-        }
+    function validateBasics() {
+        if (!form.firstName.trim() || !form.lastName.trim()) return 'Enter your full name';
+        if (!/^\S+@\S+\.\S+$/.test(form.email)) return 'Enter a valid email address';
+        if (form.password.length < 8) return 'Password must be at least 8 characters';
+        if (form.password !== form.confirmPassword) return 'Passwords do not match';
+        if (!form.dateOfBirth) return 'Date of birth is required';
+        if (new Date(form.dateOfBirth) > new Date()) return 'Date of birth cannot be in the future';
+        if (!form.gender) return 'Please select gender';
         return null;
     }
 
-    function handleNext() {
-        const err = validateStep();
-        if (err) { setError(err); return; }
-        setError('');
-        setStep(s => s + 1);
-    }
-
-    async function handleSubmit(e: React.FormEvent) {
-        e.preventDefault();
+    async function submit() {
         setSubmitting(true);
         setError('');
         try {
-            if (isPatient) {
-                await api.post('/auth/patient-register', {
-                    firstName: form.firstName, lastName: form.lastName,
-                    email: form.email, password: form.password,
-                    dateOfBirth: form.dateOfBirth, gender: form.gender.toUpperCase(),
-                    phone: form.phone, address: form.address, city: form.city,
-                    bloodGroup: form.bloodGroup || undefined,
-                    allergies: form.allergies || undefined,
-                    medicalHistory: form.medicalHistory || undefined,
-                    currentMedications: form.currentMedications || undefined,
-                    smokingStatus: form.smokingStatus.toUpperCase(),
-                    alcoholUse: form.alcoholUse.toUpperCase().replace(' ', '_'),
-                    emergencyContactName: form.emergencyContactName || undefined,
-                    emergencyContactPhone: form.emergencyContactPhone || undefined,
-                    emergencyContactRel: form.emergencyContactRel || undefined,
-                });
-            } else {
-                await api.post('/auth/register', {
-                    firstName: form.firstName, lastName: form.lastName,
-                    email: form.email, password: form.password,
-                    role: selectedRole,
-                    dateOfBirth: form.dateOfBirth, gender: form.gender.toUpperCase(),
-                    phone: form.phone,
-                    // Doctors are always Cardiologist — specialization is set server-side
-                });
-            }
+            await api.post('/auth/patient-register', {
+                firstName: form.firstName.trim(), lastName: form.lastName.trim(),
+                email: form.email.trim(), password: form.password,
+                dateOfBirth: form.dateOfBirth, gender: form.gender.toUpperCase(),
+                phone: form.phone || undefined, city: form.city || undefined,
+                bloodGroup: form.bloodGroup || undefined,
+                allergies: form.allergies || undefined,
+                medicalHistory: form.medicalHistory || undefined,
+                currentMedications: form.currentMedications || undefined,
+                smokingStatus: form.smokingStatus.toUpperCase(),
+                alcoholUse: form.alcoholUse.toUpperCase(),
+                ...Object.fromEntries(CONDITIONS.map(([key]) => [key, form[key]])),
+                emergencyContactName: form.emergencyContactName || undefined,
+                emergencyContactPhone: form.emergencyContactPhone || undefined,
+                emergencyContactRel: form.emergencyContactRel || undefined,
+            });
             navigate('/login?registered=1');
         } catch (err: any) {
             setError(err?.response?.data?.message || 'Registration failed. Please try again.');
@@ -140,304 +88,188 @@ export default function RegisterPage() {
         }
     }
 
-    // ── ROLE PICKER SCREEN ────────────────────────────────────────────────────
-    if (step === 0) {
-        return (
-            <div style={{
-                minHeight: '100vh', background: 'linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-secondary) 50%, var(--bg-primary) 100%)',
-                display: 'flex', alignItems: 'center', justifyContent: 'center',
-                fontFamily: '"Inter", system-ui, sans-serif', padding: '24px',
-            }}>
-                <div style={{ width: '100%', maxWidth: 640 }}>
-                    {/* Logo */}
-                    <div style={{ textAlign: 'center', marginBottom: 40 }}>
-                        <div style={{ display: 'inline-flex', alignItems: 'center', gap: 10, marginBottom: 14 }}>
-                            <div style={{ width: 40, height: 40, background: 'linear-gradient(135deg, var(--accent-primary), var(--accent-primary-dim))', borderRadius: 12, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 20 }}>🫀</div>
-                            <span style={{ fontSize: 22, fontWeight: 900, background: 'linear-gradient(90deg, var(--accent-primary), var(--accent-primary-hover))', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>MediSense AI</span>
-                        </div>
-                        <h1 style={{ fontSize: 28, fontWeight: 900, color: 'var(--text-primary)', marginBottom: 8 }}>Register As</h1>
-                        <p style={{ fontSize: 14, color: 'var(--text-secondary)' }}>Choose your role to get started</p>
-                    </div>
-
-                    {/* Role cards */}
-                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, marginBottom: 24 }}>
-                        {ROLES.map(role => (
-                            <button key={role.id} onClick={() => { setSelectedRole(role.id); setStep(1); }}
-                                style={{
-                                    padding: '28px 20px', borderRadius: 18, border: `1px solid ${role.color}30`,
-                                    background: `${role.color}08`, cursor: 'pointer', textAlign: 'left',
-                                    transition: 'all 0.18s', display: 'flex', flexDirection: 'column', gap: 10,
-                                }}
-                                onMouseOver={e => {
-                                    (e.currentTarget as HTMLButtonElement).style.background = `${role.color}18`;
-                                    (e.currentTarget as HTMLButtonElement).style.borderColor = `${role.color}60`;
-                                    (e.currentTarget as HTMLButtonElement).style.transform = 'translateY(-3px)';
-                                    (e.currentTarget as HTMLButtonElement).style.boxShadow = `0 12px 40px ${role.color}20`;
-                                }}
-                                onMouseOut={e => {
-                                    (e.currentTarget as HTMLButtonElement).style.background = `${role.color}08`;
-                                    (e.currentTarget as HTMLButtonElement).style.borderColor = `${role.color}30`;
-                                    (e.currentTarget as HTMLButtonElement).style.transform = 'translateY(0)';
-                                    (e.currentTarget as HTMLButtonElement).style.boxShadow = 'none';
-                                }}
-                            >
-                                <div style={{ fontSize: 36 }}>{role.icon}</div>
-                                <div style={{ fontWeight: 800, fontSize: 18, color: 'var(--text-primary)' }}>{role.label}</div>
-                                <div style={{ fontSize: 13, color: 'var(--text-secondary)', lineHeight: 1.6 }}>{role.desc}</div>
-                                <div style={{ marginTop: 4, display: 'inline-flex', alignItems: 'center', gap: 6, color: role.color, fontSize: 13, fontWeight: 700 }}>
-                                    Register as {role.label} →
-                                </div>
-                            </button>
-                        ))}
-                    </div>
-
-                    <div style={{ textAlign: 'center' }}>
-                        <span style={{ fontSize: 13, color: 'var(--text-muted)' }}>Already have an account? </span>
-                        <Link to="/login" style={{ fontSize: 13, color: 'var(--accent-primary)', fontWeight: 700, textDecoration: 'none' }}>Sign In →</Link>
-                    </div>
-                    <div style={{ textAlign: 'center', marginTop: 10 }}>
-                        <Link to="/" style={{ fontSize: 12, color: 'var(--text-muted)', textDecoration: 'none' }}>← Back to home</Link>
-                    </div>
-                </div>
-                <style>{`@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');`}</style>
-            </div>
-        );
+    function handleSubmit(e: React.FormEvent) {
+        e.preventDefault();
+        if (step === 0) {
+            const err = validateBasics();
+            if (err) { setError(err); return; }
+        }
+        setError('');
+        if (step < STEPS.length - 1) setStep(s => s + 1);
+        else submit();
     }
-
-    // ── REGISTRATION FORM ─────────────────────────────────────────────────────
-    const accentColor = roleObj?.color || 'var(--accent-primary)';
-    const dataStep = step - 1; // 0-indexed within form steps
 
     return (
         <div style={{
             minHeight: '100vh', background: 'linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-secondary) 50%, var(--bg-primary) 100%)',
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            fontFamily: '"Inter", system-ui, sans-serif', padding: '24px', overflowY: 'auto',
+            display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '32px 16px',
         }}>
             <div style={{ width: '100%', maxWidth: 560 }}>
-                {/* Logo + role badge */}
-                <div style={{ textAlign: 'center', marginBottom: 28 }}>
-                    <div style={{ display: 'inline-flex', alignItems: 'center', gap: 10, marginBottom: 10 }}>
+                {/* Logo + title */}
+                <div style={{ textAlign: 'center', marginBottom: 26 }}>
+                    <Link to="/" style={{ display: 'inline-flex', alignItems: 'center', gap: 10, marginBottom: 14, textDecoration: 'none' }}>
                         <div style={{ width: 36, height: 36, background: 'linear-gradient(135deg, var(--accent-primary), var(--accent-primary-dim))', borderRadius: 10, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 18 }}>🫀</div>
-                        <span style={{ fontSize: 18, fontWeight: 900, background: 'linear-gradient(90deg, var(--accent-primary), var(--accent-primary-hover))', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>MediSense AI</span>
-                    </div>
-                    <div style={{ display: 'inline-flex', alignItems: 'center', gap: 8, padding: '5px 14px', borderRadius: 20, background: `${accentColor}15`, border: `1px solid ${accentColor}40`, marginBottom: 10 }}>
-                        <span style={{ fontSize: 16 }}>{roleObj?.icon}</span>
-                        <span style={{ fontSize: 13, fontWeight: 700, color: accentColor }}>Registering as {roleObj?.label}</span>
-                    </div>
-                    <h1 style={{ fontSize: 22, fontWeight: 800, color: 'var(--text-primary)', margin: 0 }}>{stepLabels[dataStep]}</h1>
+                        <span style={{ fontSize: 18, fontWeight: 800, fontFamily: 'var(--font-display)', color: 'var(--text-primary)' }}>MediSense AI</span>
+                    </Link>
+                    <h1 style={{ fontSize: 24, fontWeight: 800, fontFamily: 'var(--font-display)', color: 'var(--text-primary)', margin: 0 }}>
+                        Create your patient account
+                    </h1>
+                    <p style={{ fontSize: 13.5, color: 'var(--text-secondary)', marginTop: 6 }}>
+                        Book appointments, see your reports and consult the AI health assistant.
+                    </p>
                 </div>
 
                 {/* Step indicator */}
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 24, gap: 0 }}>
-                    {stepLabels.map((label, i) => (
-                        <React.Fragment key={i}>
-                            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 5 }}>
-                                <div style={{
-                                    width: 34, height: 34, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center',
-                                    background: i < dataStep ? accentColor : i === dataStep ? `${accentColor}30` : 'var(--surface-2)',
-                                    border: i === dataStep ? `2px solid ${accentColor}` : '2px solid transparent',
-                                    fontSize: 13, fontWeight: 700, color: i <= dataStep ? 'var(--text-primary)' : 'var(--text-muted)', transition: 'all 0.3s',
-                                }}>
-                                    {i < dataStep ? '✓' : i + 1}
-                                </div>
-                                <span style={{ fontSize: 10, color: i <= dataStep ? accentColor : 'var(--text-muted)', fontWeight: 600, whiteSpace: 'nowrap' }}>{label}</span>
-                            </div>
-                            {i < stepLabels.length - 1 && (
-                                <div style={{ width: 50, height: 2, background: i < dataStep ? accentColor : 'var(--surface-2)', margin: '0 6px', marginBottom: 20, transition: 'background 0.3s' }} />
-                            )}
-                        </React.Fragment>
-                    ))}
-                </div>
+                <ol style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'center', gap: 6, listStyle: 'none', padding: 0, margin: '0 0 22px' }}>
+                    {STEPS.map((label, i) => {
+                        const done = i < step;
+                        const current = i === step;
+                        return (
+                            <React.Fragment key={label}>
+                                <li style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 5 }} aria-current={current ? 'step' : undefined}>
+                                    <div style={{
+                                        width: 32, height: 32, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                        fontSize: 13, fontWeight: 700, transition: 'all 0.2s',
+                                        background: done ? 'var(--accent-primary)' : current ? 'rgba(35, 83, 71, 0.12)' : 'var(--surface-2)',
+                                        border: current ? '2px solid var(--accent-primary)' : '2px solid transparent',
+                                        color: done ? '#fff' : current ? 'var(--accent-primary)' : 'var(--text-muted)',
+                                    }}>
+                                        {done ? '✓' : i + 1}
+                                    </div>
+                                    <span style={{ fontSize: 11, color: done || current ? 'var(--accent-primary)' : 'var(--text-muted)', fontWeight: 600, whiteSpace: 'nowrap' }}>{label}</span>
+                                </li>
+                                {i < STEPS.length - 1 && (
+                                    <div aria-hidden style={{ width: 44, height: 2, marginTop: 15, background: done ? 'var(--accent-primary)' : 'var(--surface-2)', transition: 'background 0.2s' }} />
+                                )}
+                            </React.Fragment>
+                        );
+                    })}
+                </ol>
 
-                <div style={{ background: 'var(--surface-1)', border: '1px solid var(--surface-border)', borderRadius: 20, padding: 28 }}>
-
-                    {/* ── STEP 1: Basic Info (all roles) ── */}
-                    {step === 1 && (
+                <form onSubmit={handleSubmit} noValidate style={{ background: 'var(--surface-1)', border: '1px solid var(--surface-border)', borderRadius: 20, padding: 28 }}>
+                    {step === 0 && (
                         <div>
-                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14, marginBottom: 14 }}>
-                                <div><label style={labelStyle}>First Name *</label><input style={inputStyle} value={form.firstName} onChange={e => update('firstName', e.target.value)} placeholder="John" /></div>
-                                <div><label style={labelStyle}>Last Name *</label><input style={inputStyle} value={form.lastName} onChange={e => update('lastName', e.target.value)} placeholder="Doe" /></div>
+                            <div style={pair}>
+                                <div><label style={labelStyle}>First name *</label><input style={inputStyle} value={form.firstName} onChange={e => update('firstName', e.target.value)} autoComplete="given-name" /></div>
+                                <div><label style={labelStyle}>Last name *</label><input style={inputStyle} value={form.lastName} onChange={e => update('lastName', e.target.value)} autoComplete="family-name" /></div>
                             </div>
                             <div style={{ marginBottom: 14 }}>
-                                <label style={labelStyle}>Email Address *</label>
-                                <input type="email" style={inputStyle} value={form.email} onChange={e => update('email', e.target.value)} placeholder="you@example.com" />
+                                <label style={labelStyle}>Email address *</label>
+                                <input type="email" style={inputStyle} value={form.email} onChange={e => update('email', e.target.value)} placeholder="you@example.com" autoComplete="email" />
                             </div>
-                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14, marginBottom: 14 }}>
-                                <div><label style={labelStyle}>Password *</label><input type="password" style={inputStyle} value={form.password} onChange={e => update('password', e.target.value)} placeholder="Min 8 characters" /></div>
-                                <div><label style={labelStyle}>Confirm Password *</label><input type="password" style={inputStyle} value={form.confirmPassword} onChange={e => update('confirmPassword', e.target.value)} placeholder="Repeat password" /></div>
+                            <div style={pair}>
+                                <div><label style={labelStyle}>Password *</label><input type="password" style={inputStyle} value={form.password} onChange={e => update('password', e.target.value)} placeholder="At least 8 characters" autoComplete="new-password" /></div>
+                                <div><label style={labelStyle}>Confirm password *</label><input type="password" style={inputStyle} value={form.confirmPassword} onChange={e => update('confirmPassword', e.target.value)} autoComplete="new-password" /></div>
                             </div>
-                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14, marginBottom: 14 }}>
+                            <div style={pair}>
                                 <div>
-                                    <label style={labelStyle}>Date of Birth *</label>
-                                    <input type="date" style={inputStyle} value={form.dateOfBirth} onChange={e => update('dateOfBirth', e.target.value)} />
+                                    <label style={labelStyle}>Date of birth *</label>
+                                    <input type="date" style={inputStyle} value={form.dateOfBirth} max={new Date().toISOString().slice(0, 10)} onChange={e => update('dateOfBirth', e.target.value)} />
                                 </div>
                                 <div>
                                     <label style={labelStyle}>Gender *</label>
-                                    <select style={{ ...inputStyle, appearance: 'none' }} value={form.gender} onChange={e => update('gender', e.target.value)}>
+                                    <select style={inputStyle} value={form.gender} onChange={e => update('gender', e.target.value)}>
                                         <option value="">Select</option>
                                         {GENDERS.map(g => <option key={g} value={g}>{g}</option>)}
                                     </select>
                                 </div>
                             </div>
-                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
-                                <div><label style={labelStyle}>Phone</label><input style={inputStyle} value={form.phone} onChange={e => update('phone', e.target.value)} placeholder="+91 98765 43210" /></div>
-                                <div><label style={labelStyle}>City</label><input style={inputStyle} value={form.city} onChange={e => update('city', e.target.value)} placeholder="Mumbai" /></div>
+                            <div style={{ ...pair, marginBottom: 0 }}>
+                                <div><label style={labelStyle}>Phone</label><input style={inputStyle} value={form.phone} onChange={e => update('phone', e.target.value)} placeholder="+91 98765 43210" autoComplete="tel" /></div>
+                                <div><label style={labelStyle}>City</label><input style={inputStyle} value={form.city} onChange={e => update('city', e.target.value)} autoComplete="address-level2" /></div>
                             </div>
                         </div>
                     )}
 
-                    {/* ── STEP 2 (PATIENT): Medical History ── */}
-                    {step === 2 && isPatient && (
+                    {step === 1 && (
                         <div>
-                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14, marginBottom: 14 }}>
+                            <div style={pair}>
                                 <div>
-                                    <label style={labelStyle}>Blood Group</label>
-                                    <select style={{ ...inputStyle, appearance: 'none' }} value={form.bloodGroup} onChange={e => update('bloodGroup', e.target.value)}>
-                                        <option value="">Select</option>
+                                    <label style={labelStyle}>Blood group</label>
+                                    <select style={inputStyle} value={form.bloodGroup} onChange={e => update('bloodGroup', e.target.value)}>
+                                        <option value="">Not sure</option>
                                         {BLOOD_GROUPS.map(g => <option key={g} value={g}>{g}</option>)}
                                     </select>
                                 </div>
                                 <div>
-                                    <label style={labelStyle}>Smoking Status</label>
-                                    <select style={{ ...inputStyle, appearance: 'none' }} value={form.smokingStatus} onChange={e => update('smokingStatus', e.target.value)}>
+                                    <label style={labelStyle}>Smoking</label>
+                                    <select style={inputStyle} value={form.smokingStatus} onChange={e => update('smokingStatus', e.target.value)}>
                                         {SMOKING.map(s => <option key={s} value={s}>{s}</option>)}
+                                    </select>
+                                </div>
+                                <div>
+                                    <label style={labelStyle}>Alcohol</label>
+                                    <select style={inputStyle} value={form.alcoholUse} onChange={e => update('alcoholUse', e.target.value)}>
+                                        {ALCOHOL.map(a => <option key={a} value={a}>{a}</option>)}
                                     </select>
                                 </div>
                             </div>
                             <div style={{ marginBottom: 14 }}>
-                                <label style={labelStyle}>Alcohol Use</label>
-                                <select style={{ ...inputStyle, appearance: 'none' }} value={form.alcoholUse} onChange={e => update('alcoholUse', e.target.value)}>
-                                    {ALCOHOL.map(a => <option key={a} value={a}>{a}</option>)}
-                                </select>
+                                <label style={labelStyle}>Known allergies</label>
+                                <textarea style={{ ...inputStyle, height: 60, resize: 'vertical' }} value={form.allergies} onChange={e => update('allergies', e.target.value)} placeholder="e.g. Penicillin, peanuts" />
                             </div>
                             <div style={{ marginBottom: 14 }}>
-                                <label style={labelStyle}>Known Allergies</label>
-                                <textarea style={{ ...inputStyle, height: 64, resize: 'none' }} value={form.allergies} onChange={e => update('allergies', e.target.value)} placeholder="e.g. Penicillin, Peanuts..." />
+                                <label style={labelStyle}>Current medicines</label>
+                                <textarea style={{ ...inputStyle, height: 60, resize: 'vertical' }} value={form.currentMedications} onChange={e => update('currentMedications', e.target.value)} placeholder="Name and dose of anything you take regularly" />
                             </div>
                             <div style={{ marginBottom: 14 }}>
-                                <label style={labelStyle}>Past Medical History</label>
-                                <textarea style={{ ...inputStyle, height: 64, resize: 'none' }} value={form.medicalHistory} onChange={e => update('medicalHistory', e.target.value)} placeholder="e.g. Appendectomy 2019..." />
+                                <label style={labelStyle}>Past medical history</label>
+                                <textarea style={{ ...inputStyle, height: 60, resize: 'vertical' }} value={form.medicalHistory} onChange={e => update('medicalHistory', e.target.value)} placeholder="e.g. Appendix surgery 2019" />
                             </div>
-                            <div>
-                                <label style={labelStyle}>Existing Conditions</label>
-                                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
-                                    {[['hasDiabetes','Diabetes'],['hasHypertension','Hypertension'],['hasHeartDisease','Heart Disease'],['hasCKD','Chronic Kidney Disease'],['hasAsthma','Asthma'],['hasObesity','Obesity']].map(([key, label]) => (
-                                        <label key={key} style={{ display:'flex', alignItems:'center', gap:8, cursor:'pointer', fontSize:13, color:'var(--text-secondary)' }}>
-                                            <input type="checkbox" checked={(form as any)[key]} onChange={e => update(key, e.target.checked)} style={{ width:15, height:15, accentColor }} />
+                            <fieldset style={{ border: 'none', padding: 0, margin: 0 }}>
+                                <legend style={labelStyle}>Existing conditions</legend>
+                                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(170px, 1fr))', gap: 8 }}>
+                                    {CONDITIONS.map(([key, label]) => (
+                                        <label key={key} style={{ display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer', fontSize: 13, color: 'var(--text-secondary)' }}>
+                                            <input type="checkbox" checked={form[key]} onChange={e => update(key, e.target.checked)} style={{ width: 15, height: 15, accentColor: 'var(--accent-primary)' }} />
                                             {label}
                                         </label>
                                     ))}
                                 </div>
-                            </div>
+                            </fieldset>
                         </div>
                     )}
 
-                    {/* ── STEP 2 (DOCTOR): Static Cardiologist Info ── */}
-                    {step === 2 && isDoctor && (
+                    {step === 2 && (
                         <div>
-                            <div style={{ padding: '20px', background: 'rgba(35, 83, 71, 0.07)', border: '1px solid rgba(35, 83, 71, 0.2)', borderRadius: 14, marginBottom: 16, textAlign: 'center' }}>
-                                <div style={{ fontSize: 40, marginBottom: 8 }}>🫀</div>
-                                <div style={{ fontSize: 18, fontWeight: 900, color: 'var(--accent-primary)', marginBottom: 6 }}>Cardiologist</div>
-                                <div style={{ fontSize: 13, color: 'var(--text-secondary)', lineHeight: 1.7 }}>
-                                    All doctors in MediSense AI are registered as Cardiologists.<br />
-                                    Your specialization is set automatically upon account creation.
-                                </div>
-                            </div>
-                            <div style={{ padding: '12px 16px', background: 'var(--surface-1)', border: '1px solid var(--surface-border)', borderRadius: 10 }}>
-                                <div style={{ fontSize: 12, color: 'var(--text-muted)', lineHeight: 1.6 }}>
-                                    ✅ Your account will be reviewed by an admin before activation.<br />
-                                    You will receive access to the cardiac AI tools upon approval.
-                                </div>
-                            </div>
-                        </div>
-                    )}
-
-                    {/* ── STEP 2 (RECEPTIONIST/LABTECH): Confirm ── */}
-                    {step === 2 && !isPatient && !isDoctor && (
-                        <div>
-                            <div style={{ padding: '18px', background: `${accentColor}10`, border: `1px solid ${accentColor}25`, borderRadius: 12, marginBottom: 16 }}>
-                                <p style={{ fontSize: 13, color: 'var(--text-secondary)', margin: 0, lineHeight: 1.7 }}>
-                                    You are registering as a <strong style={{ color: accentColor }}>{roleObj?.label}</strong>.<br />
-                                    Your account will need to be approved by an admin before you can log in.<br /><br />
-                                    <strong>Name:</strong> {form.firstName} {form.lastName}<br />
-                                    <strong>Email:</strong> {form.email}<br />
-                                    <strong>Role:</strong> {roleObj?.label}
-                                </p>
-                            </div>
-                        </div>
-                    )}
-
-                    {/* ── STEP 3 (PATIENT): Emergency Contact ── */}
-                    {step === 3 && isPatient && (
-                        <form onSubmit={handleSubmit}>
                             <div style={{ marginBottom: 14 }}>
-                                <label style={labelStyle}>Emergency Contact Name</label>
-                                <input style={inputStyle} value={form.emergencyContactName} onChange={e => update('emergencyContactName', e.target.value)} placeholder="Jane Doe" />
+                                <label style={labelStyle}>Emergency contact name</label>
+                                <input style={inputStyle} value={form.emergencyContactName} onChange={e => update('emergencyContactName', e.target.value)} />
                             </div>
-                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14, marginBottom: 14 }}>
-                                <div><label style={labelStyle}>Contact Phone</label><input style={inputStyle} value={form.emergencyContactPhone} onChange={e => update('emergencyContactPhone', e.target.value)} placeholder="+91 98765 43210" /></div>
-                                <div><label style={labelStyle}>Relationship</label><input style={inputStyle} value={form.emergencyContactRel} onChange={e => update('emergencyContactRel', e.target.value)} placeholder="Mother, Spouse..." /></div>
+                            <div style={pair}>
+                                <div><label style={labelStyle}>Contact phone</label><input style={inputStyle} value={form.emergencyContactPhone} onChange={e => update('emergencyContactPhone', e.target.value)} placeholder="+91 98765 43210" /></div>
+                                <div><label style={labelStyle}>Relationship</label><input style={inputStyle} value={form.emergencyContactRel} onChange={e => update('emergencyContactRel', e.target.value)} placeholder="Mother, spouse…" /></div>
                             </div>
-                            <div style={{ padding: '14px', background: 'rgba(63, 138, 102, 0.07)', border: '1px solid rgba(63, 138, 102, 0.2)', borderRadius: 10, marginBottom: 18 }}>
-                                <p style={{ fontSize: 12.5, color: 'var(--text-secondary)', margin: 0, lineHeight: 1.6 }}>
-                                    ✓ By registering, you agree to provide accurate medical information. Your data is secured and only accessible to authorized medical staff.
-                                </p>
-                            </div>
-                            {error && <div style={{ marginBottom: 14, padding: '10px 14px', background: 'rgba(200, 67, 75, 0.1)', border: '1px solid rgba(200, 67, 75, 0.25)', borderRadius: 8, fontSize: 13, color: 'var(--risk-high-text)' }}>⚠️ {error}</div>}
-                            <button type="submit" disabled={submitting} style={{ width: '100%', padding: '14px', borderRadius: 10, border: 'none', cursor: submitting ? 'not-allowed' : 'pointer', background: submitting ? `${accentColor}50` : `linear-gradient(135deg, ${accentColor}, ${accentColor}cc)`, color: '#fff', fontSize: 15, fontWeight: 700, opacity: submitting ? 0.7 : 1 }}>
-                                {submitting ? '⏳ Creating account...' : `✅ Create ${roleObj?.label} Account`}
-                            </button>
-                        </form>
-                    )}
-
-                    {/* ── FINAL SUBMIT for non-patient ── */}
-                    {step === 2 && !isPatient && (
-                        <form onSubmit={handleSubmit} style={{ marginTop: 0 }}>
-                            {error && <div style={{ marginBottom: 14, padding: '10px 14px', background: 'rgba(200, 67, 75, 0.1)', border: '1px solid rgba(200, 67, 75, 0.25)', borderRadius: 8, fontSize: 13, color: 'var(--risk-high-text)' }}>⚠️ {error}</div>}
-                        </form>
-                    )}
-
-                    {/* Error for non-final steps */}
-                    {error && step < (isPatient ? 3 : 2) && (
-                        <div style={{ marginTop: 12, padding: '10px 14px', background: 'rgba(200, 67, 75, 0.1)', border: '1px solid rgba(200, 67, 75, 0.25)', borderRadius: 8, fontSize: 13, color: 'var(--risk-high-text)' }}>⚠️ {error}</div>
-                    )}
-
-                    {/* Navigation buttons */}
-                    {!(step === 3 && isPatient) && (
-                        <div style={{ display: 'flex', gap: 12, marginTop: 22 }}>
-                            <button onClick={() => { setStep(s => s - 1); setError(''); }}
-                                style={{ flex: 1, padding: '13px', borderRadius: 10, border: '1px solid var(--surface-border-md)', background: 'transparent', color: 'var(--text-primary)', fontSize: 14, fontWeight: 600, cursor: 'pointer' }}>
-                                ← Back
-                            </button>
-                            {step < (isPatient ? 3 : 2) ? (
-                                <button onClick={handleNext}
-                                    style={{ flex: 2, padding: '13px', borderRadius: 10, border: 'none', background: `linear-gradient(135deg, ${accentColor}, ${accentColor}cc)`, color: '#fff', fontSize: 14, fontWeight: 700, cursor: 'pointer' }}>
-                                    Next →
-                                </button>
-                            ) : (
-                                // Final step for non-patient (step 2, non-patient)
-                                <button onClick={(e: any) => handleSubmit(e as any)} disabled={submitting}
-                                    style={{ flex: 2, padding: '13px', borderRadius: 10, border: 'none', background: submitting ? `${accentColor}50` : `linear-gradient(135deg, ${accentColor}, ${accentColor}cc)`, color: '#fff', fontSize: 14, fontWeight: 700, cursor: submitting ? 'not-allowed' : 'pointer', opacity: submitting ? 0.7 : 1 }}>
-                                    {submitting ? '⏳ Creating...' : `✅ Create ${roleObj?.label} Account`}
-                                </button>
-                            )}
+                            <p style={{ fontSize: 12.5, color: 'var(--text-secondary)', margin: 0, lineHeight: 1.6, padding: '12px 14px', background: 'rgba(63, 138, 102, 0.07)', border: '1px solid rgba(63, 138, 102, 0.2)', borderRadius: 10 }}>
+                                Your record is visible only to you and the hospital staff treating you.
+                            </p>
                         </div>
                     )}
-                </div>
 
-                <div style={{ textAlign: 'center', marginTop: 18, display: 'flex', justifyContent: 'center', gap: 20 }}>
-                    <button onClick={() => { setStep(0); setSelectedRole(null); setError(''); }} style={{ background: 'none', border: 'none', color: 'var(--text-muted)', fontSize: 13, cursor: 'pointer', textDecoration: 'underline' }}>← Change role</button>
-                    <Link to="/login" style={{ fontSize: 13, color: accentColor, fontWeight: 600, textDecoration: 'none' }}>Already registered? Sign In →</Link>
+                    {error && <div role="alert" style={errorBox}>{error}</div>}
+
+                    <div style={{ display: 'flex', gap: 12, marginTop: 22 }}>
+                        {step > 0 && (
+                            <button type="button" onClick={() => { setStep(s => s - 1); setError(''); }}
+                                style={{ flex: 1, padding: 13, borderRadius: 10, border: '1px solid var(--surface-border-md)', background: 'transparent', color: 'var(--text-primary)', fontSize: 14, fontWeight: 600, cursor: 'pointer' }}>
+                                Back
+                            </button>
+                        )}
+                        <button type="submit" disabled={submitting}
+                            style={{ flex: 2, padding: 13, borderRadius: 10, border: 'none', background: 'var(--accent-primary)', color: '#fff', fontSize: 14, fontWeight: 700, cursor: submitting ? 'not-allowed' : 'pointer', opacity: submitting ? 0.7 : 1 }}>
+                            {step < STEPS.length - 1 ? 'Next' : submitting ? 'Creating account…' : 'Create account'}
+                        </button>
+                    </div>
+                </form>
+
+                <div style={{ textAlign: 'center', marginTop: 18, fontSize: 13 }}>
+                    <span style={{ color: 'var(--text-muted)' }}>Already have an account? </span>
+                    <Link to="/login" style={{ color: 'var(--accent-primary)', fontWeight: 700, textDecoration: 'none' }}>Sign in</Link>
                 </div>
+                <p style={{ textAlign: 'center', fontSize: 12.5, color: 'var(--text-muted)', marginTop: 10, lineHeight: 1.6 }}>
+                    Hospital staff? Your account is created by your administrator — sign in with the details they gave you.
+                </p>
             </div>
-            <style>{`
-                @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
-                input::placeholder, textarea::placeholder { color: var(--text-muted); }
-                select option { background: var(--surface-0); color: var(--surface-0); }
-                input[type="date"]::-webkit-calendar-picker-indicator { filter: invert(0.5); }
-            `}</style>
         </div>
     );
 }
-

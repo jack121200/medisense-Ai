@@ -6,6 +6,10 @@ import { sendSuccess } from '../../utils/apiResponse';
 
 const router = Router();
 
+// Front-desk scheduling roles. SUPER_ADMIN is included so it has at least the
+// rights of ADMIN, as everywhere else — it could list requests but not act on them.
+const SCHEDULERS = ['RECEPTIONIST', 'ADMIN', 'SUPER_ADMIN'] as const;
+
 // POST /api/v1/appointment-requests — patient creates request
 router.post('/', authenticate, requireRole('PATIENT'), async (req: Request, res: Response, next: NextFunction) => {
     try {
@@ -24,7 +28,7 @@ router.post('/', authenticate, requireRole('PATIENT'), async (req: Request, res:
 // POST /api/v1/appointment-requests/staff-book — receptionist/admin books
 // directly on behalf of a patient (walk-in/phone booking), immediately
 // confirmed — no separate patient-approval step, since staff initiated it.
-router.post('/staff-book', authenticate, requireRole('RECEPTIONIST', 'ADMIN'), async (req: Request, res: Response, next: NextFunction) => {
+router.post('/staff-book', authenticate, requireRole(...SCHEDULERS), async (req: Request, res: Response, next: NextFunction) => {
     try {
         const result = await appointmentRequestService.createByStaff({
             patientId: req.body.patientId,
@@ -41,7 +45,7 @@ router.post('/staff-book', authenticate, requireRole('RECEPTIONIST', 'ADMIN'), a
 router.get('/', authenticate, async (req: Request, res: Response, next: NextFunction) => {
     try {
         const user = (req as any).user;
-        if (user.role === 'RECEPTIONIST' || user.role === 'ADMIN' || user.role === 'SUPER_ADMIN') {
+        if ((SCHEDULERS as readonly string[]).includes(user.role)) {
             const result = await appointmentRequestService.listAll(req.query.status as string);
             return sendSuccess(res, result);
         }
@@ -58,7 +62,7 @@ router.get('/', authenticate, async (req: Request, res: Response, next: NextFunc
 });
 
 // PATCH /api/v1/appointment-requests/:id/approve — receptionist approves
-router.patch('/:id/approve', authenticate, requireRole('RECEPTIONIST', 'ADMIN'), async (req: Request, res: Response, next: NextFunction) => {
+router.patch('/:id/approve', authenticate, requireRole(...SCHEDULERS), async (req: Request, res: Response, next: NextFunction) => {
     try {
         const result = await appointmentRequestService.approve(req.params.id);
         sendSuccess(res, result);
@@ -66,7 +70,7 @@ router.patch('/:id/approve', authenticate, requireRole('RECEPTIONIST', 'ADMIN'),
 });
 
 // PATCH /api/v1/appointment-requests/:id/reject — receptionist rejects with counter-offer
-router.patch('/:id/reject', authenticate, requireRole('RECEPTIONIST', 'ADMIN'), async (req: Request, res: Response, next: NextFunction) => {
+router.patch('/:id/reject', authenticate, requireRole(...SCHEDULERS), async (req: Request, res: Response, next: NextFunction) => {
     try {
         const { counterDate, counterSlot, note } = req.body;
         const result = await appointmentRequestService.reject(req.params.id, counterDate, counterSlot, note);

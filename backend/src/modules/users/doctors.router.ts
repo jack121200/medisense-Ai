@@ -8,6 +8,8 @@ const router = Router();
  * GET /api/v1/doctors
  * Returns list of active doctors with their specialization and consultation fee.
  * Public endpoint — no auth required so patients can see doctors before registering.
+ * Being public, it returns only what a patient needs to choose a doctor; the
+ * license number is not part of that and is no longer exposed here.
  */
 router.get('/', async (_req: Request, res: Response, next: NextFunction) => {
     try {
@@ -19,7 +21,6 @@ router.get('/', async (_req: Request, res: Response, next: NextFunction) => {
                 lastName: true,
                 specialization: true,
                 consultationFee: true,
-                licenseNumber: true,
             },
             orderBy: { firstName: 'asc' },
         });
@@ -31,7 +32,6 @@ router.get('/', async (_req: Request, res: Response, next: NextFunction) => {
             lastName: d.lastName,
             specialization: d.specialization || 'General Physician',
             consultationFee: d.consultationFee || 0,
-            licenseNumber: d.licenseNumber,
         }));
 
         sendSuccess(res, formatted);

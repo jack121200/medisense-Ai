@@ -1,10 +1,11 @@
 import { Router } from 'express';
 import { authController } from './auth.controller';
 import { authenticate } from '../../middleware/auth.middleware';
+import { requireAdmin } from '../../middleware/rbac.middleware';
 import { validate } from '../../middleware/validate.middleware';
 import { authRateLimiter, loginRateLimiter, registrationRateLimiter } from '../../middleware/rateLimiter.middleware';
 import {
-    registerSchema, loginSchema, refreshSchema,
+    registerSchema, patientRegisterSchema, loginSchema, refreshSchema,
     updateProfileSchema, changePasswordSchema,
     forgotPasswordSchema, resetPasswordSchema,
 } from './auth.schema';
@@ -15,9 +16,9 @@ const router = Router();
  * @swagger
  * /api/v1/auth/register:
  *   post:
- *     summary: Register a new user (Admin only in production)
+ *     summary: Create a staff account (admin only)
  *     tags: [Auth]
- *     security: []
+ *     security: [{ bearerAuth: [] }]
  *     requestBody:
  *       required: true
  *       content:
@@ -30,12 +31,16 @@ const router = Router();
  *               password: { type: string, minLength: 8 }
  *               firstName: { type: string }
  *               lastName: { type: string }
- *               role: { type: string, enum: [ADMIN, DOCTOR, NURSE, ANALYST] }
+ *               role: { type: string, enum: [DOCTOR, NURSE, ANALYST, RECEPTIONIST, LAB_TECHNICIAN] }
  */
-// Patient self-registration — public, now rate-limited (previously had none at all)
-router.post('/patient-register', registrationRateLimiter, authController.registerPatient);
+// Patient self-registration — public, rate-limited and validated
+router.post('/patient-register', registrationRateLimiter, validate(patientRegisterSchema), authController.registerPatient);
 
-router.post('/register', authRateLimiter, validate(registerSchema), authController.register);
+// Staff accounts are created by an admin, never self-registered. This route
+// used to be public and accepted a role — ADMIN included — so anyone could
+// create an administrator account for themselves. The Users page goes through
+// /users; this stays for API clients, behind the same admin check.
+router.post('/register', authRateLimiter, authenticate, requireAdmin, validate(registerSchema), authController.register);
 
 // Login has its own strict limiter (see rateLimiter.middleware.ts) — the
 // general authRateLimiter was far too permissive for the brute-force target.

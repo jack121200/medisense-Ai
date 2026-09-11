@@ -75,56 +75,77 @@ export const authService = {
         currentMedications?: string;
         smokingStatus?: string;
         alcoholUse?: string;
+        hasDiabetes?: boolean;
+        hasHypertension?: boolean;
+        hasHeartDisease?: boolean;
+        hasCKD?: boolean;
+        hasAsthma?: boolean;
+        hasCOPD?: boolean;
+        hasObesity?: boolean;
     }) {
         const existing = await prisma.user.findUnique({ where: { email: data.email } });
         if (existing) throw new AppError('Email already registered', 409, 'EMAIL_EXISTS');
 
         const passwordHash = await bcrypt.hash(data.password, 12);
 
-        // Create User with PATIENT role
-        const user = await prisma.user.create({
-            data: {
-                email: data.email,
-                passwordHash,
-                firstName: data.firstName,
-                lastName: data.lastName,
-                role: 'PATIENT',
-            },
-        });
-
-        // Auto-generate patient code
-        const count = await prisma.patient.count();
-        const patientCode = `MED-${String(count + 1).padStart(5, '0')}`;
-
         const bloodGroupMap: Record<string, string> = {
             'A+': 'A_POS', 'A-': 'A_NEG', 'B+': 'B_POS', 'B-': 'B_NEG',
             'AB+': 'AB_POS', 'AB-': 'AB_NEG', 'O+': 'O_POS', 'O-': 'O_NEG',
         };
 
-        // Create linked Patient record
-        await prisma.patient.create({
-            data: {
-                userId: user.id,
-                patientCode,
-                firstName: data.firstName,
-                lastName: data.lastName,
-                dateOfBirth: new Date(data.dateOfBirth),
-                gender: (data.gender?.toUpperCase() as any) || 'OTHER',
-                bloodGroup: data.bloodGroup ? (bloodGroupMap[data.bloodGroup] as any) : undefined,
-                email: data.email,
-                phone: data.phone,
-                address: data.address,
-                city: data.city,
-                emergencyContactName: data.emergencyContactName,
-                emergencyContactPhone: data.emergencyContactPhone,
-                emergencyContactRel: data.emergencyContactRel,
-                allergies: data.allergies,
-                medicalHistory: data.medicalHistory,
-                currentMedications: data.currentMedications,
-                smokingStatus: (data.smokingStatus?.toUpperCase() as any) || 'NEVER',
-                alcoholUse: (data.alcoholUse?.toUpperCase() as any) || 'NEVER',
-                isSeeded: false,
-            },
+        // The login and its patient record are created together or not at
+        // all. As two separate writes, a failure creating the patient record
+        // left a PATIENT login with no chart — every portal page then failed
+        // with PATIENT_NOT_FOUND, and the email could not be registered again.
+        const { user, patientCode } = await prisma.$transaction(async (tx) => {
+            const user = await tx.user.create({
+                data: {
+                    email: data.email,
+                    passwordHash,
+                    firstName: data.firstName,
+                    lastName: data.lastName,
+                    role: 'PATIENT',
+                },
+            });
+
+            const count = await tx.patient.count();
+            const patientCode = `MED-${String(count + 1).padStart(5, '0')}`;
+
+            await tx.patient.create({
+                data: {
+                    userId: user.id,
+                    patientCode,
+                    firstName: data.firstName,
+                    lastName: data.lastName,
+                    dateOfBirth: new Date(data.dateOfBirth),
+                    gender: (data.gender?.toUpperCase() as any) || 'OTHER',
+                    bloodGroup: data.bloodGroup ? (bloodGroupMap[data.bloodGroup] as any) : undefined,
+                    email: data.email,
+                    phone: data.phone,
+                    address: data.address,
+                    city: data.city,
+                    emergencyContactName: data.emergencyContactName,
+                    emergencyContactPhone: data.emergencyContactPhone,
+                    emergencyContactRel: data.emergencyContactRel,
+                    allergies: data.allergies,
+                    medicalHistory: data.medicalHistory,
+                    currentMedications: data.currentMedications,
+                    smokingStatus: (data.smokingStatus?.toUpperCase() as any) || 'NEVER',
+                    alcoholUse: (data.alcoholUse?.toUpperCase() as any) || 'NEVER',
+                    // The registration form has always collected these, but
+                    // they were never saved — and the AI Doctor reads them for
+                    // its interaction checks and knowledge retrieval.
+                    hasDiabetes: data.hasDiabetes ?? false,
+                    hasHypertension: data.hasHypertension ?? false,
+                    hasHeartDisease: data.hasHeartDisease ?? false,
+                    hasCKD: data.hasCKD ?? false,
+                    hasAsthma: data.hasAsthma ?? false,
+                    hasCOPD: data.hasCOPD ?? false,
+                    hasObesity: data.hasObesity ?? false,
+                    isSeeded: false,
+                },
+            });
+            return { user, patientCode };
         });
 
         logger.info(`New patient registered: ${user.email} → ${patientCode}`);

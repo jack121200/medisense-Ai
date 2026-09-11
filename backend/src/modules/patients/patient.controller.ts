@@ -21,7 +21,19 @@ export const patientController = {
     }),
 
     update: asyncHandler(async (req: AuthRequest, res: Response) => {
-        const patient = await patientService.update(req.params.id, req.body);
+        // Demographics and medical profile only. patientCode, the ML-set risk
+        // level and score, the portal account link (userId) and the seed and
+        // active flags each have their own code path; passing the body
+        // straight to Prisma let a caller overwrite any of them.
+        const editable = [
+            'firstName', 'lastName', 'dateOfBirth', 'gender', 'bloodGroup', 'email', 'phone', 'address', 'city',
+            'emergencyContactName', 'emergencyContactPhone', 'emergencyContactRel', 'photo',
+            'bmi', 'height', 'weight', 'smokingStatus', 'alcoholUse', 'physicalActivity',
+            'allergies', 'medicalHistory', 'currentMedications',
+            'hasDiabetes', 'hasHypertension', 'hasHeartDisease', 'hasCKD', 'hasAsthma', 'hasCOPD', 'hasObesity', 'hasCancer',
+        ];
+        const data = Object.fromEntries(Object.entries(req.body ?? {}).filter(([key]) => editable.includes(key)));
+        const patient = await patientService.update(req.params.id, data);
         sendSuccess(res, patient, 'Patient updated');
     }),
 

@@ -18,7 +18,8 @@ const NAV_BY_ROLE: Record<string, Array<{ to: string; icon: any; label: string; 
         { to: '/appointments', icon: Calendar, label: 'Appointments', badge: true },
         { to: '/billing', icon: Receipt, label: 'Billing' },
         { to: '/alerts', icon: Bell, label: 'Alerts', badge: true },
-        { to: '/users', icon: UserCog, label: 'Users' },
+        // No Users link: user management is admin-only on the server, so the
+        // receptionist's link only ever led to a page that failed to load.
         { to: '/settings', icon: Settings, label: 'Settings' },
     ],
     ADMIN: [
@@ -70,11 +71,12 @@ const NAV_BY_ROLE: Record<string, Array<{ to: string; icon: any; label: string; 
         { to: '/vitals', icon: Activity, label: 'Vitals Monitor' },
         { to: '/alerts', icon: Bell, label: 'Alerts', badge: true },
     ],
+    // Analysts work with aggregate data; the per-patient clinical tools they
+    // used to be linked to are closed to them on the server.
     ANALYST: [
         { to: '/dashboard', icon: LayoutDashboard, label: 'Dashboard' },
         { to: '/analytics', icon: BarChart3, label: 'Analytics' },
-        { to: '/ml-predictions', icon: Brain, label: 'AI Predictions' },
-        { to: '/report-analyzer', icon: FlaskConical, label: 'Report Analyzer' },
+        { to: '/research-analytics', icon: Microscope, label: 'Research & Analytics' },
     ],
 };
 
