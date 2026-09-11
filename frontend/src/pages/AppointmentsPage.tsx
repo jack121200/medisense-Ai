@@ -10,6 +10,7 @@ import { patientApi } from '../api/patient.api';
 import { useAuthStore } from '../store/authStore';
 import toast from 'react-hot-toast';
 import { format, isToday, isTomorrow, parseISO } from 'date-fns';
+import { doctorName } from '../utils/doctorName';
 
 // ─── Shared config ──────────────────────────────────────────────────────────
 
@@ -67,8 +68,8 @@ function ApproveModal({ reqId, defaultDate, onClose, onDone }: { reqId: string; 
     };
 
     return (
-        <div style={{ position: 'fixed', inset: 0, background: 'rgba(13, 45, 62, 0.16)', backdropFilter: 'blur(10px)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000 }}>
-            <div style={{ background: 'var(--surface-1)', border: '1px solid rgba(24, 155, 130, 0.25)', borderRadius: 20, padding: 32, width: 440 }}>
+        <div style={{ position: 'fixed', inset: 0, background: 'rgba(5, 31, 32, 0.16)', backdropFilter: 'blur(10px)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000 }}>
+            <div style={{ background: 'var(--surface-1)', border: '1px solid rgba(63, 138, 102, 0.25)', borderRadius: 20, padding: 32, width: 440 }}>
                 <h3 style={{ fontSize: 18, fontWeight: 800, marginBottom: 6 }}>Approve Appointment</h3>
                 <p style={{ fontSize: 12.5, color: 'var(--text-muted)', marginBottom: 22 }}>Set the confirmed date and time for this appointment.</p>
                 <label style={{ display: 'block', fontSize: 11, color: 'var(--text-muted)', fontWeight: 700, marginBottom: 6, textTransform: 'uppercase' }}>Date</label>
@@ -106,13 +107,13 @@ function RejectModal({ reqId, onClose, onDone }: { reqId: string; onClose: () =>
     };
 
     return (
-        <div style={{ position: 'fixed', inset: 0, background: 'rgba(13, 45, 62, 0.16)', backdropFilter: 'blur(10px)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000 }}>
-            <div style={{ background: 'var(--surface-1)', border: '1px solid rgba(232, 131, 58, 0.25)', borderRadius: 20, padding: 32, width: 460 }}>
+        <div style={{ position: 'fixed', inset: 0, background: 'rgba(5, 31, 32, 0.16)', backdropFilter: 'blur(10px)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000 }}>
+            <div style={{ background: 'var(--surface-1)', border: '1px solid rgba(217, 122, 58, 0.25)', borderRadius: 20, padding: 32, width: 460 }}>
                 <h3 style={{ fontSize: 18, fontWeight: 800, marginBottom: 6 }}>Reject / Counter-offer</h3>
                 <p style={{ fontSize: 12.5, color: 'var(--text-muted)', marginBottom: 18 }}>Optionally suggest an alternative date/time. If none, request is rejected.</p>
                 <label style={{ display: 'block', fontSize: 11, color: 'var(--text-muted)', fontWeight: 700, marginBottom: 6, textTransform: 'uppercase' }}>Reason (optional)</label>
                 <input type="text" className="form-input" value={reason} onChange={e => setReason(e.target.value)} placeholder="Doctor unavailable..." style={{ marginBottom: 16 }} />
-                <div style={{ padding: '14px 16px', background: 'rgba(232, 131, 58, 0.06)', border: '1px solid rgba(232, 131, 58, 0.15)', borderRadius: 12, marginBottom: 20 }}>
+                <div style={{ padding: '14px 16px', background: 'rgba(217, 122, 58, 0.06)', border: '1px solid rgba(217, 122, 58, 0.15)', borderRadius: 12, marginBottom: 20 }}>
                     <div style={{ fontSize: 11.5, fontWeight: 700, color: 'var(--risk-high-text)', marginBottom: 10 }}>↩ Suggest Alternative (optional)</div>
                     <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
                         <div>
@@ -189,7 +190,7 @@ function RequestsTab() {
                 {FILTERS.map(f => (
                     <button key={f} onClick={() => setFilter(f)} style={{
                         padding: '6px 14px', borderRadius: 20, fontSize: 11.5, fontWeight: 700, cursor: 'pointer',
-                        background: filter === f ? 'rgba(13, 92, 126, 0.12)' : 'var(--surface-2)',
+                        background: filter === f ? 'rgba(35, 83, 71, 0.12)' : 'var(--surface-2)',
                         border: `1px solid ${filter === f ? '#6366f140' : 'var(--surface-border)'}`,
                         color: filter === f ? 'var(--accent-primary)' : 'var(--text-muted)',
                     }}>
@@ -214,12 +215,12 @@ function RequestsTab() {
                 ) : filtered.map((req: any) => {
                     const sc = STATUS_COLORS[req.status] || { color: 'var(--text-muted)', bg: '#aaa15', label: req.status };
                     const patName = `${req.patient?.user?.firstName || req.patient?.firstName || ''} ${req.patient?.user?.lastName || req.patient?.lastName || ''}`.trim();
-                    const docName = `Dr. ${req.doctor?.firstName || ''} ${req.doctor?.lastName || ''}`.trim();
+                    const docName = doctorName(req.doctor?.firstName, req.doctor?.lastName);
                     return (
                         <div key={req.id} style={{ padding: '18px 22px', borderBottom: '1px solid var(--surface-border)' }}>
                             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 10 }}>
                                 <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-                                    <div style={{ width: 40, height: 40, borderRadius: 12, background: 'rgba(13, 92, 126, 0.12)', border: '1px solid rgba(13, 92, 126, 0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 16 }}>👤</div>
+                                    <div style={{ width: 40, height: 40, borderRadius: 12, background: 'rgba(35, 83, 71, 0.12)', border: '1px solid rgba(35, 83, 71, 0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 16 }}>👤</div>
                                     <div>
                                         <div style={{ fontWeight: 700, fontSize: 14, color: 'var(--text-primary)' }}>
                                             {patName || 'Unknown Patient'}
@@ -238,18 +239,18 @@ function RequestsTab() {
                                 {req.reason && <span style={{ fontStyle: 'italic' }}>"{req.reason?.slice(0, 60)}"</span>}
                             </div>
                             {req.status === 'APPROVED' && req.scheduledDate && (
-                                <div style={{ padding: '8px 12px', background: 'rgba(24, 155, 130, 0.06)', border: '1px solid rgba(24, 155, 130, 0.15)', borderRadius: 8, fontSize: 12.5, color: 'var(--risk-low-text)', marginTop: 8 }}>
+                                <div style={{ padding: '8px 12px', background: 'rgba(63, 138, 102, 0.06)', border: '1px solid rgba(63, 138, 102, 0.15)', borderRadius: 8, fontSize: 12.5, color: 'var(--risk-low-text)', marginTop: 8 }}>
                                     ✅ Confirmed: {new Date(req.scheduledDate).toLocaleDateString('en-IN', { weekday: 'short', day: 'numeric', month: 'short' })} at {req.scheduledTime}
                                 </div>
                             )}
                             {req.status === 'PENDING' && (
                                 <div style={{ display: 'flex', gap: 8 }}>
                                     <button onClick={() => { setApproving(req.id); setApprovingReq(req); }}
-                                        style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '7px 16px', background: 'rgba(24, 155, 130, 0.08)', border: '1px solid rgba(24, 155, 130, 0.2)', borderRadius: 8, color: 'var(--risk-low-text)', fontWeight: 700, fontSize: 12, cursor: 'pointer' }}>
+                                        style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '7px 16px', background: 'rgba(63, 138, 102, 0.08)', border: '1px solid rgba(63, 138, 102, 0.2)', borderRadius: 8, color: 'var(--risk-low-text)', fontWeight: 700, fontSize: 12, cursor: 'pointer' }}>
                                         <CheckCircle size={12} /> Approve & Schedule
                                     </button>
                                     <button onClick={() => setRejecting(req.id)}
-                                        style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '7px 16px', background: 'rgba(232, 131, 58, 0.08)', border: '1px solid rgba(232, 131, 58, 0.2)', borderRadius: 8, color: 'var(--risk-high-text)', fontWeight: 700, fontSize: 12, cursor: 'pointer' }}>
+                                        style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '7px 16px', background: 'rgba(217, 122, 58, 0.08)', border: '1px solid rgba(217, 122, 58, 0.2)', borderRadius: 8, color: 'var(--risk-high-text)', fontWeight: 700, fontSize: 12, cursor: 'pointer' }}>
                                         <XCircle size={12} /> Reject / Counter
                                     </button>
                                 </div>
@@ -343,7 +344,7 @@ function BookTab() {
     return (
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20, alignItems: 'flex-start' }}>
             {/* Form */}
-            <div style={{ background: 'var(--surface-1)', border: '1px solid rgba(13, 92, 126, 0.18)', borderRadius: 18, padding: '24px 26px', position: 'relative', overflow: 'hidden' }}>
+            <div style={{ background: 'var(--surface-1)', border: '1px solid rgba(35, 83, 71, 0.18)', borderRadius: 18, padding: '24px 26px', position: 'relative', overflow: 'hidden' }}>
                 <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 2, background: 'var(--accent-primary)', opacity: 0.5, borderRadius: '18px 18px 0 0' }} />
                 <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 20 }}>
                     <Calendar size={18} color="var(--accent-primary)" />
@@ -416,7 +417,7 @@ function BookTab() {
                             <textarea className="form-input" rows={2} value={form.notes} onChange={e => setForm(f => ({ ...f, notes: e.target.value }))} placeholder="Special instructions..." style={{ resize: 'none' }} />
                         </div>
 
-                        <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '9px 12px', background: 'rgba(24, 155, 130, 0.04)', border: '1px solid rgba(24, 155, 130, 0.12)', borderRadius: 9, fontSize: 12, color: 'var(--text-secondary)' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '9px 12px', background: 'rgba(63, 138, 102, 0.04)', border: '1px solid rgba(63, 138, 102, 0.12)', borderRadius: 9, fontSize: 12, color: 'var(--text-secondary)' }}>
                             <MessageSquare size={13} color="var(--accent-green-text)" />
                             Patient will get an in-app notification if they have a portal account.
                         </div>
@@ -438,14 +439,14 @@ function BookTab() {
                         <div style={{ fontSize: 13 }}>Booked appointments appear here</div>
                     </div>
                 ) : booked.map(b => (
-                    <div key={b.id} style={{ background: 'var(--surface-1)', border: '1px solid rgba(13, 92, 126, 0.14)', borderRadius: 14, padding: '14px 18px', marginBottom: 10 }}>
+                    <div key={b.id} style={{ background: 'var(--surface-1)', border: '1px solid rgba(35, 83, 71, 0.14)', borderRadius: 14, padding: '14px 18px', marginBottom: 10 }}>
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                             <div>
                                 <div style={{ fontWeight: 700, fontSize: 13.5, color: 'var(--text-primary)' }}>{b.patientName}</div>
                                 <div style={{ fontSize: 12, color: 'var(--text-muted)', marginTop: 2 }}>Dr. {b.doctorName} · {b.doctorDept}</div>
                                 <div style={{ fontSize: 11.5, color: 'var(--text-muted)', marginTop: 4 }}>📅 {b.date} · ⏰ {b.time} · {b.reason}</div>
                             </div>
-                            <span style={{ fontSize: 10, fontWeight: 700, padding: '2px 9px', borderRadius: 20, color: 'var(--risk-low-text)', background: 'rgba(24, 155, 130, 0.1)', border: '1px solid rgba(24, 155, 130, 0.2)' }}>BOOKED</span>
+                            <span style={{ fontSize: 10, fontWeight: 700, padding: '2px 9px', borderRadius: 20, color: 'var(--risk-low-text)', background: 'rgba(63, 138, 102, 0.1)', border: '1px solid rgba(63, 138, 102, 0.2)' }}>BOOKED</span>
                         </div>
                     </div>
                 ))}
@@ -486,8 +487,8 @@ export default function AppointmentsPage() {
                 {tabs.map(t => (
                     <button key={t.id} onClick={() => setActiveTab(t.id as any)} style={{
                         flex: 1, textAlign: 'left', padding: '14px 18px', borderRadius: 14, cursor: 'pointer',
-                        border: `1px solid ${activeTab === t.id ? 'rgba(13, 92, 126, 0.3)' : 'var(--surface-border)'}`,
-                        background: activeTab === t.id ? 'rgba(13, 92, 126, 0.06)' : 'var(--surface-1)',
+                        border: `1px solid ${activeTab === t.id ? 'rgba(35, 83, 71, 0.3)' : 'var(--surface-border)'}`,
+                        background: activeTab === t.id ? 'rgba(35, 83, 71, 0.06)' : 'var(--surface-1)',
                         transition: 'all 0.15s',
                     }}>
                         <div style={{ fontSize: 13.5, fontWeight: 800, color: activeTab === t.id ? 'var(--accent-primary)' : 'var(--text-primary)' }}>{t.label}</div>

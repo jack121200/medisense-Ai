@@ -74,8 +74,8 @@ export default function AnalyticsPage() {
                             style={{
                                 display: 'flex', alignItems: 'center', gap: 7,
                                 padding: '8px 16px', borderRadius: 10, cursor: 'pointer',
-                                background: isActive ? 'rgba(13, 92, 126, 0.10)' : 'transparent',
-                                border: isActive ? '1px solid rgba(13, 92, 126, 0.20)' : '1px solid transparent',
+                                background: isActive ? 'rgba(35, 83, 71, 0.10)' : 'transparent',
+                                border: isActive ? '1px solid rgba(35, 83, 71, 0.20)' : '1px solid transparent',
                                 color: isActive ? 'var(--accent-primary)' : 'var(--text-secondary)',
                                 fontSize: 12.5, fontWeight: 600,
                                 transition: 'all 0.15s ease',
@@ -94,7 +94,7 @@ export default function AnalyticsPage() {
                 <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: 300, flexDirection: 'column', gap: 16 }}>
                     <div style={{
                         width: 40, height: 40, borderRadius: '50%',
-                        border: '3px solid rgba(13, 92, 126, 0.15)',
+                        border: '3px solid rgba(35, 83, 71, 0.15)',
                         borderTopColor: 'var(--accent-primary)',
                         animation: 'spin 0.8s linear infinite',
                     }} />
@@ -114,7 +114,7 @@ export default function AnalyticsPage() {
                                         borderRadius: 14, padding: '16px 18px',
                                         transition: 'all 0.2s',
                                     }}
-                                        onMouseEnter={e => (e.currentTarget as HTMLDivElement).style.borderColor = 'rgba(13, 92, 126, 0.20)'}
+                                        onMouseEnter={e => (e.currentTarget as HTMLDivElement).style.borderColor = 'rgba(35, 83, 71, 0.20)'}
                                         onMouseLeave={e => (e.currentTarget as HTMLDivElement).style.borderColor = 'var(--surface-border)'}
                                     >
                                         <div style={{
@@ -168,7 +168,7 @@ export default function AnalyticsPage() {
                                 return (
                                     <div key={test.test_id} style={{
                                         background: 'var(--surface-1)',
-                                        border: `1px solid ${test.reject_h0 ? 'rgba(217, 165, 32, 0.20)' : 'rgba(24, 155, 130, 0.15)'}`,
+                                        border: `1px solid ${test.reject_h0 ? 'rgba(201, 154, 42, 0.20)' : 'rgba(63, 138, 102, 0.15)'}`,
                                         borderRadius: 14, padding: '20px 24px',
                                     }}>
                                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 14 }}>

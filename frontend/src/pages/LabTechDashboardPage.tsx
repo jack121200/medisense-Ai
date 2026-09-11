@@ -95,7 +95,7 @@ export default function LabTechDashboardPage() {
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 16, marginBottom: 24 }}>
                 {[{ label: 'Pending', val: stats.pending, color: 'var(--risk-medium-text)' }, { label: 'Accepted', val: stats.accepted, color: 'var(--accent-primary)' }, { label: 'Sample Collected', val: stats.sample, color: 'var(--risk-high-text)' }].map(s => (
                     <div key={s.label} style={{ background: 'var(--surface-1)', border: `1px solid ${s.color}22`, borderRadius: 16, padding: '20px 22px' }}>
-                        <div style={{ fontSize: 32, fontWeight: 900, color: s.color, fontFamily: 'monospace' }}>{s.val}</div>
+                        <div style={{ fontSize: 32, fontWeight: 900, color: s.color, fontFamily: 'var(--font-mono)' }}>{s.val}</div>
                         <div style={{ fontSize: 12, color: 'var(--text-muted)', marginTop: 4 }}>{s.label}</div>
                     </div>
                 ))}
@@ -103,7 +103,7 @@ export default function LabTechDashboardPage() {
 
             <div style={{ display: 'flex', gap: 8, marginBottom: 20 }}>
                 {['all', 'PENDING', 'ACCEPTED', 'SAMPLE_COLLECTED'].map(f => (
-                    <button key={f} onClick={() => setFilter(f)} style={{ padding: '7px 16px', borderRadius: 20, fontSize: 12, fontWeight: 700, cursor: 'pointer', background: filter === f ? 'rgba(13, 92, 126, 0.15)' : 'var(--surface-2)', border: `1px solid ${filter === f ? '#00E5FF40' : 'var(--surface-border-md)'}`, color: filter === f ? 'var(--accent-primary)' : 'var(--surface-border-md)' }}>{f === 'all' ? 'All' : f.replace('_', ' ')}</button>
+                    <button key={f} onClick={() => setFilter(f)} style={{ padding: '7px 16px', borderRadius: 20, fontSize: 12, fontWeight: 700, cursor: 'pointer', background: filter === f ? 'rgba(35, 83, 71, 0.15)' : 'var(--surface-2)', border: `1px solid ${filter === f ? '#00E5FF40' : 'var(--surface-border-md)'}`, color: filter === f ? 'var(--accent-primary)' : 'var(--surface-border-md)' }}>{f === 'all' ? 'All' : f.replace('_', ' ')}</button>
                 ))}
             </div>
 
@@ -130,9 +130,9 @@ export default function LabTechDashboardPage() {
                                     </div>
                                     <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
                                         <span style={{ fontSize: 11, fontWeight: 700, color: sc, background: `${sc}15`, padding: '4px 12px', borderRadius: 20 }}>{req.status.replace('_', ' ')}</span>
-                                        {req.status === 'PENDING' && <button onClick={() => accept(req)} style={{ padding: '7px 14px', background: 'rgba(13, 92, 126, 0.1)', border: '1px solid rgba(13, 92, 126, 0.25)', borderRadius: 8, color: 'var(--accent-primary)', fontWeight: 700, fontSize: 12, cursor: 'pointer' }}>Accept</button>}
-                                        {req.status === 'ACCEPTED' && <button onClick={() => markSample(req)} style={{ padding: '7px 14px', background: 'rgba(232, 131, 58, 0.1)', border: '1px solid rgba(232, 131, 58, 0.25)', borderRadius: 8, color: 'var(--risk-high-text)', fontWeight: 700, fontSize: 12, cursor: 'pointer' }}>Mark Sample Collected</button>}
-                                        {req.status === 'SAMPLE_COLLECTED' && <button onClick={() => setSelected(req)} style={{ padding: '7px 14px', background: 'rgba(24, 155, 130, 0.1)', border: '1px solid rgba(24, 155, 130, 0.25)', borderRadius: 8, color: 'var(--risk-low-text)', fontWeight: 700, fontSize: 12, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6 }}><Upload size={12} /> Upload Results</button>}
+                                        {req.status === 'PENDING' && <button onClick={() => accept(req)} style={{ padding: '7px 14px', background: 'rgba(35, 83, 71, 0.1)', border: '1px solid rgba(35, 83, 71, 0.25)', borderRadius: 8, color: 'var(--accent-primary)', fontWeight: 700, fontSize: 12, cursor: 'pointer' }}>Accept</button>}
+                                        {req.status === 'ACCEPTED' && <button onClick={() => markSample(req)} style={{ padding: '7px 14px', background: 'rgba(217, 122, 58, 0.1)', border: '1px solid rgba(217, 122, 58, 0.25)', borderRadius: 8, color: 'var(--risk-high-text)', fontWeight: 700, fontSize: 12, cursor: 'pointer' }}>Mark Sample Collected</button>}
+                                        {req.status === 'SAMPLE_COLLECTED' && <button onClick={() => setSelected(req)} style={{ padding: '7px 14px', background: 'rgba(63, 138, 102, 0.1)', border: '1px solid rgba(63, 138, 102, 0.25)', borderRadius: 8, color: 'var(--risk-low-text)', fontWeight: 700, fontSize: 12, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6 }}><Upload size={12} /> Upload Results</button>}
                                     </div>
                                 </div>
                             </div>);
@@ -140,7 +140,7 @@ export default function LabTechDashboardPage() {
             </div>
 
             {selected && (
-                <div style={{ position: 'fixed', inset: 0, background: 'rgba(13, 45, 62, 0.16)', backdropFilter: 'blur(8px)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000 }}>
+                <div style={{ position: 'fixed', inset: 0, background: 'rgba(5, 31, 32, 0.16)', backdropFilter: 'blur(8px)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000 }}>
                     <div style={{ background: 'var(--surface-2)', border: '1px solid var(--surface-border-md)', borderRadius: 20, padding: 32, width: 540, maxHeight: '90vh', overflowY: 'auto' }}>
                         <div style={{ marginBottom: 20 }}>
                             <div style={{ fontSize: 11, color: 'var(--risk-high-text)', marginBottom: 6, fontWeight: 700 }}>UPLOAD RESULTS — {selected.testId}</div>
@@ -149,10 +149,10 @@ export default function LabTechDashboardPage() {
 
                         {/* Mode toggle */}
                         <div style={{ display: 'flex', gap: 4, background: 'var(--surface-1)', padding: 4, borderRadius: 12, marginBottom: 20 }}>
-                            <button onClick={() => setUploadMode('pdf')} style={{ flex: 1, padding: '9px 0', borderRadius: 9, border: 'none', cursor: 'pointer', fontWeight: 700, fontSize: 13, background: uploadMode === 'pdf' ? 'rgba(24, 155, 130, 0.15)' : 'transparent', color: uploadMode === 'pdf' ? 'var(--risk-low)' : 'var(--surface-3)', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 7 }}>
+                            <button onClick={() => setUploadMode('pdf')} style={{ flex: 1, padding: '9px 0', borderRadius: 9, border: 'none', cursor: 'pointer', fontWeight: 700, fontSize: 13, background: uploadMode === 'pdf' ? 'rgba(63, 138, 102, 0.15)' : 'transparent', color: uploadMode === 'pdf' ? 'var(--risk-low)' : 'var(--surface-3)', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 7 }}>
                                 <FileText size={14} /> Upload PDF
                             </button>
-                            <button onClick={() => setUploadMode('numeric')} style={{ flex: 1, padding: '9px 0', borderRadius: 9, border: 'none', cursor: 'pointer', fontWeight: 700, fontSize: 13, background: uploadMode === 'numeric' ? 'rgba(232, 131, 58, 0.15)' : 'transparent', color: uploadMode === 'numeric' ? 'var(--risk-high)' : 'var(--surface-3)', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 7 }}>
+                            <button onClick={() => setUploadMode('numeric')} style={{ flex: 1, padding: '9px 0', borderRadius: 9, border: 'none', cursor: 'pointer', fontWeight: 700, fontSize: 13, background: uploadMode === 'numeric' ? 'rgba(217, 122, 58, 0.15)' : 'transparent', color: uploadMode === 'numeric' ? 'var(--risk-high)' : 'var(--surface-3)', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 7 }}>
                                 <Upload size={14} /> Enter Values
                             </button>
                         </div>
@@ -160,7 +160,7 @@ export default function LabTechDashboardPage() {
                         {/* PDF Mode */}
                         {uploadMode === 'pdf' && (
                             <div>
-                                <div style={{ border: '2px dashed rgba(24, 155, 130, 0.25)', borderRadius: 14, padding: 32, textAlign: 'center', marginBottom: 16, background: pdfFile ? 'rgba(24, 155, 130, 0.05)' : 'transparent', cursor: 'pointer' }}
+                                <div style={{ border: '2px dashed rgba(63, 138, 102, 0.25)', borderRadius: 14, padding: 32, textAlign: 'center', marginBottom: 16, background: pdfFile ? 'rgba(63, 138, 102, 0.05)' : 'transparent', cursor: 'pointer' }}
                                     onClick={() => document.getElementById('lab-pdf-input')?.click()}>
                                     <FileText size={32} style={{ color: pdfFile ? 'var(--risk-low)' : 'var(--text-muted)', margin: '0 auto 10px', display: 'block' }} />
                                     {pdfFile
@@ -170,7 +170,7 @@ export default function LabTechDashboardPage() {
                                 <input id="lab-pdf-input" type="file" accept="application/pdf" style={{ display: 'none' }} onChange={e => setPdfFile(e.target.files?.[0] || null)} />
                                 <div style={{ display: 'flex', gap: 10 }}>
                                     <button onClick={() => { setSelected(null); setPdfFile(null); }} style={{ flex: 1, padding: 12, border: '1px solid var(--surface-border-md)', background: 'transparent', color: 'var(--text-primary)', borderRadius: 10, cursor: 'pointer', fontWeight: 700 }}>Cancel</button>
-                                    <button onClick={uploadPdfResult} disabled={uploading || !pdfFile} style={{ flex: 2, padding: 12, background: pdfFile ? 'linear-gradient(135deg, var(--risk-low), #00A858)' : 'rgba(24, 155, 130, 0.25)', border: 'none', borderRadius: 10, color: 'var(--bg-primary)', fontWeight: 800, cursor: pdfFile ? 'pointer' : 'not-allowed', fontSize: 14 }}>
+                                    <button onClick={uploadPdfResult} disabled={uploading || !pdfFile} style={{ flex: 2, padding: 12, background: pdfFile ? 'linear-gradient(135deg, var(--risk-low), #00A858)' : 'rgba(63, 138, 102, 0.25)', border: 'none', borderRadius: 10, color: 'var(--bg-primary)', fontWeight: 800, cursor: pdfFile ? 'pointer' : 'not-allowed', fontSize: 14 }}>
                                         {uploading ? '⏳ Uploading...' : '📄 Upload PDF Report'}
                                     </button>
                                 </div>
@@ -189,7 +189,7 @@ export default function LabTechDashboardPage() {
                                         </div>
                                     ))}
                                 </div>
-                                <div style={{ background: 'rgba(232, 131, 58, 0.08)', border: '1px solid rgba(232, 131, 58, 0.2)', borderRadius: 10, padding: 12, marginBottom: 16, display: 'flex', gap: 8 }}>
+                                <div style={{ background: 'rgba(217, 122, 58, 0.08)', border: '1px solid rgba(217, 122, 58, 0.2)', borderRadius: 10, padding: 12, marginBottom: 16, display: 'flex', gap: 8 }}>
                                     <AlertTriangle size={14} style={{ color: 'var(--risk-high-text)', flexShrink: 0 }} />
                                     <span style={{ fontSize: 12, color: 'var(--text-secondary)' }}>AI will automatically flag abnormal values on upload.</span>
                                 </div>

@@ -38,7 +38,7 @@ export default function FuzzyDosingCard() {
     return (
         <div style={{
             background: 'var(--surface-1)',
-            border: '1px solid rgba(217, 165, 32, 0.25)',
+            border: '1px solid rgba(201, 154, 42, 0.25)',
             borderRadius: 20,
             padding: 24,
             marginBottom: 24,
@@ -49,8 +49,8 @@ export default function FuzzyDosingCard() {
                 <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
                     <div style={{
                         width: 44, height: 44, borderRadius: 14,
-                        background: 'linear-gradient(135deg, rgba(217, 165, 32, 0.2), rgba(232, 131, 58, 0.05))',
-                        border: '1px solid rgba(217, 165, 32, 0.3)',
+                        background: 'linear-gradient(135deg, rgba(201, 154, 42, 0.2), rgba(217, 122, 58, 0.05))',
+                        border: '1px solid rgba(201, 154, 42, 0.3)',
                         display: 'flex', alignItems: 'center', justifyContent: 'center'
                     }}>
                         <Cpu size={22} color="var(--risk-medium-text)" />
@@ -62,7 +62,7 @@ export default function FuzzyDosingCard() {
                             </h2>
                             <span style={{
                                 fontSize: 10, fontWeight: 800, padding: '2px 8px', borderRadius: 12,
-                                background: 'rgba(217, 165, 32, 0.15)', color: 'var(--risk-medium-text)', border: '1px solid rgba(217, 165, 32, 0.3)'
+                                background: 'rgba(201, 154, 42, 0.15)', color: 'var(--risk-medium-text)', border: '1px solid rgba(201, 154, 42, 0.3)'
                             }}>
                                 UNIT III — MAMDANI FIS
                             </span>
@@ -81,7 +81,7 @@ export default function FuzzyDosingCard() {
                             style={{
                                 padding: '6px 14px', borderRadius: 10, fontSize: 12, fontWeight: 700,
                                 border: drug === d ? '1px solid var(--risk-medium)' : '1px solid var(--surface-border)',
-                                background: drug === d ? 'rgba(217, 165, 32, 0.15)' : 'var(--surface-2)',
+                                background: drug === d ? 'rgba(201, 154, 42, 0.15)' : 'var(--surface-2)',
                                 color: drug === d ? 'var(--risk-medium)' : 'var(--text-secondary)',
                                 cursor: 'pointer'
                             }}
@@ -97,7 +97,7 @@ export default function FuzzyDosingCard() {
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 16, marginBottom: 20 }}>
                     {/* Dose Output */}
                     <div style={{
-                        background: 'rgba(217, 165, 32, 0.06)', border: '1px solid rgba(217, 165, 32, 0.3)',
+                        background: 'rgba(201, 154, 42, 0.06)', border: '1px solid rgba(201, 154, 42, 0.3)',
                         borderRadius: 14, padding: 18
                     }}>
                         <div style={{ fontSize: 11, color: 'var(--risk-medium-text)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em' }}>
@@ -193,7 +193,7 @@ export default function FuzzyDosingCard() {
             {/* Mamdani Active Fired Rules Trace */}
             {result?.active_rules_fired?.length > 0 && (
                 <div style={{
-                    background: 'rgba(13, 45, 62, 0.10)', border: '1px solid var(--surface-border)',
+                    background: 'rgba(5, 31, 32, 0.10)', border: '1px solid var(--surface-border)',
                     borderRadius: 14, padding: 16
                 }}>
                     <div style={{ fontSize: 13, fontWeight: 800, color: 'var(--text-primary)', marginBottom: 10 }}>
@@ -209,7 +209,7 @@ export default function FuzzyDosingCard() {
                                 <div style={{ color: 'var(--text-primary)', fontWeight: 600 }}>
                                     Rule #{r.rule_id}: {r.rule_text}
                                 </div>
-                                <div style={{ color: 'var(--risk-medium-text)', fontWeight: 800, fontFamily: 'monospace' }}>
+                                <div style={{ color: 'var(--risk-medium-text)', fontWeight: 800, fontFamily: 'var(--font-mono)' }}>
                                     Firing $\alpha$ = {r.firing_strength_alpha}
                                 </div>
                             </div>

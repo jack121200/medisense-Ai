@@ -217,7 +217,7 @@ export default function PatientDetailPage() {
                     <button
                         onClick={() => navigate(`/appointments?new=1&patientId=${id}`)}
                         className="btn-ghost"
-                        style={{ color: 'var(--accent-primary)', borderColor: 'rgba(13, 92, 126, 0.2)', background: 'rgba(13, 92, 126, 0.04)' }}
+                        style={{ color: 'var(--accent-primary)', borderColor: 'rgba(35, 83, 71, 0.2)', background: 'rgba(35, 83, 71, 0.04)' }}
                     >
                         <Calendar size={15} /> Book Appointment
                     </button>
@@ -314,9 +314,9 @@ export default function PatientDetailPage() {
                     <button key={tab} onClick={() => setActiveTab(tab as any)} style={{
                         flex: 1, padding: '8px 14px', borderRadius: 9, fontSize: 13, fontWeight: 700,
                         border: 'none', cursor: 'pointer', transition: 'all 0.15s',
-                        background: activeTab === tab ? 'rgba(13, 92, 126, 0.10)' : 'transparent',
+                        background: activeTab === tab ? 'rgba(35, 83, 71, 0.10)' : 'transparent',
                         color: activeTab === tab ? 'var(--accent-primary)' : 'var(--text-muted)',
-                        boxShadow: activeTab === tab ? 'inset 0 0 0 1px rgba(13, 92, 126, 0.20)' : 'none',
+                        boxShadow: activeTab === tab ? 'inset 0 0 0 1px rgba(35, 83, 71, 0.20)' : 'none',
                     }}>
                         {label}
                     </button>
@@ -366,10 +366,10 @@ export default function PatientDetailPage() {
                         {/* 3 ML Model Panels */}
                         <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
                             {/* Risk Classification */}
-                            <div style={{ background: 'var(--surface-1)', border: pred ? '1px solid rgba(13, 92, 126, 0.18)' : '1px solid var(--surface-border)', borderRadius: 16, padding: '18px 22px' }}>
+                            <div style={{ background: 'var(--surface-1)', border: pred ? '1px solid rgba(35, 83, 71, 0.18)' : '1px solid var(--surface-border)', borderRadius: 16, padding: '18px 22px' }}>
                                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: pred ? 14 : 0 }}>
                                     <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                                        <div style={{ width: 36, height: 36, borderRadius: 10, background: 'rgba(13, 92, 126, 0.1)', border: '1px solid rgba(13, 92, 126, 0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                        <div style={{ width: 36, height: 36, borderRadius: 10, background: 'rgba(35, 83, 71, 0.1)', border: '1px solid rgba(35, 83, 71, 0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                                             <Brain size={16} color="var(--accent-primary)" />
                                         </div>
                                         <div>
@@ -384,7 +384,7 @@ export default function PatientDetailPage() {
                                                 <div style={{ fontSize: 10.5, color: 'var(--text-muted)', marginTop: 4 }}>Confidence: {((pred.riskConfidence || 0) * 100).toFixed(1)}%</div>
                                             </div>
                                         )}
-                                        <button onClick={runPrediction} disabled={predicting} className="btn-ghost" style={{ fontSize: 12, padding: '6px 14px', color: 'var(--accent-primary)', borderColor: 'rgba(13, 92, 126, 0.2)' }}>
+                                        <button onClick={runPrediction} disabled={predicting} className="btn-ghost" style={{ fontSize: 12, padding: '6px 14px', color: 'var(--accent-primary)', borderColor: 'rgba(35, 83, 71, 0.2)' }}>
                                             {predicting ? <RefreshCw size={13} style={{ animation: 'spin 0.8s linear infinite' }} /> : <Brain size={13} />}
                                             {predicting ? 'Running...' : pred ? 'Re-run' : 'Run Now'}
                                         </button>
@@ -411,10 +411,10 @@ export default function PatientDetailPage() {
                             </div>
 
                             {/* LOS Predictor */}
-                            <div style={{ background: 'var(--surface-1)', border: pred ? '1px solid rgba(255,44,245,0.18)' : '1px solid var(--surface-border)', borderRadius: 16, padding: '18px 22px' }}>
+                            <div style={{ background: 'var(--surface-1)', border: pred ? '1px solid rgba(142, 182, 155, 0.18)' : '1px solid var(--surface-border)', borderRadius: 16, padding: '18px 22px' }}>
                                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                                     <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                                        <div style={{ width: 36, height: 36, borderRadius: 10, background: 'rgba(255,44,245,0.1)', border: '1px solid rgba(255,44,245,0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                        <div style={{ width: 36, height: 36, borderRadius: 10, background: 'rgba(142, 182, 155, 0.1)', border: '1px solid rgba(142, 182, 155, 0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                                             <Clock size={16} color="var(--accent-magenta)" />
                                         </div>
                                         <div>
@@ -431,7 +431,7 @@ export default function PatientDetailPage() {
                                                 <div style={{ fontSize: 10.5, color: 'var(--text-muted)' }}>Predicted hospital stay</div>
                                             </div>
                                         )}
-                                        <button onClick={runPrediction} disabled={predicting} className="btn-ghost" style={{ fontSize: 12, padding: '6px 14px', color: 'var(--accent-magenta)', borderColor: 'rgba(255,44,245,0.2)' }}>
+                                        <button onClick={runPrediction} disabled={predicting} className="btn-ghost" style={{ fontSize: 12, padding: '6px 14px', color: 'var(--accent-magenta)', borderColor: 'rgba(142, 182, 155, 0.2)' }}>
                                             {predicting ? <RefreshCw size={13} style={{ animation: 'spin 0.8s linear infinite' }} /> : <Brain size={13} />}
                                             {predicting ? 'Running...' : pred ? 'Re-run' : 'Run Now'}
                                         </button>
@@ -451,10 +451,10 @@ export default function PatientDetailPage() {
                             </div>
 
                             {/* Readmission Model */}
-                            <div style={{ background: 'var(--surface-1)', border: pred ? '1px solid rgba(24, 155, 130, 0.18)' : '1px solid var(--surface-border)', borderRadius: 16, padding: '18px 22px' }}>
+                            <div style={{ background: 'var(--surface-1)', border: pred ? '1px solid rgba(63, 138, 102, 0.18)' : '1px solid var(--surface-border)', borderRadius: 16, padding: '18px 22px' }}>
                                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                                     <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                                        <div style={{ width: 36, height: 36, borderRadius: 10, background: 'rgba(24, 155, 130, 0.1)', border: '1px solid rgba(24, 155, 130, 0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                        <div style={{ width: 36, height: 36, borderRadius: 10, background: 'rgba(63, 138, 102, 0.1)', border: '1px solid rgba(63, 138, 102, 0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                                             <RefreshCw size={16} color="var(--accent-green-text)" />
                                         </div>
                                         <div>
@@ -473,7 +473,7 @@ export default function PatientDetailPage() {
                                                 </div>
                                             </div>
                                         )}
-                                        <button onClick={runPrediction} disabled={predicting} className="btn-ghost" style={{ fontSize: 12, padding: '6px 14px', color: 'var(--accent-green-text)', borderColor: 'rgba(24, 155, 130, 0.2)' }}>
+                                        <button onClick={runPrediction} disabled={predicting} className="btn-ghost" style={{ fontSize: 12, padding: '6px 14px', color: 'var(--accent-green-text)', borderColor: 'rgba(63, 138, 102, 0.2)' }}>
                                             {predicting ? <RefreshCw size={13} style={{ animation: 'spin 0.8s linear infinite' }} /> : <Brain size={13} />}
                                             {predicting ? 'Running...' : pred ? 'Re-run' : 'Run Now'}
                                         </button>
@@ -520,10 +520,10 @@ export default function PatientDetailPage() {
 
                     {/* Active Alerts */}
                     {patient.alerts?.length > 0 && (
-                        <div style={{ background: 'var(--surface-1)', border: '1px solid rgba(209, 63, 74, 0.3)', borderRadius: 16, padding: '20px 24px' }}>
+                        <div style={{ background: 'var(--surface-1)', border: '1px solid rgba(200, 67, 75, 0.3)', borderRadius: 16, padding: '20px 24px' }}>
                             <h3 style={{ fontSize: 15, fontWeight: 600, color: 'var(--risk-critical-text)', marginBottom: 12 }}>🚨 Active Alerts</h3>
                             {patient.alerts.map((a: any) => (
-                                <div key={a.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '10px 14px', background: 'rgba(209, 63, 74, 0.05)', borderRadius: 8, marginBottom: 8 }}>
+                                <div key={a.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '10px 14px', background: 'rgba(200, 67, 75, 0.05)', borderRadius: 8, marginBottom: 8 }}>
                                     <div>
                                         <span style={{ fontSize: 12, fontWeight: 600, color: 'var(--risk-critical-text)' }}>[{a.severity}] {a.type}</span>
                                         <div style={{ fontSize: 13, color: 'var(--text-secondary)', marginTop: 2 }}>{a.message}</div>
@@ -552,10 +552,10 @@ export default function PatientDetailPage() {
                     </div>
 
                     {/* Risk Classification */}
-                    <div style={{ background: 'var(--surface-1)', border: pred ? '1px solid rgba(13, 92, 126, 0.25)' : '1px solid var(--surface-border)', borderRadius: 18, padding: '22px 26px' }}>
+                    <div style={{ background: 'var(--surface-1)', border: pred ? '1px solid rgba(35, 83, 71, 0.25)' : '1px solid var(--surface-border)', borderRadius: 18, padding: '22px 26px' }}>
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: pred ? 20 : 0 }}>
                             <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-                                <div style={{ width: 44, height: 44, borderRadius: 12, background: 'rgba(13, 92, 126, 0.1)', border: '1px solid rgba(13, 92, 126, 0.25)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                <div style={{ width: 44, height: 44, borderRadius: 12, background: 'rgba(35, 83, 71, 0.1)', border: '1px solid rgba(35, 83, 71, 0.25)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                                     <Brain size={20} color="var(--accent-primary)" />
                                 </div>
                                 <div>
@@ -585,10 +585,10 @@ export default function PatientDetailPage() {
                     </div>
 
                     {/* LOS Predictor */}
-                    <div style={{ background: 'var(--surface-1)', border: pred ? '1px solid rgba(255,44,245,0.25)' : '1px solid var(--surface-border)', borderRadius: 18, padding: '22px 26px' }}>
+                    <div style={{ background: 'var(--surface-1)', border: pred ? '1px solid rgba(142, 182, 155, 0.25)' : '1px solid var(--surface-border)', borderRadius: 18, padding: '22px 26px' }}>
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                             <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-                                <div style={{ width: 44, height: 44, borderRadius: 12, background: 'rgba(255,44,245,0.1)', border: '1px solid rgba(255,44,245,0.25)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                <div style={{ width: 44, height: 44, borderRadius: 12, background: 'rgba(142, 182, 155, 0.1)', border: '1px solid rgba(142, 182, 155, 0.25)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                                     <Clock size={20} color="var(--accent-magenta)" />
                                 </div>
                                 <div>
@@ -620,10 +620,10 @@ export default function PatientDetailPage() {
                     </div>
 
                     {/* Readmission Model */}
-                    <div style={{ background: 'var(--surface-1)', border: pred ? '1px solid rgba(24, 155, 130, 0.25)' : '1px solid var(--surface-border)', borderRadius: 18, padding: '22px 26px' }}>
+                    <div style={{ background: 'var(--surface-1)', border: pred ? '1px solid rgba(63, 138, 102, 0.25)' : '1px solid var(--surface-border)', borderRadius: 18, padding: '22px 26px' }}>
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                             <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-                                <div style={{ width: 44, height: 44, borderRadius: 12, background: 'rgba(24, 155, 130, 0.1)', border: '1px solid rgba(24, 155, 130, 0.25)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                <div style={{ width: 44, height: 44, borderRadius: 12, background: 'rgba(63, 138, 102, 0.1)', border: '1px solid rgba(63, 138, 102, 0.25)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                                     <RefreshCw size={20} color="var(--accent-green-text)" />
                                 </div>
                                 <div>
@@ -769,8 +769,8 @@ export default function PatientDetailPage() {
                                     <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
                                         {abnormal.map(f => {
                                             const c = f.status === 'HIGH'
-                                                ? { color: 'var(--risk-high-text)', bg: 'rgba(232, 131, 58, 0.10)', label: '↑ HIGH' }
-                                                : { color: 'var(--accent-primary)', bg: 'rgba(13, 92, 126, 0.08)', label: '↓ LOW' };
+                                                ? { color: 'var(--risk-high-text)', bg: 'rgba(217, 122, 58, 0.10)', label: '↑ HIGH' }
+                                                : { color: 'var(--accent-primary)', bg: 'rgba(35, 83, 71, 0.08)', label: '↓ LOW' };
                                             return (
                                                 <div key={f.name} style={{ background: c.bg, border: `1px solid ${c.color}30`, borderRadius: 10, padding: '10px 14px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                                                     <div>
@@ -800,7 +800,7 @@ export default function PatientDetailPage() {
                                     {showNormal && (
                                         <div style={{ marginTop: 10, display: 'flex', flexDirection: 'column', gap: 6 }}>
                                             {normalFindings.map(f => (
-                                                <div key={f.name} style={{ display: 'flex', justifyContent: 'space-between', padding: '7px 10px', background: 'rgba(24, 155, 130, 0.04)', borderRadius: 8 }}>
+                                                <div key={f.name} style={{ display: 'flex', justifyContent: 'space-between', padding: '7px 10px', background: 'rgba(63, 138, 102, 0.04)', borderRadius: 8 }}>
                                                     <span style={{ fontSize: 12.5, color: 'var(--text-secondary)' }}>{f.name}</span>
                                                     <span className="font-mono" style={{ fontSize: 13, fontWeight: 700, color: 'var(--accent-green-text)' }}>{f.value} {f.unit}</span>
                                                 </div>

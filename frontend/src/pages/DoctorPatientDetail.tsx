@@ -119,7 +119,7 @@ export default function DoctorPatientDetail() {
 
     if (loading) return (
         <div style={{ display: 'flex', justifyContent: 'center', padding: 80 }}>
-            <div style={{ width: 36, height: 36, borderRadius: '50%', border: '3px solid rgba(13, 92, 126, 0.15)', borderTopColor: 'var(--accent-primary)', animation: 'spin 0.8s linear infinite' }} />
+            <div style={{ width: 36, height: 36, borderRadius: '50%', border: '3px solid rgba(35, 83, 71, 0.15)', borderTopColor: 'var(--accent-primary)', animation: 'spin 0.8s linear infinite' }} />
         </div>
     );
     if (!patient) return <div style={{ padding: 40, color: 'var(--text-muted)' }}>Patient not found</div>;
@@ -181,7 +181,7 @@ export default function DoctorPatientDetail() {
                 <div style={{
                     width: 64, height: 64, borderRadius: '50%', flexShrink: 0,
                     background: 'linear-gradient(135deg, #00E5FF33, #6366f133)',
-                    border: '2px solid rgba(13, 92, 126, 0.2)',
+                    border: '2px solid rgba(35, 83, 71, 0.2)',
                     display: 'flex', alignItems: 'center', justifyContent: 'center',
                     fontSize: 24, fontWeight: 800, color: 'var(--accent-primary)',
                 }}>
@@ -202,7 +202,7 @@ export default function DoctorPatientDetail() {
                         )}
                     </div>
                     <div style={{ fontSize: 12, color: 'var(--text-muted)', marginBottom: 10 }}>
-                        <span style={{ fontFamily: 'monospace' }}>{patient.patientCode}</span>
+                        <span style={{ fontFamily: 'var(--font-mono)' }}>{patient.patientCode}</span>
                         {age && ` · ${age} yrs`}
                         {patient.gender && ` · ${patient.gender}`}
                         {patient.bloodGroup && ` · 🩸 ${patient.bloodGroup.replace('_', '')}`}
@@ -217,7 +217,7 @@ export default function DoctorPatientDetail() {
                 {patient.riskScore != null && (
                     <div style={{ textAlign: 'center', flexShrink: 0 }}>
                         <div style={{
-                            fontFamily: 'monospace', fontSize: 42, fontWeight: 700,
+                            fontFamily: 'var(--font-mono)', fontSize: 42, fontWeight: 700,
                             color: patient.riskScore > 70 ? 'var(--risk-critical)' : patient.riskScore > 50 ? 'var(--risk-high)' : 'var(--risk-low)',
                         }}>{patient.riskScore.toFixed(1)}</div>
                         <div style={{ fontSize: 10, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
@@ -299,7 +299,7 @@ export default function DoctorPatientDetail() {
                                     <span style={{
                                         fontSize: 10, fontWeight: 700, padding: '2px 8px', borderRadius: 20,
                                         color: a.status === 'APPROVED' || a.status === 'PATIENT_ACCEPTED' ? 'var(--risk-low)' : 'var(--text-muted)',
-                                        background: a.status === 'APPROVED' || a.status === 'PATIENT_ACCEPTED' ? 'rgba(24, 155, 130, 0.1)' : 'var(--surface-2)',
+                                        background: a.status === 'APPROVED' || a.status === 'PATIENT_ACCEPTED' ? 'rgba(63, 138, 102, 0.1)' : 'var(--surface-2)',
                                     }}>{a.status}</span>
                                 </div>
                             ))}
@@ -310,7 +310,7 @@ export default function DoctorPatientDetail() {
 
             {/* ML Prediction Panel — DOCTOR only, not shown to RECEPTIONIST */}
             {!isReceptionist && (
-            <div style={{ background: 'var(--surface-1)', border: '1px solid rgba(13, 92, 126, 0.2)', borderRadius: 18, padding: 24 }}>
+            <div style={{ background: 'var(--surface-1)', border: '1px solid rgba(35, 83, 71, 0.2)', borderRadius: 18, padding: 24 }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
                     <div>
                         <div style={{ fontSize: 11, fontWeight: 700, color: 'var(--accent-magenta)', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 4 }}>
@@ -370,7 +370,7 @@ export default function DoctorPatientDetail() {
                                 <div key={level} style={{ marginBottom: 10 }}>
                                     <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 11, marginBottom: 4 }}>
                                         <span style={{ color: RISK_COLORS[level] || 'var(--text-secondary)' }}>{level}</span>
-                                        <span style={{ color: 'var(--text-primary)', fontFamily: 'monospace' }}>{(prob * 100).toFixed(1)}%</span>
+                                        <span style={{ color: 'var(--text-primary)', fontFamily: 'var(--font-mono)' }}>{(prob * 100).toFixed(1)}%</span>
                                     </div>
                                     <div style={{ height: 5, background: 'var(--surface-2)', borderRadius: 4 }}>
                                         <div style={{
@@ -425,7 +425,7 @@ export default function DoctorPatientDetail() {
 
             {/* AI Doctor Call History — previously fully siloed to the patient's own portal */}
             {aiDoctorCalls.length > 0 && (
-                <div style={{ background: 'var(--surface-1)', border: '1px solid rgba(13, 92, 126, 0.2)', borderRadius: 18, padding: 20, marginTop: 20 }}>
+                <div style={{ background: 'var(--surface-1)', border: '1px solid rgba(35, 83, 71, 0.2)', borderRadius: 18, padding: 20, marginTop: 20 }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 14 }}>
                         <Bot size={15} color="var(--accent-primary)" />
                         <div style={{ fontSize: 11, fontWeight: 700, color: 'var(--accent-primary)', textTransform: 'uppercase', letterSpacing: '0.1em' }}>
@@ -449,7 +449,7 @@ export default function DoctorPatientDetail() {
                                         <span style={{
                                             fontSize: 10, fontWeight: 700, padding: '2px 9px', borderRadius: 20,
                                             color: suggestions.urgency === 'URGENT' ? 'var(--risk-critical)' : suggestions.urgency === 'SOON' ? 'var(--risk-medium)' : 'var(--risk-low)',
-                                            background: suggestions.urgency === 'URGENT' ? 'rgba(209, 63, 74, 0.1)' : suggestions.urgency === 'SOON' ? 'rgba(217, 165, 32, 0.1)' : 'rgba(24, 155, 130, 0.1)',
+                                            background: suggestions.urgency === 'URGENT' ? 'rgba(200, 67, 75, 0.1)' : suggestions.urgency === 'SOON' ? 'rgba(201, 154, 42, 0.1)' : 'rgba(63, 138, 102, 0.1)',
                                         }}>{suggestions.urgency}</span>
                                     )}
                                 </div>

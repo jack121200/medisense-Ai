@@ -29,7 +29,7 @@ const STATUS_COLOR: Record<string, string> = {
 };
 const STATUS_BG: Record<string, string> = {
     'OPTIMAL':      `${C.teal}18`,
-    'NEAR OPTIMAL': '#3A86FF18',
+    'NEAR OPTIMAL': 'rgba(43, 106, 79, 0.10)',
     'PROTECTIVE':   `${C.teal}18`,
     'NORMAL':       `${C.teal}12`,
     'BORDERLINE':   `${C.gold}18`,
@@ -48,7 +48,7 @@ const RISK_CFG: Record<string, { color: string; bg: string; label: string; emoji
 // ── Statin intensity badge ─────────────────────────────────────────────────────
 const STATIN_CFG: Record<string, { color: string; bg: string }> = {
     NONE:     { color: C.teal,    bg: `${C.teal}18` },
-    LOW:      { color: '#3A86FF', bg: '#3A86FF18' },
+    LOW:      { color: '#256876', bg: 'rgba(46, 122, 138, 0.10)' },
     MODERATE: { color: C.gold,    bg: `${C.gold}18` },
     HIGH:     { color: C.crimson, bg: `${C.crimson}18` },
 };
@@ -80,7 +80,7 @@ function Field({ label, value, onChange, placeholder = '', unit = '' }: {
                 placeholder={placeholder}
                 style={{
                     padding: '9px 12px',
-                    background: focused ? 'rgba(13, 92, 126, 0.06)' : 'var(--surface-2)',
+                    background: focused ? 'rgba(35, 83, 71, 0.06)' : 'var(--surface-2)',
                     border: `1px solid ${focused ? `${C.lipid}60` : 'var(--surface-border)'}`,
                     borderRadius: 9, color: 'var(--text-primary)', fontSize: 13.5,
                     outline: 'none', fontFamily: 'inherit',
@@ -206,10 +206,10 @@ export default function LipidProfileTab() {
         };
         return (
             <tr style={{ borderBottom: '1px solid var(--surface-border)' }}
-                onMouseEnter={e => (e.currentTarget.style.background = 'rgba(13, 92, 126, 0.04)')}
+                onMouseEnter={e => (e.currentTarget.style.background = 'rgba(35, 83, 71, 0.04)')}
                 onMouseLeave={e => (e.currentTarget.style.background = '')}>
                 <td style={{ padding: '11px 16px', fontWeight: 700, color: 'var(--text-primary)', fontSize: 13 }}>{labels[paramKey] || paramKey}</td>
-                <td style={{ padding: '11px 16px', fontFamily: 'monospace', color: col, fontWeight: 800, fontSize: 14 }}>{p.value}</td>
+                <td style={{ padding: '11px 16px', fontFamily: 'var(--font-mono)', color: col, fontWeight: 800, fontSize: 14 }}>{p.value}</td>
                 <td style={{ padding: '11px 16px', color: 'var(--text-muted)', fontSize: 12 }}>{p.unit}</td>
                 <td style={{ padding: '11px 16px', color: 'var(--text-muted)', fontSize: 11, maxWidth: 200 }}>{p.reference}</td>
                 <td style={{ padding: '11px 16px' }}>
@@ -244,7 +244,7 @@ export default function LipidProfileTab() {
                         <div style={{ fontSize: 42, marginBottom: 6 }}>{risk.emoji}</div>
                         <div style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 4 }}>Cardiovascular Risk</div>
                         <div style={{ fontSize: 26, fontWeight: 900, color: risk.color }}>{risk.label} RISK</div>
-                        <div style={{ fontSize: 32, fontWeight: 900, color: risk.color, fontFamily: 'monospace', marginTop: 4 }}>{probPct}%</div>
+                        <div style={{ fontSize: 32, fontWeight: 900, color: risk.color, fontFamily: 'var(--font-mono)', marginTop: 4 }}>{probPct}%</div>
                         <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 4 }}>probability</div>
                     </div>
 
@@ -298,7 +298,7 @@ export default function LipidProfileTab() {
                             return (
                                 <div key={k} style={{ background: `${col}10`, border: `1px solid ${col}25`, borderRadius: 10, padding: '10px 14px' }}>
                                     <div style={{ fontSize: 10, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.07em', marginBottom: 4 }}>{ratioLabels[k] || k}</div>
-                                    <div style={{ fontSize: 20, fontWeight: 900, color: col, fontFamily: 'monospace' }}>{Number(v).toFixed(2)}</div>
+                                    <div style={{ fontSize: 20, fontWeight: 900, color: col, fontFamily: 'var(--font-mono)' }}>{Number(v).toFixed(2)}</div>
                                 </div>
                             );
                         })}
@@ -355,7 +355,7 @@ export default function LipidProfileTab() {
             <div style={{ overflowX: 'auto' }}>
                 <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13 }}>
                     <thead>
-                        <tr style={{ background: 'rgba(13, 92, 126, 0.04)' }}>
+                        <tr style={{ background: 'rgba(35, 83, 71, 0.04)' }}>
                             {['Parameter', 'Value', 'Unit', 'Reference Range', 'Status'].map(h => (
                                 <th key={h} style={{ padding: '10px 16px', textAlign: 'left', color: 'var(--text-muted)', fontWeight: 700, fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.06em', borderBottom: `1px solid ${C.border}` }}>{h}</th>
                             ))}
@@ -380,7 +380,7 @@ export default function LipidProfileTab() {
                 {/* Header row */}
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 22 }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                        <div style={{ width: 36, height: 36, borderRadius: 10, background: `linear-gradient(135deg, ${C.lipid}, #0077B6)`, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                        <div style={{ width: 36, height: 36, borderRadius: 10, background: `linear-gradient(135deg, ${C.lipid}, var(--accent-magenta))`, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                             <Heart size={18} color="#fff" />
                         </div>
                         <div>
@@ -419,7 +419,7 @@ export default function LipidProfileTab() {
                         <div style={{ fontSize: 11, color: 'var(--text-muted)', marginBottom: 24 }}>You can review and edit all values before running the analysis.</div>
                         <button onClick={() => fileRef.current?.click()} disabled={pdfLoading} style={{
                             padding: '12px 30px', borderRadius: 10, border: 'none', cursor: 'pointer',
-                            background: `linear-gradient(135deg, ${C.lipid}, #0077B6)`, color: '#fff', fontWeight: 800, fontSize: 14,
+                            background: `linear-gradient(135deg, ${C.lipid}, var(--accent-magenta))`, color: '#fff', fontWeight: 800, fontSize: 14,
                             boxShadow: `0 4px 20px ${C.lipid}30`, opacity: pdfLoading ? 0.7 : 1,
                         }}>
                             {pdfLoading ? '⏳ Extracting...' : '📂 Choose File (PDF / DOCX)'}
@@ -465,7 +465,7 @@ export default function LipidProfileTab() {
                         {/* Submit */}
                         <button onClick={submit} disabled={loading} style={{
                             padding: '13px 36px', borderRadius: 12, border: 'none',
-                            background: loading ? 'var(--surface-2)' : `linear-gradient(135deg, ${C.lipid}, #0077B6)`,
+                            background: loading ? 'var(--surface-2)' : `linear-gradient(135deg, ${C.lipid}, var(--accent-magenta))`,
                             color: 'var(--text-primary)', fontWeight: 800, fontSize: 14.5, cursor: loading ? 'not-allowed' : 'pointer',
                             boxShadow: loading ? 'none' : `0 6px 28px ${C.lipid}35`,
                             transition: 'all 0.2s',
@@ -493,7 +493,7 @@ export default function LipidProfileTab() {
                                     <div key={cat} style={{ marginBottom: 12 }}>
                                         <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 5 }}>
                                             <span style={{ fontSize: 12, fontWeight: 700, color: cfg.color }}>{cat}</span>
-                                            <span style={{ fontSize: 12, fontFamily: 'monospace', color: cfg.color, fontWeight: 700 }}>{pct}%</span>
+                                            <span style={{ fontSize: 12, fontFamily: 'var(--font-mono)', color: cfg.color, fontWeight: 700 }}>{pct}%</span>
                                         </div>
                                         <div style={{ height: 6, borderRadius: 99, background: 'var(--surface-2)', overflow: 'hidden' }}>
                                             <div style={{ height: '100%', width: `${pct}%`, background: `linear-gradient(90deg, ${cfg.color}, ${cfg.color}aa)`, borderRadius: 99, transition: 'width 0.6s ease' }} />

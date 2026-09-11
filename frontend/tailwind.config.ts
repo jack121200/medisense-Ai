@@ -43,9 +43,9 @@ export default {
                 info: 'var(--accent-primary)',
             },
             fontFamily: {
-                display: ['"DM Sans"', 'sans-serif'],
-                body: ['Inter', 'sans-serif'],
-                mono: ['"JetBrains Mono"', 'monospace'],
+                display: ['"Bricolage Grotesque"', 'Onest', 'system-ui', 'sans-serif'],
+                body: ['Onest', 'system-ui', 'sans-serif'],
+                mono: ['"Spline Sans Mono"', 'ui-monospace', 'monospace'],
             },
             // Named type scale — every component below (and every page as
             // it migrates off inline styles) should reach for one of these
@@ -93,8 +93,8 @@ export default {
                     '100%': { opacity: '1', transform: 'translateY(0)' },
                 },
                 glow: {
-                    '0%': { boxShadow: '0 0 10px rgba(194,91,60,0.15)' },
-                    '100%': { boxShadow: '0 0 25px rgba(194,91,60,0.35)' },
+                    '0%': { boxShadow: '0 0 10px rgba(35,83,71,0.15)' },
+                    '100%': { boxShadow: '0 0 25px rgba(35,83,71,0.35)' },
                 },
             },
             boxShadow: {

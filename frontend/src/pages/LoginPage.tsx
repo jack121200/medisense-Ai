@@ -122,8 +122,8 @@ const LoginPage = () => {
             overflow: 'hidden',
         }}>
             {/* Ambient glows */}
-            <div style={{ position: 'absolute', top: '-20%', left: '-10%', width: 600, height: 600, borderRadius: '50%', background: 'radial-gradient(circle, rgba(13, 92, 126, 0.07) 0%, transparent 70%)', pointerEvents: 'none' }} />
-            <div style={{ position: 'absolute', bottom: '-20%', right: '-10%', width: 500, height: 500, borderRadius: '50%', background: 'radial-gradient(circle, rgba(18, 121, 163, 0.05) 0%, transparent 70%)', pointerEvents: 'none' }} />
+            <div style={{ position: 'absolute', top: '-20%', left: '-10%', width: 600, height: 600, borderRadius: '50%', background: 'radial-gradient(circle, rgba(35, 83, 71, 0.07) 0%, transparent 70%)', pointerEvents: 'none' }} />
+            <div style={{ position: 'absolute', bottom: '-20%', right: '-10%', width: 500, height: 500, borderRadius: '50%', background: 'radial-gradient(circle, rgba(46, 107, 91, 0.05) 0%, transparent 70%)', pointerEvents: 'none' }} />
 
             <div style={{ width: '100%', maxWidth: step === 'role' ? 900 : 440, transition: 'max-width 0.4s ease' }}>
                 {/* Header */}
@@ -249,7 +249,7 @@ const LoginPage = () => {
                             </div>
 
                             {error && (
-                                <div style={{ marginBottom: 16, padding: '10px 14px', background: 'rgba(209, 63, 74, 0.1)', border: '1px solid rgba(209, 63, 74, 0.25)', borderRadius: 8, fontSize: 13, color: 'var(--risk-high-text)' }}>
+                                <div style={{ marginBottom: 16, padding: '10px 14px', background: 'rgba(200, 67, 75, 0.1)', border: '1px solid rgba(200, 67, 75, 0.25)', borderRadius: 8, fontSize: 13, color: 'var(--risk-high-text)' }}>
                                     ⚠️ {error}
                                 </div>
                             )}
@@ -259,7 +259,7 @@ const LoginPage = () => {
                                 disabled={submitting}
                                 style={{
                                     width: '100%', padding: '14px', borderRadius: 10, border: 'none', cursor: submitting ? 'not-allowed' : 'pointer',
-                                    background: submitting ? 'rgba(13, 92, 126, 0.4)' : 'linear-gradient(135deg, var(--accent-primary), var(--accent-primary-dim))',
+                                    background: submitting ? 'rgba(35, 83, 71, 0.4)' : 'linear-gradient(135deg, var(--accent-primary), var(--accent-primary-dim))',
                                     color: 'var(--text-primary)', fontSize: 15, fontWeight: 700, transition: 'opacity 0.2s, transform 0.1s',
                                     opacity: submitting ? 0.7 : 1,
                                 }}

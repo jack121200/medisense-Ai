@@ -18,8 +18,8 @@ function ComorbidityTag({ label }: { label: string }) {
     return (
         <span style={{
             fontSize: 11, padding: '2px 9px', borderRadius: 20,
-            background: 'rgba(232, 131, 58, 0.1)', color: 'var(--risk-high-text)',
-            border: '1px solid rgba(232, 131, 58, 0.25)', fontWeight: 600,
+            background: 'rgba(217, 122, 58, 0.1)', color: 'var(--risk-high-text)',
+            border: '1px solid rgba(217, 122, 58, 0.25)', fontWeight: 600,
         }}>{label}</span>
     );
 }
@@ -134,7 +134,7 @@ export default function DoctorPatientsPage() {
                                     transition: 'all 0.2s ease',
                                 }}
                                 onMouseEnter={e => {
-                                    (e.currentTarget as HTMLDivElement).style.border = '1px solid rgba(13, 92, 126, 0.2)';
+                                    (e.currentTarget as HTMLDivElement).style.border = '1px solid rgba(35, 83, 71, 0.2)';
                                     (e.currentTarget as HTMLDivElement).style.background = 'var(--surface-1)';
                                 }}
                                 onMouseLeave={e => {
@@ -147,7 +147,7 @@ export default function DoctorPatientsPage() {
                                     <div style={{
                                         width: 50, height: 50, borderRadius: 14, flexShrink: 0,
                                         background: 'linear-gradient(135deg, #00E5FF22, #6366f122)',
-                                        border: '1px solid rgba(13, 92, 126, 0.2)',
+                                        border: '1px solid rgba(35, 83, 71, 0.2)',
                                         display: 'flex', alignItems: 'center', justifyContent: 'center',
                                         fontSize: 18, fontWeight: 800, color: 'var(--accent-primary)',
                                     }}>
@@ -157,11 +157,11 @@ export default function DoctorPatientsPage() {
                                         <div style={{ fontSize: 15, fontWeight: 800, color: 'var(--text-primary)', marginBottom: 2 }}>
                                             {p.firstName} {p.lastName}
                                         </div>
-                                        <div style={{ fontSize: 11, color: 'var(--text-muted)', fontFamily: 'monospace' }}>
+                                        <div style={{ fontSize: 11, color: 'var(--text-muted)', fontFamily: 'var(--font-mono)' }}>
                                             {p.patientCode}
                                         </div>
                                     </div>
-                                    <div style={{ fontSize: 10, fontWeight: 700, color: 'var(--accent-primary)', background: 'rgba(13, 92, 126, 0.1)', padding: '3px 10px', borderRadius: 20, border: '1px solid rgba(13, 92, 126, 0.2)', flexShrink: 0 }}>
+                                    <div style={{ fontSize: 10, fontWeight: 700, color: 'var(--accent-primary)', background: 'rgba(35, 83, 71, 0.1)', padding: '3px 10px', borderRadius: 20, border: '1px solid rgba(35, 83, 71, 0.2)', flexShrink: 0 }}>
                                         {appts.length} appt{appts.length !== 1 ? 's' : ''}
                                     </div>
                                 </div>

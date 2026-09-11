@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&family=DM+Sans:wght@400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=Onest:wght@400..700&family=Spline+Sans+Mono:wght@400..600&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -6,108 +6,119 @@
 
 
 /* ══════════════════════════════════════════════════
-   DESIGN TOKENS — MediSense AI "Clinical Teal"
+   DESIGN TOKENS — MediSense AI "Forest"
 
-   Source palette:
-     #DEFBC8 mint · #189B82 teal · #0D5C7E deep ocean
-     #CEEAEC pale cyan · #F0F6FE pale blue
+   Source palette, darkest to lightest:
+     #051F20 dark forest · #0B2B26 deep pine · #163832 muted teal-green
+     #235347 dark sage   · #8EB69B soft sage · #DAF1DE pale mint
 
-   Every variable name is deliberately stable: pages and the ui/ component
-   library read these, so the palette can be swapped wholesale by editing
-   values here and nothing else.
+   The dark half anchors the shell (sidebar, landing hero); the light half
+   is the reading surface. Every token name is stable — pages and ui/
+   components read these, so a palette swap is an edit here and nowhere
+   else. Text values are checked against WCAG AA on the surfaces they sit on.
    ══════════════════════════════════════════════════ */
 
 :root {
   color-scheme: light;
 
+  /* ── RAW PALETTE (for surfaces that are deliberately dark) ── */
+  --forest-900: #051F20;
+  --forest-800: #0B2B26;
+  --forest-700: #163832;
+  --forest-600: #235347;
+  --sage-400:   #8EB69B;
+  --mint-100:   #DAF1DE;
+
   /* ── BACKGROUNDS ── */
-  --bg-primary:    #F0F6FE;
-  --bg-secondary:  #E6F0FA;
-  --bg-tertiary:   #CEEAEC;
-  --bg-glass:      rgba(255, 255, 255, 0.82);
-  --bg-overlay:    rgba(11, 43, 59, 0.48);
+  --bg-primary:    #EEF6EF;
+  --bg-secondary:  #DAF1DE;
+  --bg-tertiary:   #C4E2CB;
+  --bg-glass:      rgba(250, 253, 250, 0.84);
+  --bg-overlay:    rgba(5, 31, 32, 0.58);
 
   /* ── ELEVATED SURFACES ── */
   --surface-0:        #FFFFFF;
-  --surface-1:        #FBFDFF;
-  --surface-2:        #F0F6FE;
-  --surface-3:        #DFEDF7;
-  --surface-border:    rgba(13, 92, 126, 0.13);
-  --surface-border-md: rgba(13, 92, 126, 0.22);
-  --surface-border-hi: rgba(13, 92, 126, 0.34);
+  --surface-1:        #FAFDFA;
+  --surface-2:        #EEF6EF;
+  --surface-3:        #DAF1DE;
+  --surface-border:    rgba(35, 83, 71, 0.14);
+  --surface-border-md: rgba(35, 83, 71, 0.24);
+  --surface-border-hi: rgba(35, 83, 71, 0.36);
 
-  /* ── PRIMARY ACCENT — DEEP OCEAN ── */
-  --accent-primary:       #0D5C7E;
-  --accent-primary-dim:   #08455E;
-  --accent-primary-hover: #1279A3;
-  --accent-glow:          rgba(13, 92, 126, 0.15);
-  --accent-glow-sm:       rgba(13, 92, 126, 0.08);
+  /* ── PRIMARY ACCENT — DARK SAGE ── */
+  --accent-primary:       #235347;
+  --accent-primary-dim:   #163832;
+  --accent-primary-hover: #2E6B5B;
+  --accent-glow:          rgba(35, 83, 71, 0.16);
+  --accent-glow-sm:       rgba(35, 83, 71, 0.08);
 
-  /* ── SECONDARY ACCENT — TEAL ── */
-  --accent-magenta:       #189B82;
-  --accent-magenta-dim:   #127A66;
-  --accent-magenta-glow:  rgba(24, 155, 130, 0.15);
+  /* ── SECONDARY ACCENT — MID SAGE (safe under white text) ── */
+  --accent-magenta:       #3F7A63;
+  --accent-magenta-dim:   #2E6B5B;
+  --accent-magenta-glow:  rgba(63, 122, 99, 0.16);
 
-  /* ── TERTIARY ACCENT — TEAL / MINT ── */
-  --accent-green:         #189B82;
-  --accent-green-dim:     #127A66;
-  --accent-green-glow:    rgba(24, 155, 130, 0.15);
-  --accent-mint:          #DEFBC8;
+  /* ── TERTIARY ── */
+  --accent-green:         #3F8A66;
+  --accent-green-dim:     #2B6A4F;
+  --accent-green-glow:    rgba(63, 138, 102, 0.16);
+  --accent-mint:          #DAF1DE;
+  --accent-sage:          #8EB69B;
 
   /* ── RISK / SEVERITY SCALE ──
-     Clinical severity has to stay red/amber/green to be readable at a
-     glance, so these sit alongside the brand hues rather than inside them.
-     Only "low" borrows the palette's teal, which is where it belongs. */
-  --risk-critical:    #D13F4A;
-  --risk-critical-bg: rgba(209, 63, 74, 0.10);
-  --risk-critical-border: rgba(209, 63, 74, 0.28);
-  --risk-high:        #E8833A;
-  --risk-high-bg:     rgba(232, 131, 58, 0.10);
-  --risk-medium:      #D9A520;
-  --risk-medium-bg:   rgba(217, 165, 32, 0.13);
-  --risk-low:         #189B82;
-  --risk-low-bg:      rgba(24, 155, 130, 0.10);
-  --mint-bg:          rgba(222, 251, 200, 0.55);
-
+     Severity stays red/amber/green so it reads at a glance; the hues are
+     pulled slightly toward the palette so they sit in it rather than on it. */
+  --risk-critical:    #C8434B;
+  --risk-critical-bg: rgba(200, 67, 75, 0.10);
+  --risk-critical-border: rgba(200, 67, 75, 0.28);
+  --risk-high:        #D97A3A;
+  --risk-high-bg:     rgba(217, 122, 58, 0.11);
+  --risk-medium:      #C99A2A;
+  --risk-medium-bg:   rgba(201, 154, 42, 0.14);
+  --risk-low:         #3F8A66;
+  --risk-low-bg:      rgba(63, 138, 102, 0.11);
+  --mint-bg:          rgba(218, 241, 222, 0.7);
 
   /* ── TEXT-ON-TINT VARIANTS ──
-     Coloured text on a light tint of the same hue is the app's most common
-     badge pattern, and the vivid hues fail WCAG AA at small sizes against
-     their own tint (gold measured 2.05:1). These are the same hues darkened
-     until they clear 4.5:1 on a 12% tint. Fills and borders keep the vivid
-     values; only text uses these. */
-  --risk-low-text:      #137965;
-  --risk-medium-text:   #7E5F12;
-  --risk-high-text:     #A05A28;
-  --risk-critical-text: #BC3943;
-  --accent-green-text:  #137965;
+     For coloured text sitting on a light tint of its own hue (badges, chips,
+     active states). Each clears 4.5:1 on a 12% tint over the canvas. */
+  --risk-low-text:      #2B6A4F;
+  --risk-medium-text:   #7A5C14;
+  --risk-high-text:     #924E21;
+  --risk-critical-text: #B0363F;
+  --accent-green-text:  #2B6A4F;
 
-  /* ── TEXT ── */
-  --text-primary:   #0B2B3B;
-  --text-secondary: #4C6B7C;
-  --text-muted:     #8BA6B6;
+  /* ── TEXT ──
+     Deep pine instead of black: 13.7:1 on the canvas, and it keeps even the
+     body copy inside the palette. */
+  --text-primary:   #0B2B26;
+  --text-secondary: #3E5A52;
+  --text-muted:     #4F6B62;
   --text-inverse:   #FFFFFF;
 
   /* ── VITALS PALETTE ── */
-  --vitals-heart:   #D13F4A;
-  --vitals-oxygen:  #1279A3;
-  --vitals-bp:      #7C6AB4;
-  --vitals-temp:    #E8833A;
-  --vitals-glucose: #189B82;
+  --vitals-heart:   #C8434B;
+  --vitals-oxygen:  #2E7A8A;
+  --vitals-bp:      #7A68AE;
+  --vitals-temp:    #D97A3A;
+  --vitals-glucose: #3F8A66;
 
   /* ── CHART COLORS ── */
-  --chart-1: #0D5C7E;
-  --chart-2: #189B82;
-  --chart-3: #D9A520;
-  --chart-4: #E8833A;
-  --chart-5: #7C6AB4;
-  --chart-6: #D13F4A;
-  --chart-7: #6EAD5A;
+  --chart-1: #235347;
+  --chart-2: #8EB69B;
+  --chart-3: #C99A2A;
+  --chart-4: #D97A3A;
+  --chart-5: #7A68AE;
+  --chart-6: #C8434B;
+  --chart-7: #0B2B26;
 
-  /* ── TYPOGRAPHY ── */
-  --font-display: 'DM Sans', 'Inter', sans-serif;
-  --font-body:    'Inter', sans-serif;
-  --font-mono:    'JetBrains Mono', monospace;
+  /* ── TYPOGRAPHY ──
+     Bricolage Grotesque for display — a grotesque with an optical-size axis,
+     so headings get genuine character instead of a scaled-up body face.
+     Onest for body: humanist and very legible at small sizes. Spline Sans
+     Mono for numbers, where tabular alignment matters in vitals and scores. */
+  --font-display: 'Bricolage Grotesque', 'Onest', system-ui, sans-serif;
+  --font-body:    'Onest', system-ui, sans-serif;
+  --font-mono:    'Spline Sans Mono', ui-monospace, monospace;
 
   /* ── SPACING / RADII ── */
   --radius-xs:  4px;
@@ -117,19 +128,17 @@
   --radius-xl:  24px;
   --radius-2xl: 32px;
 
-  /* ── SHADOWS / GLOWS ──
-     Blue-tinted rather than neutral black, so shadows read as depth on a
-     cool ground instead of grey smudges. */
-  --shadow-sm:         0 1px 3px rgba(13, 45, 62, 0.08);
-  --shadow-md:         0 4px 14px rgba(13, 45, 62, 0.10);
-  --shadow-lg:         0 10px 32px rgba(13, 45, 62, 0.12);
-  --shadow-xl:         0 20px 50px rgba(13, 45, 62, 0.16);
-  --glow-cyan:         0 4px 16px rgba(13, 92, 126, 0.28);
-  --glow-cyan-sm:      0 2px 8px rgba(13, 92, 126, 0.18);
-  --glow-magenta:      0 4px 16px rgba(24, 155, 130, 0.25);
-  --glow-red:          0 4px 16px rgba(209, 63, 74, 0.25);
-  --glow-green:        0 4px 16px rgba(24, 155, 130, 0.25);
-  --glow-card:         0 0 0 1px rgba(13, 92, 126, 0.06), 0 2px 12px rgba(13, 45, 62, 0.06);
+  /* ── SHADOWS / GLOWS — forest-tinted, so depth reads green not grey ── */
+  --shadow-sm:         0 1px 3px rgba(5, 31, 32, 0.08);
+  --shadow-md:         0 4px 14px rgba(5, 31, 32, 0.10);
+  --shadow-lg:         0 10px 32px rgba(5, 31, 32, 0.13);
+  --shadow-xl:         0 20px 50px rgba(5, 31, 32, 0.18);
+  --glow-cyan:         0 4px 16px rgba(35, 83, 71, 0.30);
+  --glow-cyan-sm:      0 2px 8px rgba(35, 83, 71, 0.20);
+  --glow-magenta:      0 4px 16px rgba(63, 122, 99, 0.25);
+  --glow-red:          0 4px 16px rgba(200, 67, 75, 0.25);
+  --glow-green:        0 4px 16px rgba(63, 138, 102, 0.25);
+  --glow-card:         0 0 0 1px rgba(35, 83, 71, 0.06), 0 2px 12px rgba(5, 31, 32, 0.06);
 }
 
 /* ══════════════════════════════════════════════════
@@ -175,8 +184,8 @@ body {
   min-height: 100vh;
   overflow-x: hidden;
   background-image:
-    radial-gradient(ellipse 80% 50% at 20% -10%, rgba(13, 92, 126, 0.07) 0%, transparent 60%),
-    radial-gradient(ellipse 60% 40% at 80% 110%, rgba(222, 251, 200, 0.45) 0%, transparent 60%);
+    radial-gradient(ellipse 80% 50% at 20% -10%, rgba(35, 83, 71, 0.07) 0%, transparent 60%),
+    radial-gradient(ellipse 60% 40% at 80% 110%, rgba(218, 241, 222, 0.45) 0%, transparent 60%);
 }
 
 /* ══════════════════════════════════════════════════
@@ -185,8 +194,8 @@ body {
 
 ::-webkit-scrollbar          { width: 5px; height: 5px; }
 ::-webkit-scrollbar-track    { background: var(--bg-secondary); }
-::-webkit-scrollbar-thumb    { background: rgba(13, 92, 126, 0.22); border-radius: 3px; }
-::-webkit-scrollbar-thumb:hover { background: rgba(13, 92, 126, 0.38); }
+::-webkit-scrollbar-thumb    { background: rgba(35, 83, 71, 0.22); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(35, 83, 71, 0.38); }
 
 /* ══════════════════════════════════════════════════
    TYPOGRAPHY
@@ -194,12 +203,14 @@ body {
 
 h1, h2, h3, h4, h5, h6 {
   font-family: var(--font-display);
+  font-optical-sizing: auto;
   color: var(--text-primary);
-  line-height: 1.25;
-  letter-spacing: -0.01em;
+  line-height: 1.2;
+  letter-spacing: -0.025em;
+  text-wrap: balance;
 }
 
-.font-mono, .stat-number { font-family: var(--font-mono); }
+.font-mono, .stat-number { font-family: var(--font-mono); font-variant-numeric: tabular-nums; }
 
 /* ══════════════════════════════════════════════════
    PAGE SHELL
@@ -331,9 +342,9 @@ h1, h2, h3, h4, h5, h6 {
   border-radius: 9999px;
   font-size: 11px;
   font-weight: 700;
-  background: rgba(13, 92, 126, 0.10);
+  background: rgba(35, 83, 71, 0.10);
   color: var(--accent-primary);
-  border: 1px solid rgba(13, 92, 126, 0.22);
+  border: 1px solid rgba(35, 83, 71, 0.22);
   font-family: var(--font-mono);
 }
 
@@ -367,16 +378,16 @@ h1, h2, h3, h4, h5, h6 {
   transition: background 0.15s ease;
 }
 .nav-item:hover {
-  background: rgba(13, 92, 126, 0.07);
+  background: rgba(35, 83, 71, 0.07);
   color: var(--text-primary);
-  border-color: rgba(13, 92, 126, 0.12);
+  border-color: rgba(35, 83, 71, 0.12);
 }
-.nav-item:hover::before { background: rgba(13, 92, 126, 0.45); }
+.nav-item:hover::before { background: rgba(35, 83, 71, 0.45); }
 
 .nav-item.active {
-  background: rgba(13, 92, 126, 0.10);
+  background: rgba(35, 83, 71, 0.10);
   color: var(--accent-primary);
-  border-color: rgba(13, 92, 126, 0.20);
+  border-color: rgba(35, 83, 71, 0.20);
 }
 .nav-item.active::before { background: var(--accent-primary); }
 
@@ -385,7 +396,7 @@ h1, h2, h3, h4, h5, h6 {
    ══════════════════════════════════════════════════ */
 
 .btn-primary {
-  background: linear-gradient(135deg, #0D5C7E 0%, #08455E 100%);
+  background: linear-gradient(135deg, #235347 0%, #163832 100%);
   color: #fff;
   border: none;
   padding: 9px 20px;
@@ -399,10 +410,10 @@ h1, h2, h3, h4, h5, h6 {
   align-items: center;
   gap: 8px;
   letter-spacing: 0.01em;
-  box-shadow: 0 2px 10px rgba(13, 92, 126, 0.22);
+  box-shadow: 0 2px 10px rgba(35, 83, 71, 0.22);
 }
 .btn-primary:hover {
-  background: linear-gradient(135deg, #1279A3 0%, #0D5C7E 100%);
+  background: linear-gradient(135deg, #2E6B5B 0%, #235347 100%);
   box-shadow: var(--glow-cyan);
   transform: translateY(-1px);
 }
@@ -410,7 +421,7 @@ h1, h2, h3, h4, h5, h6 {
 .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
 
 .btn-ghost {
-  background: rgba(13, 92, 126, 0.05);
+  background: rgba(35, 83, 71, 0.05);
   color: var(--text-secondary);
   border: 1px solid var(--surface-border);
   padding: 9px 16px;
@@ -425,7 +436,7 @@ h1, h2, h3, h4, h5, h6 {
   font-family: var(--font-body);
 }
 .btn-ghost:hover {
-  background: rgba(13, 92, 126, 0.10);
+  background: rgba(35, 83, 71, 0.10);
   color: var(--text-primary);
   border-color: var(--surface-border-md);
 }
@@ -447,7 +458,7 @@ h1, h2, h3, h4, h5, h6 {
   font-family: var(--font-body);
 }
 .btn-danger:hover {
-  background: rgba(209, 63, 74, 0.18);
+  background: rgba(200, 67, 75, 0.18);
   box-shadow: var(--glow-red);
 }
 
@@ -470,7 +481,7 @@ h1, h2, h3, h4, h5, h6 {
 .form-input:focus {
   border-color: var(--accent-primary);
   background: #fff;
-  box-shadow: 0 0 0 3px rgba(13, 92, 126, 0.12);
+  box-shadow: 0 0 0 3px rgba(35, 83, 71, 0.12);
 }
 .form-input::placeholder { color: var(--text-muted); }
 .form-input option { background: var(--surface-0); }
@@ -481,7 +492,7 @@ h1, h2, h3, h4, h5, h6 {
 
 .data-table { width: 100%; border-collapse: collapse; }
 .data-table th {
-  background: rgba(13, 92, 126, 0.05);
+  background: rgba(35, 83, 71, 0.05);
   color: var(--text-muted);
   font-size: 10.5px;
   font-weight: 700;
@@ -494,13 +505,13 @@ h1, h2, h3, h4, h5, h6 {
 }
 .data-table td {
   padding: 14px 18px;
-  border-bottom: 1px solid rgba(13, 92, 126, 0.08);
+  border-bottom: 1px solid rgba(35, 83, 71, 0.08);
   color: var(--text-secondary);
   font-size: 13.5px;
   transition: background 0.12s ease;
 }
 .data-table tr:hover td {
-  background: rgba(13, 92, 126, 0.045);
+  background: rgba(35, 83, 71, 0.045);
 }
 .data-table tr:last-child td { border-bottom: none; }
 
@@ -510,7 +521,7 @@ h1, h2, h3, h4, h5, h6 {
 
 .progress-bar-track {
   height: 6px;
-  background: rgba(13, 92, 126, 0.12);
+  background: rgba(35, 83, 71, 0.12);
   border-radius: 9999px;
   overflow: hidden;
 }
@@ -573,7 +584,7 @@ h1, h2, h3, h4, h5, h6 {
   gap: 5px;
   padding: 4px 10px;
   border-radius: var(--radius-sm);
-  background: rgba(13, 92, 126, 0.06);
+  background: rgba(35, 83, 71, 0.06);
   border: 1px solid var(--surface-border);
   font-size: 11px;
   font-family: var(--font-mono);
@@ -597,15 +608,15 @@ h1, h2, h3, h4, h5, h6 {
 
 /* Critical pulse */
 @keyframes criticalPulse {
-  0%, 100% { box-shadow: 0 0 0 0 rgba(209, 63, 74, 0.40); }
-  50%       { box-shadow: 0 0 0 10px rgba(209, 63, 74, 0); }
+  0%, 100% { box-shadow: 0 0 0 0 rgba(200, 67, 75, 0.40); }
+  50%       { box-shadow: 0 0 0 10px rgba(200, 67, 75, 0); }
 }
 .pulse-critical { animation: criticalPulse 1.8s ease infinite; }
 
 /* Vital sign critical state */
 @keyframes vitalCriticalPulse {
   0%, 100% { border-color: var(--surface-border); box-shadow: var(--shadow-sm); }
-  50%       { border-color: var(--risk-critical); box-shadow: 0 0 14px rgba(209, 63, 74, 0.22); }
+  50%       { border-color: var(--risk-critical); box-shadow: 0 0 14px rgba(200, 67, 75, 0.22); }
 }
 
 /* Heartbeat */
@@ -703,8 +714,8 @@ h1, h2, h3, h4, h5, h6 {
    ══════════════════════════════════════════════════ */
 
 .accuracy-banner {
-  background: linear-gradient(135deg, rgba(13, 92, 126, 0.08) 0%, rgba(24, 155, 130, 0.06) 100%);
-  border: 1px solid rgba(13, 92, 126, 0.16);
+  background: linear-gradient(135deg, rgba(35, 83, 71, 0.08) 0%, rgba(63, 138, 102, 0.06) 100%);
+  border: 1px solid rgba(35, 83, 71, 0.16);
   border-radius: var(--radius-lg);
   padding: 20px 24px;
   position: relative;
@@ -750,9 +761,9 @@ h1, h2, h3, h4, h5, h6 {
    CARD HOVER GLOW VARIANTS
    ══════════════════════════════════════════════════ */
 
-.card-hover-accent:hover   { box-shadow: 0 0 0 1px rgba(13, 92, 126, 0.28),  var(--shadow-md); }
-.card-hover-critical:hover { box-shadow: 0 0 0 1px rgba(209, 63, 74, 0.28),  var(--shadow-md); }
-.card-hover-success:hover  { box-shadow: 0 0 0 1px rgba(24, 155, 130, 0.28), var(--shadow-md); }
+.card-hover-accent:hover   { box-shadow: 0 0 0 1px rgba(35, 83, 71, 0.28),  var(--shadow-md); }
+.card-hover-critical:hover { box-shadow: 0 0 0 1px rgba(200, 67, 75, 0.28),  var(--shadow-md); }
+.card-hover-success:hover  { box-shadow: 0 0 0 1px rgba(63, 138, 102, 0.28), var(--shadow-md); }
 
 /* ══════════════════════════════════════════════════
    GRID BACKGROUND PATTERN
@@ -760,8 +771,8 @@ h1, h2, h3, h4, h5, h6 {
 
 .grid-bg {
   background-image:
-    linear-gradient(rgba(13, 92, 126, 0.05) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(13, 92, 126, 0.05) 1px, transparent 1px);
+    linear-gradient(rgba(35, 83, 71, 0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(35, 83, 71, 0.05) 1px, transparent 1px);
   background-size: 40px 40px;
 }
 
@@ -770,3 +781,26 @@ h1, h2, h3, h4, h5, h6 {
   0%, 100% { opacity: 1; transform: scale(1); }
   50%       { opacity: 0.4; transform: scale(0.85); }
 }
+
+/* ══════════════════════════════════════════════════
+   DARK SIDEBAR LINKS
+   The sidebar is the dark anchor of the shell. Link colours live here
+   rather than in inline styles so hover works; --role-color is set on the
+   <aside> per signed-in role.
+   ══════════════════════════════════════════════════ */
+
+.sidebar-link {
+  color: #9DBBA8;
+  border-left: 3px solid transparent;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+.sidebar-link:hover {
+  background: rgba(142, 182, 155, 0.08);
+  color: var(--mint-100);
+}
+.sidebar-link.active {
+  background: var(--forest-700);
+  color: var(--mint-100);
+  border-left-color: var(--role-color, var(--sage-400));
+}
+.sidebar-link.active svg { color: var(--role-color, var(--sage-400)); }

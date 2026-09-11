@@ -31,7 +31,7 @@ function RiskBadge({ level, probability }: { level: string; probability: number 
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8, padding: 32, background: s.bg, border: `2px solid ${s.color}30`, borderRadius: 20 }}>
             <div style={{ fontSize: 52 }}>{s.icon}</div>
             <div style={{ fontSize: 28, fontWeight: 900, color: s.color }}>{level} RISK</div>
-            <div style={{ fontSize: 36, fontWeight: 900, color: s.color, fontFamily: 'monospace' }}>{safeProb.toFixed(1)}%</div>
+            <div style={{ fontSize: 36, fontWeight: 900, color: s.color, fontFamily: 'var(--font-mono)' }}>{safeProb.toFixed(1)}%</div>
             <div style={{ fontSize: 12, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.1em' }}>Heart Disease Probability</div>
         </div>
     );
@@ -147,7 +147,7 @@ function HeartRiskTab() {
                 </div>
 
                 {inputMode === 'pdf' ? (
-                    <div style={{ border: '2px dashed rgba(13, 92, 126, 0.3)', borderRadius: 14, padding: 40, textAlign: 'center' }}>
+                    <div style={{ border: '2px dashed rgba(35, 83, 71, 0.3)', borderRadius: 14, padding: 40, textAlign: 'center' }}>
                         <input ref={fileRef} type="file" accept=".pdf,.docx" style={{ display: 'none' }}
                             onChange={e => e.target.files?.[0] && handlePdfUpload(e.target.files[0])} />
                         <div style={{ fontSize: 36, marginBottom: 12 }}>📄</div>
@@ -295,8 +295,8 @@ function CBCTab() {
         }
     };
 
-    const statusColor: Record<string, string> = { HIGH: C.crimson, LOW: '#3A86FF', NORMAL: C.teal };
-    const statusBg: Record<string, string>    = { HIGH: `${C.crimson}15`, LOW: '#3A86FF15', NORMAL: `${C.teal}10` };
+    const statusColor: Record<string, string> = { HIGH: C.crimson, LOW: '#256876', NORMAL: C.teal };
+    const statusBg: Record<string, string>    = { HIGH: `${C.crimson}15`, LOW: 'rgba(46, 122, 138, 0.10)', NORMAL: `${C.teal}10` };
 
     return (
         <div>
@@ -320,7 +320,7 @@ function CBCTab() {
                 </div>
 
                 {inputMode === 'pdf' ? (
-                    <div style={{ border: '2px dashed rgba(18, 121, 163, 0.3)', borderRadius: 14, padding: 40, textAlign: 'center' }}>
+                    <div style={{ border: '2px dashed rgba(46, 107, 91, 0.3)', borderRadius: 14, padding: 40, textAlign: 'center' }}>
                         <input ref={cbcFileRef} type="file" accept=".pdf" style={{ display: 'none' }}
                             onChange={e => e.target.files?.[0] && handleCbcPdf(e.target.files[0])} />
                         <div style={{ fontSize: 36, marginBottom: 12 }}>🧪</div>
@@ -389,7 +389,7 @@ function CBCTab() {
                                             onMouseOut={e => (e.currentTarget as HTMLTableRowElement).style.background = ''}
                                         >
                                             <td style={{ padding: '10px 16px', fontWeight: 700, color: 'var(--text-primary)' }}>{f.name}</td>
-                                            <td style={{ padding: '10px 16px', fontFamily: 'monospace', color: statusColor[f.status] || 'var(--text-primary)', fontWeight: 700 }}>{f.value}</td>
+                                            <td style={{ padding: '10px 16px', fontFamily: 'var(--font-mono)', color: statusColor[f.status] || 'var(--text-primary)', fontWeight: 700 }}>{f.value}</td>
                                             <td style={{ padding: '10px 16px', color: 'var(--text-muted)', fontSize: 12 }}>{f.unit}</td>
                                             <td style={{ padding: '10px 16px', color: 'var(--text-muted)', fontSize: 12 }}>{f.reference}</td>
                                             <td style={{ padding: '10px 16px' }}>
@@ -510,7 +510,7 @@ function SymptomTab() {
                 </div>
 
                 {inputMode === 'pdf' ? (
-                    <div style={{ border: '2px dashed rgba(124, 106, 180, 0.3)', borderRadius: 14, padding: 40, textAlign: 'center', marginBottom: 0 }}>
+                    <div style={{ border: '2px dashed rgba(122, 104, 174, 0.3)', borderRadius: 14, padding: 40, textAlign: 'center', marginBottom: 0 }}>
                         <input ref={symFileRef} type="file" accept=".pdf,.docx" style={{ display: 'none' }}
                             onChange={e => e.target.files?.[0] && handleSymptomFile(e.target.files[0])} />
                         <div style={{ fontSize: 36, marginBottom: 12 }}>🧠</div>
@@ -556,7 +556,7 @@ function SymptomTab() {
                     <div style={{ background: `${C.lavender}12`, border: `1px solid ${C.lavender}30`, borderRadius: 18, padding: 24 }}>
                         <div style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 10 }}>Primary Diagnosis</div>
                         <div style={{ fontSize: 20, fontWeight: 900, color: 'var(--text-primary)', marginBottom: 6 }}>{result.disease}</div>
-                        <div style={{ fontSize: 28, fontWeight: 900, color: C.lavender, fontFamily: 'monospace' }}>{result.confidence}%</div>
+                        <div style={{ fontSize: 28, fontWeight: 900, color: C.lavender, fontFamily: 'var(--font-mono)' }}>{result.confidence}%</div>
                         <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 4 }}>Confidence</div>
                     </div>
                     <div style={{ background: C.bg, border: `1px solid ${C.border}`, borderRadius: 16, padding: 20 }}>
@@ -565,7 +565,7 @@ function SymptomTab() {
                             {result.alternatives?.slice(1).map((a: any) => (
                                 <div key={a.disease} style={{ display: 'flex', justifyContent: 'space-between', padding: '8px 12px', background: 'var(--surface-1)', borderRadius: 8 }}>
                                     <span style={{ fontSize: 13, color: 'var(--text-secondary)' }}>{a.disease}</span>
-                                    <span style={{ fontSize: 13, color: C.lavender, fontFamily: 'monospace', fontWeight: 700 }}>{a.confidence}%</span>
+                                    <span style={{ fontSize: 13, color: C.lavender, fontFamily: 'var(--font-mono)', fontWeight: 700 }}>{a.confidence}%</span>
                                 </div>
                             ))}
                         </div>
@@ -612,7 +612,7 @@ export default function MLPredictionsPage() {
             {/* Header */}
             <div style={{ marginBottom: 28 }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 8 }}>
-                    <div style={{ width: 40, height: 40, borderRadius: 12, background: 'linear-gradient(135deg, var(--accent-primary), #0077B6)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 20 }}>🫀</div>
+                    <div style={{ width: 40, height: 40, borderRadius: 12, background: 'linear-gradient(135deg, var(--accent-primary), var(--accent-magenta))', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 20 }}>🫀</div>
                     <div>
                         <h1 style={{ fontSize: 22, fontWeight: 900, color: 'var(--text-primary)', letterSpacing: '-0.02em' }}>AI Clinical Tools</h1>
                         <p style={{ fontSize: 13, color: 'var(--text-muted)', marginTop: 2 }}>Research-Grade Medical AI Engine — Bayesian DAG, Mamdani FIS Dosing, Deep Autoencoder, Lipid Profiler, CBC Analyzer</p>

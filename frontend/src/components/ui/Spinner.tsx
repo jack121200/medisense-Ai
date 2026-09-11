@@ -7,7 +7,7 @@ export function Spinner({ size = 24, label = 'Loading' }: { size?: number; label
             aria-label={label}
             style={{
                 display: 'inline-block', width: size, height: size, borderRadius: '50%',
-                border: '2.5px solid rgba(13, 92, 126, 0.18)', borderTopColor: 'var(--accent-primary)',
+                border: '2.5px solid rgba(35, 83, 71, 0.18)', borderTopColor: 'var(--accent-primary)',
                 animation: 'spin 0.8s linear infinite',
             }}
         />

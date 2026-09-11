@@ -113,7 +113,7 @@ export default function ReceptionistRequestsPage() {
                 ].map(s => (
                     <div key={s.label} style={{ background: 'var(--surface-1)', border: `1px solid ${s.color}22`, borderRadius: 14, padding: '18px 20px', position: 'relative', overflow: 'hidden' }}>
                         <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 2, background: s.color, opacity: 0.7 }} />
-                        <div style={{ fontSize: 30, fontWeight: 900, color: s.color, fontFamily: 'monospace', marginBottom: 4 }}>{s.val}</div>
+                        <div style={{ fontSize: 30, fontWeight: 900, color: s.color, fontFamily: 'var(--font-mono)', marginBottom: 4 }}>{s.val}</div>
                         <div style={{ fontSize: 12, color: 'var(--text-muted)' }}>{s.label}</div>
                     </div>
                 ))}
@@ -124,7 +124,7 @@ export default function ReceptionistRequestsPage() {
                 {FILTERS.map(f => (
                     <button key={f} onClick={() => setFilter(f)} style={{
                         padding: '7px 16px', borderRadius: 20, fontSize: 12, fontWeight: 700, cursor: 'pointer',
-                        background: filter === f ? 'rgba(13, 92, 126, 0.15)' : 'var(--surface-2)',
+                        background: filter === f ? 'rgba(35, 83, 71, 0.15)' : 'var(--surface-2)',
                         border: `1px solid ${filter === f ? '#6366f140' : 'var(--surface-border-md)'}`,
                         color: filter === f ? 'var(--accent-primary)' : 'var(--text-secondary)',
                     }}>
@@ -178,7 +178,7 @@ export default function ReceptionistRequestsPage() {
 
                                     {/* Approved info */}
                                     {req.status === 'APPROVED' && req.scheduledDate && (
-                                        <div style={{ padding: '10px 14px', background: 'rgba(24, 155, 130, 0.06)', border: '1px solid rgba(24, 155, 130, 0.15)', borderRadius: 10, fontSize: 13, color: 'var(--risk-low-text)', marginTop: 6 }}>
+                                        <div style={{ padding: '10px 14px', background: 'rgba(63, 138, 102, 0.06)', border: '1px solid rgba(63, 138, 102, 0.15)', borderRadius: 10, fontSize: 13, color: 'var(--risk-low-text)', marginTop: 6 }}>
                                             ✅ Confirmed: {new Date(req.scheduledDate).toLocaleDateString('en-IN', { weekday: 'short', day: 'numeric', month: 'short' })} at {req.scheduledTime}
                                         </div>
                                     )}
@@ -187,11 +187,11 @@ export default function ReceptionistRequestsPage() {
                                     {req.status === 'PENDING' && (
                                         <div style={{ display: 'flex', gap: 8, marginTop: 12 }}>
                                             <button onClick={() => { setApproving(req.id); setApproveForm({ scheduledDate: req.requestedDate?.split('T')[0] || '', scheduledTime: '10:00' }); }}
-                                                style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '8px 16px', background: 'rgba(24, 155, 130, 0.1)', border: '1px solid rgba(24, 155, 130, 0.25)', borderRadius: 8, color: 'var(--risk-low-text)', fontWeight: 700, fontSize: 12, cursor: 'pointer' }}>
+                                                style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '8px 16px', background: 'rgba(63, 138, 102, 0.1)', border: '1px solid rgba(63, 138, 102, 0.25)', borderRadius: 8, color: 'var(--risk-low-text)', fontWeight: 700, fontSize: 12, cursor: 'pointer' }}>
                                                 <CheckCircle size={13} /> Approve & Schedule
                                             </button>
                                             <button onClick={() => { setRejecting(req.id); setRejectForm({ rejectReason: '', counterDate: '', counterTime: '' }); }}
-                                                style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '8px 16px', background: 'rgba(232, 131, 58, 0.1)', border: '1px solid rgba(232, 131, 58, 0.25)', borderRadius: 8, color: 'var(--risk-high-text)', fontWeight: 700, fontSize: 12, cursor: 'pointer' }}>
+                                                style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '8px 16px', background: 'rgba(217, 122, 58, 0.1)', border: '1px solid rgba(217, 122, 58, 0.25)', borderRadius: 8, color: 'var(--risk-high-text)', fontWeight: 700, fontSize: 12, cursor: 'pointer' }}>
                                                 <XCircle size={13} /> Reject / Counter-offer
                                             </button>
                                         </div>
@@ -203,8 +203,8 @@ export default function ReceptionistRequestsPage() {
 
             {/* APPROVE MODAL */}
             {approving && (
-                <div style={{ position: 'fixed', inset: 0, background: 'rgba(13, 45, 62, 0.16)', backdropFilter: 'blur(10px)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000 }}>
-                    <div style={{ background: 'var(--surface-2)', border: '1px solid rgba(24, 155, 130, 0.2)', borderRadius: 20, padding: 32, width: 460 }}>
+                <div style={{ position: 'fixed', inset: 0, background: 'rgba(5, 31, 32, 0.16)', backdropFilter: 'blur(10px)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000 }}>
+                    <div style={{ background: 'var(--surface-2)', border: '1px solid rgba(63, 138, 102, 0.2)', borderRadius: 20, padding: 32, width: 460 }}>
                         <h3 style={{ fontWeight: 900, fontSize: 18, color: 'var(--text-primary)', marginBottom: 6 }}>Approve Appointment</h3>
                         <p style={{ fontSize: 13, color: 'var(--text-muted)', marginBottom: 24 }}>Set the confirmed date and time for this appointment.</p>
                         <div style={{ marginBottom: 16 }}>
@@ -229,8 +229,8 @@ export default function ReceptionistRequestsPage() {
 
             {/* REJECT / COUNTER MODAL */}
             {rejecting && (
-                <div style={{ position: 'fixed', inset: 0, background: 'rgba(13, 45, 62, 0.16)', backdropFilter: 'blur(10px)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000 }}>
-                    <div style={{ background: 'var(--surface-2)', border: '1px solid rgba(232, 131, 58, 0.2)', borderRadius: 20, padding: 32, width: 480 }}>
+                <div style={{ position: 'fixed', inset: 0, background: 'rgba(5, 31, 32, 0.16)', backdropFilter: 'blur(10px)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000 }}>
+                    <div style={{ background: 'var(--surface-2)', border: '1px solid rgba(217, 122, 58, 0.2)', borderRadius: 20, padding: 32, width: 480 }}>
                         <h3 style={{ fontWeight: 900, fontSize: 18, color: 'var(--text-primary)', marginBottom: 6 }}>Reject / Counter-offer</h3>
                         <p style={{ fontSize: 13, color: 'var(--text-muted)', marginBottom: 20 }}>
                             Optionally suggest an alternative date/time. If no alternative is provided, the request is simply rejected.
@@ -239,7 +239,7 @@ export default function ReceptionistRequestsPage() {
                             <label style={{ display: 'block', fontSize: 12, color: 'var(--text-secondary)', marginBottom: 8, fontWeight: 600 }}>Reason (optional)</label>
                             <input type="text" style={inputStyle} value={rejectForm.rejectReason} onChange={e => setRejectForm(f => ({ ...f, rejectReason: e.target.value }))} placeholder="Doctor unavailable at requested time..." />
                         </div>
-                        <div style={{ padding: '14px 16px', background: 'rgba(232, 131, 58, 0.07)', border: '1px solid rgba(232, 131, 58, 0.15)', borderRadius: 12, marginBottom: 16 }}>
+                        <div style={{ padding: '14px 16px', background: 'rgba(217, 122, 58, 0.07)', border: '1px solid rgba(217, 122, 58, 0.15)', borderRadius: 12, marginBottom: 16 }}>
                             <div style={{ fontSize: 12, fontWeight: 700, color: 'var(--risk-high-text)', marginBottom: 10 }}>↩ Suggest Alternative (optional)</div>
                             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
                                 <div>

@@ -65,7 +65,7 @@ export default function NotificationDrawer({ open, onClose }: NotificationDrawer
                 <div
                     onClick={onClose}
                     style={{
-                        position: 'fixed', inset: 0, background: 'rgba(13, 45, 62, 0.16)',
+                        position: 'fixed', inset: 0, background: 'rgba(5, 31, 32, 0.16)',
                         zIndex: 1998, backdropFilter: 'blur(2px)',
                     }}
                 />
@@ -76,7 +76,7 @@ export default function NotificationDrawer({ open, onClose }: NotificationDrawer
                 position: 'fixed', top: 0, right: 0, bottom: 0, width: 380,
                 background: 'var(--surface-1)',
                 borderLeft: '1px solid var(--surface-border)',
-                boxShadow: '-20px 0 60px rgba(13, 45, 62, 0.16)',
+                boxShadow: '-20px 0 60px rgba(5, 31, 32, 0.16)',
                 zIndex: 1999,
                 transform: open ? 'translateX(0)' : 'translateX(100%)',
                 transition: 'transform 0.3s cubic-bezier(0.22, 1, 0.36, 1)',
@@ -87,14 +87,14 @@ export default function NotificationDrawer({ open, onClose }: NotificationDrawer
                 <div style={{
                     padding: '20px 22px 16px',
                     borderBottom: '1px solid var(--surface-border)',
-                    background: 'rgba(13, 92, 126, 0.03)',
+                    background: 'rgba(35, 83, 71, 0.03)',
                     flexShrink: 0,
                 }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                         <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
                             <div style={{
                                 width: 34, height: 34, borderRadius: 10,
-                                background: 'rgba(13, 92, 126, 0.08)', border: '1px solid rgba(13, 92, 126, 0.20)',
+                                background: 'rgba(35, 83, 71, 0.08)', border: '1px solid rgba(35, 83, 71, 0.20)',
                                 display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative',
                             }}>
                                 <Bell size={16} color="var(--accent-primary)" />
@@ -133,7 +133,7 @@ export default function NotificationDrawer({ open, onClose }: NotificationDrawer
                             <div style={{ color: 'var(--text-muted)', fontSize: 13, textAlign: 'center', padding: 20 }}>Loading alerts...</div>
                         ) : criticalAlerts.length === 0 ? (
                             <div style={{
-                                background: 'rgba(24, 155, 130, 0.04)', border: '1px solid rgba(24, 155, 130, 0.12)',
+                                background: 'rgba(63, 138, 102, 0.04)', border: '1px solid rgba(63, 138, 102, 0.12)',
                                 borderRadius: 12, padding: '14px 16px', fontSize: 13,
                                 color: 'var(--text-secondary)', display: 'flex', alignItems: 'center', gap: 8,
                             }}>
@@ -143,12 +143,12 @@ export default function NotificationDrawer({ open, onClose }: NotificationDrawer
                             <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
                                 {criticalAlerts.slice(0, 8).map(alert => (
                                     <div key={alert.id} onClick={() => { navigate('/alerts'); onClose(); }} style={{
-                                        background: 'rgba(209, 63, 74, 0.05)', border: '1px solid rgba(209, 63, 74, 0.15)',
+                                        background: 'rgba(200, 67, 75, 0.05)', border: '1px solid rgba(200, 67, 75, 0.15)',
                                         borderRadius: 12, padding: '12px 14px', cursor: 'pointer',
                                         transition: 'all 0.15s', borderLeft: '3px solid var(--risk-critical)',
                                     }}
-                                        onMouseEnter={e => (e.currentTarget as HTMLDivElement).style.background = 'rgba(209, 63, 74, 0.10)'}
-                                        onMouseLeave={e => (e.currentTarget as HTMLDivElement).style.background = 'rgba(209, 63, 74, 0.05)'}
+                                        onMouseEnter={e => (e.currentTarget as HTMLDivElement).style.background = 'rgba(200, 67, 75, 0.10)'}
+                                        onMouseLeave={e => (e.currentTarget as HTMLDivElement).style.background = 'rgba(200, 67, 75, 0.05)'}
                                     >
                                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 8 }}>
                                             <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-primary)', lineHeight: 1.3 }}>
@@ -183,16 +183,16 @@ export default function NotificationDrawer({ open, onClose }: NotificationDrawer
                             <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
                                 {todayAppts.map(appt => (
                                     <div key={appt.id} onClick={() => { navigate('/appointments'); onClose(); }} style={{
-                                        background: 'rgba(13, 92, 126, 0.04)', border: '1px solid rgba(13, 92, 126, 0.12)',
+                                        background: 'rgba(35, 83, 71, 0.04)', border: '1px solid rgba(35, 83, 71, 0.12)',
                                         borderRadius: 12, padding: '12px 14px', cursor: 'pointer',
                                         display: 'flex', gap: 12, alignItems: 'center',
                                         transition: 'all 0.15s',
                                     }}
-                                        onMouseEnter={e => (e.currentTarget as HTMLDivElement).style.background = 'rgba(13, 92, 126, 0.08)'}
-                                        onMouseLeave={e => (e.currentTarget as HTMLDivElement).style.background = 'rgba(13, 92, 126, 0.04)'}
+                                        onMouseEnter={e => (e.currentTarget as HTMLDivElement).style.background = 'rgba(35, 83, 71, 0.08)'}
+                                        onMouseLeave={e => (e.currentTarget as HTMLDivElement).style.background = 'rgba(35, 83, 71, 0.04)'}
                                     >
                                         <div style={{
-                                            background: 'rgba(13, 92, 126, 0.10)', border: '1px solid rgba(13, 92, 126, 0.20)',
+                                            background: 'rgba(35, 83, 71, 0.10)', border: '1px solid rgba(35, 83, 71, 0.20)',
                                             borderRadius: 8, padding: '6px 8px', textAlign: 'center', minWidth: 46,
                                         }}>
                                             <div className="font-mono" style={{ fontSize: 14, fontWeight: 800, color: 'var(--accent-primary)' }}>{appt.time}</div>
@@ -215,12 +215,12 @@ export default function NotificationDrawer({ open, onClose }: NotificationDrawer
                             <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
                                 {tomorrowAppts.slice(0, 3).map(appt => (
                                     <div key={appt.id} style={{
-                                        background: 'rgba(217, 165, 32, 0.04)', border: '1px solid rgba(217, 165, 32, 0.12)',
+                                        background: 'rgba(201, 154, 42, 0.04)', border: '1px solid rgba(201, 154, 42, 0.12)',
                                         borderRadius: 12, padding: '12px 14px',
                                         display: 'flex', gap: 12, alignItems: 'center',
                                     }}>
                                         <div style={{
-                                            background: 'rgba(217, 165, 32, 0.10)', borderRadius: 8, padding: '6px 8px',
+                                            background: 'rgba(201, 154, 42, 0.10)', borderRadius: 8, padding: '6px 8px',
                                             textAlign: 'center', minWidth: 46,
                                         }}>
                                             <div className="font-mono" style={{ fontSize: 14, fontWeight: 800, color: 'var(--risk-medium-text)' }}>{appt.time}</div>
@@ -239,7 +239,7 @@ export default function NotificationDrawer({ open, onClose }: NotificationDrawer
                     <div>
                         <SectionTitle icon={Brain} label="AI Engine Status" count={0} color="var(--accent-magenta)" />
                         <div style={{
-                            background: 'rgba(255,44,245,0.04)', border: '1px solid rgba(255,44,245,0.12)',
+                            background: 'rgba(142, 182, 155, 0.04)', border: '1px solid rgba(142, 182, 155, 0.12)',
                             borderRadius: 12, padding: '14px 16px',
                         }}>
                             {[

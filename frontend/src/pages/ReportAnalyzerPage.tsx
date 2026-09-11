@@ -37,7 +37,7 @@ const CBC_PARAMS = [
 
 const STATUS_CONFIG: Record<string, { color: string; bg: string; label: string }> = {
     HIGH:   { color: C.crimson, bg: `${C.crimson}15`, label: 'HIGH ↑' },
-    LOW:    { color: '#3A86FF', bg: '#3A86FF15',       label: 'LOW ↓' },
+    LOW:    { color: '#256876', bg: 'rgba(46, 122, 138, 0.10)',       label: 'LOW ↓' },
     NORMAL: { color: C.teal,    bg: `${C.teal}10`,     label: 'NORMAL' },
 };
 
@@ -126,9 +126,9 @@ export default function ReportAnalyzerPage() {
                                         onMouseOver={e => (e.currentTarget as HTMLTableRowElement).style.background = 'var(--surface-1)'}
                                         onMouseOut={e => (e.currentTarget as HTMLTableRowElement).style.background = ''}
                                     >
-                                        <td style={{ padding: '10px 20px', fontWeight: 800, color: C.rose, fontSize: 13, fontFamily: 'monospace' }}>{p.key}</td>
+                                        <td style={{ padding: '10px 20px', fontWeight: 800, color: C.rose, fontSize: 13, fontFamily: 'var(--font-mono)' }}>{p.key}</td>
                                         <td style={{ padding: '10px 20px', color: 'var(--text-secondary)' }}>{p.name}</td>
-                                        <td style={{ padding: '10px 20px', color: 'var(--text-muted)', fontSize: 12.5, fontFamily: 'monospace' }}>{p.ref}</td>
+                                        <td style={{ padding: '10px 20px', color: 'var(--text-muted)', fontSize: 12.5, fontFamily: 'var(--font-mono)' }}>{p.ref}</td>
                                         <td style={{ padding: '10px 20px', color: 'var(--text-muted)', fontSize: 12 }}>{p.unit}</td>
                                         <td style={{ padding: '8px 20px' }}>
                                             <input
@@ -141,7 +141,7 @@ export default function ReportAnalyzerPage() {
                                                     background: filled ? `${C.teal}10` : 'var(--surface-2)',
                                                     border: filled ? `1px solid ${C.teal}35` : '1px solid var(--surface-border)',
                                                     borderRadius: 9, color: 'var(--text-primary)', fontSize: 13.5,
-                                                    outline: 'none', fontFamily: 'monospace',
+                                                    outline: 'none', fontFamily: 'var(--font-mono)',
                                                 }}
                                                 onFocus={e => (e.currentTarget.style.border = `1px solid ${C.rose}50`)}
                                                 onBlur={e => (e.currentTarget.style.border = filled ? `1px solid ${C.teal}35` : '1px solid var(--surface-border)')}
@@ -204,17 +204,17 @@ export default function ReportAnalyzerPage() {
                                             onMouseOver={e => (e.currentTarget as HTMLTableRowElement).style.background = 'var(--surface-1)'}
                                             onMouseOut={e => (e.currentTarget as HTMLTableRowElement).style.background = ''}
                                         >
-                                            <td style={{ padding: '11px 18px', fontWeight: 800, color: C.rose, fontFamily: 'monospace', fontSize: 13 }}>{key}</td>
+                                            <td style={{ padding: '11px 18px', fontWeight: 800, color: C.rose, fontFamily: 'var(--font-mono)', fontSize: 13 }}>{key}</td>
                                             <td style={{ padding: '11px 18px', color: 'var(--text-secondary)' }}>{f.name}</td>
-                                            <td style={{ padding: '11px 18px', fontFamily: 'monospace', fontWeight: 700, color: sc.color, fontSize: 14 }}>{f.value}</td>
+                                            <td style={{ padding: '11px 18px', fontFamily: 'var(--font-mono)', fontWeight: 700, color: sc.color, fontSize: 14 }}>{f.value}</td>
                                             <td style={{ padding: '11px 18px', color: 'var(--text-muted)', fontSize: 12 }}>{f.unit}</td>
-                                            <td style={{ padding: '11px 18px', color: 'var(--text-muted)', fontSize: 12, fontFamily: 'monospace' }}>{f.reference}</td>
+                                            <td style={{ padding: '11px 18px', color: 'var(--text-muted)', fontSize: 12, fontFamily: 'var(--font-mono)' }}>{f.reference}</td>
                                             <td style={{ padding: '11px 18px' }}>
                                                 <span style={{ padding: '4px 12px', borderRadius: 9999, background: sc.bg, color: sc.color, fontSize: 11, fontWeight: 800 }}>
                                                     {f.flag} {sc.label}
                                                 </span>
                                             </td>
-                                            <td style={{ padding: '11px 18px', color: f.deviation_pct ? sc.color : 'var(--text-muted)', fontSize: 12, fontFamily: 'monospace' }}>
+                                            <td style={{ padding: '11px 18px', color: f.deviation_pct ? sc.color : 'var(--text-muted)', fontSize: 12, fontFamily: 'var(--font-mono)' }}>
                                                 {f.deviation_pct ? `+${f.deviation_pct}%` : '—'}
                                             </td>
                                         </tr>
@@ -233,15 +233,15 @@ export default function ReportAnalyzerPage() {
                             <div style={{ fontSize: 24, fontWeight: 900, color: result.overall_color, marginBottom: 6 }}>{result.overall_status}</div>
                             <div style={{ display: 'flex', gap: 16, justifyContent: 'center', marginTop: 10 }}>
                                 <div style={{ textAlign: 'center' }}>
-                                    <div style={{ fontSize: 22, fontWeight: 900, color: C.crimson, fontFamily: 'monospace' }}>{result.abnormal_count}</div>
+                                    <div style={{ fontSize: 22, fontWeight: 900, color: C.crimson, fontFamily: 'var(--font-mono)' }}>{result.abnormal_count}</div>
                                     <div style={{ fontSize: 10, color: 'var(--text-muted)', textTransform: 'uppercase' }}>Abnormal</div>
                                 </div>
                                 <div style={{ textAlign: 'center' }}>
-                                    <div style={{ fontSize: 22, fontWeight: 900, color: C.teal, fontFamily: 'monospace' }}>{result.parameters_tested - result.abnormal_count}</div>
+                                    <div style={{ fontSize: 22, fontWeight: 900, color: C.teal, fontFamily: 'var(--font-mono)' }}>{result.parameters_tested - result.abnormal_count}</div>
                                     <div style={{ fontSize: 10, color: 'var(--text-muted)', textTransform: 'uppercase' }}>Normal</div>
                                 </div>
                                 <div style={{ textAlign: 'center' }}>
-                                    <div style={{ fontSize: 22, fontWeight: 900, color: 'var(--text-primary)', fontFamily: 'monospace' }}>{result.parameters_tested}</div>
+                                    <div style={{ fontSize: 22, fontWeight: 900, color: 'var(--text-primary)', fontFamily: 'var(--font-mono)' }}>{result.parameters_tested}</div>
                                     <div style={{ fontSize: 10, color: 'var(--text-muted)', textTransform: 'uppercase' }}>Tested</div>
                                 </div>
                             </div>

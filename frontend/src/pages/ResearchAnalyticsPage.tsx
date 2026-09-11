@@ -8,7 +8,7 @@ import api from '../api/axiosInstance';
 
 const C = {
     crimson: 'var(--accent-primary)', rose: 'var(--accent-primary-hover)', gold: 'var(--risk-medium)',
-    teal: 'var(--risk-low)', lavender: 'var(--vitals-bp)', blue: '#3A86FF',
+    teal: 'var(--risk-low)', lavender: 'var(--vitals-bp)', blue: '#256876',
     bg: 'var(--surface-1)', border: 'var(--surface-border)',
 };
 
@@ -115,12 +115,12 @@ function HypothesisTab() {
                 )}
                 {loading && (
                     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: 300, gap: 12 }}>
-                        <div style={{ width: 40, height: 40, borderRadius: '50%', border: `3px solid rgba(124, 106, 180, 0.15)`, borderTopColor: C.lavender, animation: 'spin 0.8s linear infinite' }} />
+                        <div style={{ width: 40, height: 40, borderRadius: '50%', border: `3px solid rgba(122, 104, 174, 0.15)`, borderTopColor: C.lavender, animation: 'spin 0.8s linear infinite' }} />
                         <div style={{ fontSize: 13, color: 'var(--text-muted)' }}>Running {q?.test === 'chi2' ? 'Chi-Square' : 'T-Test'}...</div>
                     </div>
                 )}
                 {error && (
-                    <div style={{ padding: 20, background: 'rgba(13, 92, 126, 0.08)', border: `1px solid ${C.crimson}30`, borderRadius: 14, display: 'flex', gap: 12, alignItems: 'flex-start' }}>
+                    <div style={{ padding: 20, background: 'rgba(35, 83, 71, 0.08)', border: `1px solid ${C.crimson}30`, borderRadius: 14, display: 'flex', gap: 12, alignItems: 'flex-start' }}>
                         <AlertCircle size={18} color={C.crimson} style={{ flexShrink: 0, marginTop: 2 }} />
                         <div style={{ fontSize: 13, color: 'var(--text-secondary)', lineHeight: 1.6 }}>{error}</div>
                     </div>
@@ -155,7 +155,7 @@ function HypothesisTab() {
                             ].map(s => (
                                 <div key={s.label} style={{ background: C.bg, border: `1px solid ${C.border}`, borderRadius: 12, padding: '14px 16px', textAlign: 'center' }}>
                                     <div style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 8 }}>{s.label}</div>
-                                    <div style={{ fontSize: 22, fontWeight: 900, color: 'var(--text-primary)', fontFamily: 'monospace' }}>{s.value}</div>
+                                    <div style={{ fontSize: 22, fontWeight: 900, color: 'var(--text-primary)', fontFamily: 'var(--font-mono)' }}>{s.value}</div>
                                 </div>
                             ))}
                         </div>
@@ -209,13 +209,13 @@ function BigDataTab() {
 
     if (loading) return (
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: 300, flexDirection: 'column', gap: 12 }}>
-            <div style={{ width: 40, height: 40, borderRadius: '50%', border: `3px solid rgba(13, 92, 126, 0.15)`, borderTopColor: C.crimson, animation: 'spin 0.8s linear infinite' }} />
+            <div style={{ width: 40, height: 40, borderRadius: '50%', border: `3px solid rgba(35, 83, 71, 0.15)`, borderTopColor: C.crimson, animation: 'spin 0.8s linear infinite' }} />
             <div style={{ fontSize: 13, color: 'var(--text-muted)' }}>Loading population analytics...</div>
         </div>
     );
 
     if (error) return (
-        <div style={{ padding: 20, background: 'rgba(13, 92, 126, 0.08)', border: `1px solid ${C.crimson}30`, borderRadius: 14, fontSize: 13, color: 'var(--text-secondary)' }}>
+        <div style={{ padding: 20, background: 'rgba(35, 83, 71, 0.08)', border: `1px solid ${C.crimson}30`, borderRadius: 14, fontSize: 13, color: 'var(--text-secondary)' }}>
             ⚠️ {error}
         </div>
     );
@@ -240,7 +240,7 @@ function BigDataTab() {
                 ].map(kpi => (
                     <div key={kpi.label} style={{ background: C.bg, border: `1px solid ${kpi.color}20`, borderRadius: 14, padding: '18px 20px', textAlign: 'center' }}>
                         <div style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 10 }}>{kpi.label}</div>
-                        <div style={{ fontSize: 28, fontWeight: 900, color: kpi.color, fontFamily: 'monospace' }}>{kpi.value}</div>
+                        <div style={{ fontSize: 28, fontWeight: 900, color: kpi.color, fontFamily: 'var(--font-mono)' }}>{kpi.value}</div>
                     </div>
                 ))}
             </div>
@@ -317,7 +317,7 @@ function BigDataTab() {
                             <div key={g.label}>
                                 <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 13, marginBottom: 6 }}>
                                     <span style={{ color: 'var(--text-secondary)', fontWeight: 600 }}>{g.label}</span>
-                                    <span style={{ color: g.color, fontWeight: 800, fontFamily: 'monospace' }}>{g.pct?.toFixed(1) || 0}%</span>
+                                    <span style={{ color: g.color, fontWeight: 800, fontFamily: 'var(--font-mono)' }}>{g.pct?.toFixed(1) || 0}%</span>
                                 </div>
                                 <div style={{ height: 10, background: 'var(--surface-2)', borderRadius: 5, overflow: 'hidden' }}>
                                     <div style={{ width: `${g.pct || 0}%`, height: '100%', background: g.color, borderRadius: 5, transition: 'width 0.8s ease' }} />

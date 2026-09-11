@@ -32,7 +32,7 @@ function VoiceWave() {
                 <rect
                     key={i}
                     x={i * 19 + 4} y={(64 - h) / 2} width="7" height={h} rx="3.5"
-                    fill="var(--accent-primary)"
+                    fill="var(--sage-400)"
                     opacity={0.28 + (h / 58) * 0.6}
                 />
             ))}
@@ -177,7 +177,7 @@ export default function LandingPage() {
         { icon: '❤️', title: 'Heart Disease Risk Model', color: TERRA, delay: 120, desc: 'An XGBoost model reads 13 clinical parameters — chest pain type, ST depression, thalassemia, ECG findings — and returns a calibrated risk probability with per-feature importance.' },
         { icon: '🩸', title: 'CBC Blood Analyzer', color: CLAY, delay: 180, desc: 'Enter or upload a blood report. 20 CBC parameters are checked against reference ranges, with unsupervised anomaly detection flagging unusual overall patterns.' },
         { icon: '🧠', title: 'Symptom Checker', color: PLUM, delay: 240, desc: 'Describe what you are feeling and get the most probable conditions ranked by confidence, as a starting point for a real consultation — never as a diagnosis.' },
-        { icon: '📉', title: 'ECG Anomaly Screening', color: GOLD, delay: 300, desc: 'A 1D-CNN autoencoder trained on normal beats from the PhysioNet MIT-BIH database flags beat morphology that deviates from normal. A screening aid, not an arrhythmia classifier.' },
+        { icon: '📉', title: 'ECG Beat Screening', color: GOLD, delay: 300, desc: 'A supervised 1D-CNN trained on labelled normal and abnormal beats from the PhysioNet MIT-BIH database, evaluated on patients it never saw in training. A screening aid that surfaces beats for review, not an arrhythmia classifier.' },
         { icon: '🚨', title: 'Real Clinical Escalation', color: TERRA, delay: 360, desc: 'Emergency phrases in a consultation trigger a real alert on the clinical dashboard over websockets — not just a line of text buried in a report.' },
         { icon: '🏥', title: 'Full Hospital Workflow', color: GOLD, delay: 420, desc: 'Appointments, billing, prescriptions, lab orders and role-based dashboards for doctors, receptionists, lab technicians and patients — all behind ownership-checked access control.' },
     ];
@@ -238,7 +238,7 @@ export default function LandingPage() {
         padding: '14px 32px', borderRadius: 12, border: 'none',
         background: 'linear-gradient(135deg, var(--accent-primary), var(--accent-primary-dim))',
         color: '#fff', fontWeight: 800, fontSize: 15, cursor: 'pointer',
-        boxShadow: '0 6px 20px rgba(13, 92, 126, 0.28)', transition: 'all 0.2s',
+        boxShadow: '0 6px 20px rgba(35, 83, 71, 0.28)', transition: 'all 0.2s',
     };
     const btnSecondary: React.CSSProperties = {
         padding: '14px 32px', borderRadius: 12,
@@ -247,6 +247,16 @@ export default function LandingPage() {
         color: 'var(--text-primary)', fontWeight: 700, fontSize: 15, cursor: 'pointer',
         transition: 'all 0.2s',
     };
+
+    // Controls on the dark bands. The nav floats over the hero until scrolled,
+    // then becomes a light glass bar — so it needs both a dark and light set.
+    const navBase: React.CSSProperties = { padding: '9px 18px', borderRadius: 10, fontSize: 13, fontWeight: 700, cursor: 'pointer', transition: 'all 0.2s ease', fontFamily: 'var(--font-body)' };
+    const navGhostDark: React.CSSProperties = { ...navBase, background: 'transparent', color: 'var(--mint-100)', border: '1px solid rgba(218, 241, 222, 0.28)' };
+    const navSolidDark: React.CSSProperties = { ...navBase, background: 'var(--mint-100)', color: 'var(--forest-900)', border: '1px solid var(--mint-100)' };
+    const navGhostLight: React.CSSProperties = { ...navBase, background: 'transparent', color: 'var(--text-secondary)', border: '1px solid var(--surface-border-md)' };
+    const navSolidLight: React.CSSProperties = { ...navBase, background: 'var(--accent-primary)', color: '#fff', border: '1px solid var(--accent-primary)' };
+    const heroPrimary: React.CSSProperties = { padding: '15px 34px', borderRadius: 12, border: 'none', background: 'var(--mint-100)', color: 'var(--forest-900)', fontWeight: 800, fontSize: 15, cursor: 'pointer', boxShadow: '0 8px 28px rgba(142, 182, 155, 0.25)', transition: 'transform 0.2s ease', fontFamily: 'var(--font-body)' };
+    const heroSecondary: React.CSSProperties = { padding: '15px 34px', borderRadius: 12, border: '1px solid rgba(218, 241, 222, 0.32)', background: 'rgba(218, 241, 222, 0.06)', color: 'var(--mint-100)', fontWeight: 700, fontSize: 15, cursor: 'pointer', transition: 'background 0.2s ease', fontFamily: 'var(--font-body)' };
 
     return (
         <div style={{ background: 'var(--bg-primary)', color: 'var(--text-primary)', fontFamily: 'var(--font-body)', overflowX: 'hidden' }}>
@@ -262,61 +272,64 @@ export default function LandingPage() {
                 transition: 'all 0.3s ease',
             }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                    <div style={{ width: 34, height: 34, borderRadius: 10, background: 'linear-gradient(135deg, var(--accent-primary), var(--accent-primary-dim))', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 17 }}>🩺</div>
-                    <span style={{ fontWeight: 900, fontSize: 18, letterSpacing: '-0.02em', color: 'var(--text-primary)' }}>
-                        MediSense <span style={{ color: 'var(--accent-primary)' }}>AI</span>
+                    <div style={{ width: 34, height: 34, borderRadius: 10, background: 'linear-gradient(135deg, var(--sage-400), var(--forest-600))', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 17 }}>🩺</div>
+                    <span style={{ fontFamily: 'var(--font-display)', fontWeight: 800, fontSize: 19, letterSpacing: '-0.03em', color: scrolled ? 'var(--text-primary)' : 'var(--mint-100)', transition: 'color 0.3s ease' }}>
+                        MediSense <span style={{ color: scrolled ? 'var(--accent-primary)' : 'var(--sage-400)' }}>AI</span>
                     </span>
                 </div>
                 <div style={{ display: 'flex', gap: 8 }}>
-                    <button onClick={() => navigate('/login')} className="btn-ghost">Sign In</button>
-                    <button onClick={() => navigate('/register')} className="btn-primary">Register →</button>
+                    <button onClick={() => navigate('/login')} style={scrolled ? navGhostLight : navGhostDark}>Sign In</button>
+                    <button onClick={() => navigate('/register')} style={scrolled ? navSolidLight : navSolidDark}>Register →</button>
                 </div>
             </nav>
 
-            {/* ── HERO ── */}
-            <section style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', textAlign: 'center', padding: '150px clamp(20px, 5vw, 40px) 90px', position: 'relative', overflow: 'hidden' }}>
-                <div style={{ position: 'absolute', top: '5%', left: '8%', width: 620, height: 620, maxWidth: '100%', borderRadius: '50%', background: 'radial-gradient(circle, rgba(13, 92, 126, 0.10) 0%, transparent 66%)', pointerEvents: 'none' }} />
-                <div style={{ position: 'absolute', bottom: '2%', right: '6%', width: 460, height: 460, maxWidth: '100%', borderRadius: '50%', background: 'radial-gradient(circle, rgba(24, 155, 130, 0.10) 0%, transparent 66%)', pointerEvents: 'none' }} />
+            {/* ── HERO — the dark half of the palette ── */}
+            <section style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', textAlign: 'center', padding: '150px clamp(20px, 5vw, 40px) 96px', position: 'relative', overflow: 'hidden', background: 'linear-gradient(180deg, var(--forest-900) 0%, var(--forest-800) 60%, var(--forest-700) 100%)' }}>
+                <div style={{ position: 'absolute', top: '-8%', left: '4%', width: 640, height: 640, maxWidth: '100%', borderRadius: '50%', background: 'radial-gradient(circle, rgba(142, 182, 155, 0.14) 0%, transparent 64%)', pointerEvents: 'none' }} />
+                <div style={{ position: 'absolute', bottom: '-12%', right: '2%', width: 520, height: 520, maxWidth: '100%', borderRadius: '50%', background: 'radial-gradient(circle, rgba(35, 83, 71, 0.55) 0%, transparent 66%)', pointerEvents: 'none' }} />
 
-                <div style={{ display: 'inline-flex', alignItems: 'center', gap: 9, padding: '7px 16px', borderRadius: 9999, background: 'var(--mint-bg)', border: '1px solid rgba(24, 155, 130, 0.30)', fontSize: 11.5, fontWeight: 700, color: 'var(--accent-magenta-dim)', marginBottom: 32, letterSpacing: '0.04em', boxShadow: 'var(--shadow-sm)', animation: 'fadeUp 0.4s ease-out both' }}>
-                    <span style={{ width: 7, height: 7, borderRadius: '50%', background: 'var(--risk-low)' }} className="live-dot" />
+                <div style={{ position: 'relative', display: 'inline-flex', alignItems: 'center', gap: 9, padding: '7px 16px', borderRadius: 9999, background: 'rgba(142, 182, 155, 0.12)', border: '1px solid rgba(142, 182, 155, 0.30)', fontSize: 11.5, fontWeight: 700, color: 'var(--mint-100)', marginBottom: 32, letterSpacing: '0.06em', animation: 'fadeUp 0.4s ease-out both' }}>
+                    <span style={{ width: 7, height: 7, borderRadius: '50%', background: 'var(--sage-400)', boxShadow: '0 0 10px var(--sage-400)' }} className="live-dot" />
                     AI-ASSISTED HEALTHCARE PLATFORM
                 </div>
 
-                <h1 style={{ fontSize: 'clamp(38px, 6.4vw, 76px)', fontWeight: 900, lineHeight: 1.06, letterSpacing: '-0.03em', marginBottom: 24, maxWidth: 900, textWrap: 'balance', animation: 'fadeUp 0.5s ease-out 80ms both' }}>
+                <h1 style={{ position: 'relative', fontSize: 'clamp(40px, 6.6vw, 80px)', fontWeight: 800, lineHeight: 1.02, letterSpacing: '-0.035em', marginBottom: 24, maxWidth: 920, color: 'var(--mint-100)', animation: 'fadeUp 0.5s ease-out 80ms both' }}>
                     Healthcare that listens —{' '}
-                    <span style={{ color: 'var(--accent-primary)' }}>in your own language</span>
+                    <span style={{ color: 'var(--sage-400)' }}>in your own language</span>
                 </h1>
 
-                <div style={{ marginBottom: 22, animation: 'fadeUp 0.5s ease-out 120ms both' }}>
+                <div style={{ position: 'relative', marginBottom: 22, animation: 'fadeUp 0.5s ease-out 120ms both' }}>
                     <VoiceWave />
                 </div>
 
-                <p style={{ maxWidth: 640, fontSize: 17, color: 'var(--text-secondary)', lineHeight: 1.8, marginBottom: 38, animation: 'fadeUp 0.5s ease-out 160ms both' }}>
-                    MediSense AI pairs a <strong style={{ color: 'var(--text-primary)' }}>Hindi-speaking AI health assistant</strong> with{' '}
-                    <strong style={{ color: 'var(--text-primary)' }}>five trained clinical ML models</strong> and a complete hospital
+                <p style={{ position: 'relative', maxWidth: 640, fontSize: 17, color: 'rgba(218, 241, 222, 0.78)', lineHeight: 1.8, marginBottom: 38, animation: 'fadeUp 0.5s ease-out 160ms both' }}>
+                    MediSense AI pairs a <strong style={{ color: 'var(--mint-100)' }}>Hindi-speaking AI health assistant</strong> with{' '}
+                    <strong style={{ color: 'var(--mint-100)' }}>five trained clinical ML models</strong> and a complete hospital
                     workflow — so a patient can simply describe how they feel, and their doctor receives a structured, reviewable assessment.
                 </p>
 
-                <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap', justifyContent: 'center', animation: 'fadeUp 0.5s ease-out 240ms both' }}>
-                    <button onClick={() => navigate('/register')} style={btnPrimary}
+                <div style={{ position: 'relative', display: 'flex', gap: 12, flexWrap: 'wrap', justifyContent: 'center', animation: 'fadeUp 0.5s ease-out 240ms both' }}>
+                    <button onClick={() => navigate('/register')} style={heroPrimary}
                         onMouseOver={e => { (e.currentTarget as HTMLButtonElement).style.transform = 'translateY(-2px)'; }}
                         onMouseOut={e => { (e.currentTarget as HTMLButtonElement).style.transform = ''; }}
                     >
                         Get Started — It's Free
                     </button>
-                    <button onClick={() => navigate('/login')} style={btnSecondary}>
+                    <button onClick={() => navigate('/login')} style={heroSecondary}
+                        onMouseOver={e => { (e.currentTarget as HTMLButtonElement).style.background = 'rgba(218, 241, 222, 0.12)'; }}
+                        onMouseOut={e => { (e.currentTarget as HTMLButtonElement).style.background = 'rgba(218, 241, 222, 0.06)'; }}
+                    >
                         Sign In ↗
                     </button>
                 </div>
 
-                <div style={{ display: 'flex', gap: 'clamp(24px, 5vw, 56px)', marginTop: 68, flexWrap: 'wrap', justifyContent: 'center', animation: 'fadeUp 0.5s ease-out 320ms both' }}>
+                <div style={{ position: 'relative', display: 'flex', gap: 'clamp(24px, 5vw, 56px)', marginTop: 64, paddingTop: 36, borderTop: '1px solid rgba(142, 182, 155, 0.16)', flexWrap: 'wrap', justifyContent: 'center', animation: 'fadeUp 0.5s ease-out 320ms both' }}>
                     {stats.map(s => (
                         <div key={s.label} style={{ textAlign: 'center' }}>
-                            <div style={{ fontSize: 'clamp(28px, 4vw, 38px)', fontWeight: 900, color: 'var(--accent-primary)', fontFamily: 'var(--font-mono)', lineHeight: 1, fontVariantNumeric: 'tabular-nums' }}>
+                            <div style={{ fontSize: 'clamp(28px, 4vw, 40px)', fontWeight: 600, color: 'var(--sage-400)', fontFamily: 'var(--font-mono)', lineHeight: 1, fontVariantNumeric: 'tabular-nums' }}>
                                 <Counter to={s.val} suffix={s.suffix} />
                             </div>
-                            <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 8, textTransform: 'uppercase', letterSpacing: '0.08em' }}>{s.label}</div>
+                            <div style={{ fontSize: 11, color: '#8FAE9C', marginTop: 8, textTransform: 'uppercase', letterSpacing: '0.1em' }}>{s.label}</div>
                         </div>
                     ))}
                 </div>
@@ -395,38 +408,38 @@ export default function LandingPage() {
                 </div>
             </section>
 
-            {/* ── CTA ── */}
-            <section style={{ padding: 'clamp(70px, 10vw, 100px) clamp(20px, 5vw, 40px)', textAlign: 'center', position: 'relative', overflow: 'hidden' }}>
-                <div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%,-50%)', width: 860, maxWidth: '100%', height: 420, borderRadius: '50%', background: 'radial-gradient(circle, rgba(13, 92, 126, 0.10) 0%, transparent 66%)', pointerEvents: 'none' }} />
-                <h2 style={{ fontSize: 'clamp(30px, 4.6vw, 54px)', fontWeight: 900, letterSpacing: '-0.02em', marginBottom: 20, textWrap: 'balance', position: 'relative' }}>
+            {/* ── CTA — back to the dark half, bookending the light middle ── */}
+            <section style={{ padding: 'clamp(76px, 10vw, 110px) clamp(20px, 5vw, 40px)', textAlign: 'center', position: 'relative', overflow: 'hidden', background: 'linear-gradient(180deg, var(--forest-700) 0%, var(--forest-800) 55%, var(--forest-900) 100%)' }}>
+                <div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%,-50%)', width: 880, maxWidth: '100%', height: 440, borderRadius: '50%', background: 'radial-gradient(circle, rgba(142, 182, 155, 0.14) 0%, transparent 66%)', pointerEvents: 'none' }} />
+                <h2 style={{ fontSize: 'clamp(32px, 4.8vw, 58px)', fontWeight: 800, letterSpacing: '-0.035em', marginBottom: 20, position: 'relative', color: 'var(--mint-100)' }}>
                     Start with a conversation
                 </h2>
-                <p style={{ color: 'var(--text-secondary)', fontSize: 16, marginBottom: 38, maxWidth: 540, marginLeft: 'auto', marginRight: 'auto', lineHeight: 1.75, position: 'relative' }}>
+                <p style={{ color: 'rgba(218, 241, 222, 0.75)', fontSize: 16, marginBottom: 38, maxWidth: 540, marginLeft: 'auto', marginRight: 'auto', lineHeight: 1.75, position: 'relative' }}>
                     Register as a patient, doctor, receptionist or lab technician and explore the full platform.
                 </p>
                 <div style={{ display: 'flex', gap: 12, justifyContent: 'center', flexWrap: 'wrap', position: 'relative' }}>
-                    <button onClick={() => navigate('/register')} style={{ ...btnPrimary, padding: '16px 42px', fontSize: 16 }}>
+                    <button onClick={() => navigate('/register')} style={{ ...heroPrimary, padding: '16px 42px', fontSize: 16 }}>
                         Create an Account
                     </button>
-                    <button onClick={() => navigate('/login')} style={{ ...btnSecondary, padding: '16px 42px', fontSize: 16 }}>
+                    <button onClick={() => navigate('/login')} style={{ ...heroSecondary, padding: '16px 42px', fontSize: 16 }}>
                         Sign In →
                     </button>
                 </div>
             </section>
 
             {/* ── FOOTER ── */}
-            <footer style={{ borderTop: '1px solid var(--surface-border)', background: 'var(--bg-secondary)', padding: '32px clamp(20px, 5vw, 48px)' }}>
+            <footer style={{ background: 'var(--forest-900)', borderTop: '1px solid rgba(142, 182, 155, 0.12)', padding: '32px clamp(20px, 5vw, 48px)' }}>
                 <div style={{ maxWidth: 1180, margin: '0 auto', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 16 }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                        <div style={{ width: 26, height: 26, borderRadius: 8, background: 'linear-gradient(135deg, var(--accent-primary), var(--accent-primary-dim))', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 13 }}>🩺</div>
-                        <span style={{ fontWeight: 800, fontSize: 14, color: 'var(--text-primary)' }}>MediSense AI</span>
+                        <div style={{ width: 26, height: 26, borderRadius: 8, background: 'linear-gradient(135deg, var(--sage-400), var(--forest-600))', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 13 }}>🩺</div>
+                        <span style={{ fontFamily: 'var(--font-display)', fontWeight: 800, fontSize: 15, color: 'var(--mint-100)', letterSpacing: '-0.02em' }}>MediSense AI</span>
                     </div>
-                    <div style={{ fontSize: 12, color: 'var(--text-muted)' }}>
+                    <div style={{ fontSize: 12, color: '#8FAE9C' }}>
                         React · Node.js · FastAPI · PyTorch · Docker
                     </div>
                 </div>
-                <div style={{ maxWidth: 1180, margin: '20px auto 0', paddingTop: 18, borderTop: '1px solid var(--surface-border)', fontSize: 11.5, color: 'var(--text-muted)', lineHeight: 1.7 }}>
-                    <strong style={{ color: 'var(--text-secondary)' }}>Medical disclaimer:</strong> MediSense AI is an academic project.
+                <div style={{ maxWidth: 1180, margin: '20px auto 0', paddingTop: 18, borderTop: '1px solid rgba(142, 182, 155, 0.12)', fontSize: 11.5, color: '#8FAE9C', lineHeight: 1.7 }}>
+                    <strong style={{ color: 'var(--mint-100)' }}>Medical disclaimer:</strong> MediSense AI is an academic project.
                     It is not a licensed medical device and does not provide medical diagnosis. The AI health assistant is not a doctor.
                     Always consult a qualified physician before acting on anything you read here. In an emergency in India, call 108.
                 </div>

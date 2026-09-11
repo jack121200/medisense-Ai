@@ -18,7 +18,7 @@ function Section({ icon: Icon, title, children }: { icon: any; title: string; ch
             <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 22 }}>
                 <div style={{
                     width: 34, height: 34, borderRadius: 10,
-                    background: 'rgba(13, 92, 126, 0.08)', border: '1px solid rgba(13, 92, 126, 0.15)',
+                    background: 'rgba(35, 83, 71, 0.08)', border: '1px solid rgba(35, 83, 71, 0.15)',
                     display: 'flex', alignItems: 'center', justifyContent: 'center',
                 }}>
                     <Icon size={16} color="var(--accent-primary)" />
@@ -78,8 +78,8 @@ export default function SettingsPage() {
 
             {/* User avatar card */}
             <div style={{
-                background: 'linear-gradient(135deg, rgba(13, 92, 126, 0.06) 0%, rgba(255,44,245,0.03) 100%)',
-                border: '1px solid rgba(13, 92, 126, 0.12)', borderRadius: 18,
+                background: 'linear-gradient(135deg, rgba(35, 83, 71, 0.06) 0%, rgba(142, 182, 155, 0.03) 100%)',
+                border: '1px solid rgba(35, 83, 71, 0.12)', borderRadius: 18,
                 padding: '24px 28px', marginBottom: 20,
                 display: 'flex', alignItems: 'center', gap: 20,
             }}>
@@ -88,7 +88,7 @@ export default function SettingsPage() {
                     background: 'linear-gradient(135deg, var(--accent-primary) 0%, var(--accent-primary-dim) 100%)',
                     display: 'flex', alignItems: 'center', justifyContent: 'center',
                     fontWeight: 800, fontSize: 22, color: 'var(--bg-primary)', flexShrink: 0,
-                    boxShadow: '0 0 24px rgba(13, 92, 126, 0.35)',
+                    boxShadow: '0 0 24px rgba(35, 83, 71, 0.35)',
                 }}>
                     {user?.firstName?.[0]}{user?.lastName?.[0]}
                 </div>
@@ -100,7 +100,7 @@ export default function SettingsPage() {
                     <div style={{
                         display: 'inline-flex', alignItems: 'center', gap: 5, marginTop: 8,
                         padding: '3px 10px', borderRadius: 9999,
-                        background: 'rgba(13, 92, 126, 0.10)', border: '1px solid rgba(13, 92, 126, 0.20)',
+                        background: 'rgba(35, 83, 71, 0.10)', border: '1px solid rgba(35, 83, 71, 0.20)',
                         fontSize: 11, fontWeight: 800, color: 'var(--accent-primary)', letterSpacing: '0.06em',
                     }}>
                         <Zap size={10} /> {user?.role}

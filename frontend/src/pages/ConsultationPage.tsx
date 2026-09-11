@@ -4,6 +4,7 @@ import { useAuthStore } from '../store/authStore';
 import { consultationApi, labApi } from '../api/hospitalApi';
 import { Plus, Trash2, FlaskConical, Pill, Brain, CheckCircle, ChevronLeft, Save, Activity, Download } from 'lucide-react';
 import toast from 'react-hot-toast';
+import { doctorName } from '../utils/doctorName';
 
 const SYMPTOM_OPTIONS = ['Fever', 'Cough', 'Chest Pain', 'Fatigue', 'Headache', 'Vomiting', 'Nausea', 'Diarrhea',
     'Shortness of Breath', 'Body Pain', 'Chills', 'Sore Throat', 'Loss of Appetite', 'Dizziness', 'Swelling', 'Rash'];
@@ -175,8 +176,8 @@ export default function ConsultationPage() {
             <style>
                 body { font-family: 'Arial', sans-serif; padding: 40px; color: #111; max-width: 720px; margin: 0 auto; }
                 h1 { font-size: 22px; margin: 0; } .sub { color: #666; font-size: 13px; }
-                .header { border-bottom: 2px solid #0096AA; padding-bottom: 16px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: flex-start; }
-                .section { margin-bottom: 20px; } .section h3 { font-size: 13px; text-transform: uppercase; letter-spacing: 0.06em; color: #0096AA; border-bottom: 1px solid #ddd; padding-bottom: 6px; margin-bottom: 10px; }
+                .header { border-bottom: 2px solid #235347; padding-bottom: 16px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: flex-start; }
+                .section { margin-bottom: 20px; } .section h3 { font-size: 13px; text-transform: uppercase; letter-spacing: 0.06em; color: #235347; border-bottom: 1px solid #ddd; padding-bottom: 6px; margin-bottom: 10px; }
                 table { width: 100%; border-collapse: collapse; font-size: 13px; } th { text-align: left; padding: 8px; background: #f5f5f5; font-size: 11px; text-transform: uppercase; } td { padding: 8px; border-bottom: 1px solid #eee; }
                 .badge { display: inline-block; padding: 2px 10px; border-radius: 20px; font-size: 11px; font-weight: bold; background: #e8f8f5; color: #006655; }
                 .footer { margin-top: 40px; padding-top: 20px; border-top: 1px solid #ddd; font-size: 12px; color: #888; display: flex; justify-content: space-between; }
@@ -190,7 +191,7 @@ export default function ConsultationPage() {
                 </div>
                 <div style="text-align:right">
                     <div style="font-size:13px;font-weight:bold">Date: ${new Date().toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' })}</div>
-                    <div class="sub">Dr. ${consultation?.doctor?.firstName || ''} ${consultation?.doctor?.lastName || ''}</div>
+                    <div class="sub">${doctorName(consultation?.doctor?.firstName, consultation?.doctor?.lastName)}</div>
                     ${consultation?.doctor?.specialization ? `<div class="sub">${consultation.doctor.specialization}</div>` : ''}
                 </div>
             </div>
@@ -214,7 +215,7 @@ export default function ConsultationPage() {
             ${labList ? `<div class="section"><h3>Lab Tests Ordered</h3><ul style="font-size:13px">${labList}</ul></div>` : ''}
             <div class="footer">
                 <div><p style="font-size:11px;color:#888">⚠️ This prescription is generated digitally via MediSense AI.<br/>This is not valid without the doctor's physical signature.</p></div>
-                <div class="sig"><div class="line">Dr. ${consultation?.doctor?.firstName || ''} ${consultation?.doctor?.lastName || ''}<br>Signature & Stamp</div></div>
+                <div class="sig"><div class="line">${doctorName(consultation?.doctor?.firstName, consultation?.doctor?.lastName)}<br>Signature & Stamp</div></div>
             </div>
             </body></html>`);
         printWindow.document.close();
@@ -232,7 +233,7 @@ export default function ConsultationPage() {
         <button onClick={() => setActiveTab(key)} style={{
             display: 'flex', alignItems: 'center', gap: 8, padding: '10px 18px',
             borderRadius: 10, border: 'none', cursor: 'pointer', fontSize: 13, fontWeight: 700,
-            background: activeTab === key ? 'rgba(13, 92, 126, 0.15)' : 'transparent',
+            background: activeTab === key ? 'rgba(35, 83, 71, 0.15)' : 'transparent',
             color: activeTab === key ? 'var(--accent-primary)' : 'var(--text-secondary)',
             transition: 'all 0.15s',
         }}>
@@ -290,7 +291,7 @@ export default function ConsultationPage() {
                                     {SYMPTOM_OPTIONS.map(s => (
                                         <button key={s} onClick={() => !isCompleted && toggleSymptom(s)} style={{
                                             padding: '6px 14px', borderRadius: 20, fontSize: 12.5, fontWeight: 600, cursor: 'pointer',
-                                            background: symptoms.includes(s) ? 'rgba(13, 92, 126, 0.15)' : 'var(--surface-2)',
+                                            background: symptoms.includes(s) ? 'rgba(35, 83, 71, 0.15)' : 'var(--surface-2)',
                                             border: `1px solid ${symptoms.includes(s) ? '#00E5FF44' : 'var(--surface-border-md)'}`,
                                             color: symptoms.includes(s) ? 'var(--accent-primary)' : 'var(--text-secondary)',
                                             transition: 'all 0.15s',
@@ -309,7 +310,7 @@ export default function ConsultationPage() {
                                     </button>
                                 )}
                                 {aiPredictions.length > 0 && (
-                                    <div style={{ marginTop: 16, background: 'rgba(255,44,245,0.05)', border: '1px solid rgba(255,44,245,0.15)', borderRadius: 12, padding: 16 }}>
+                                    <div style={{ marginTop: 16, background: 'rgba(142, 182, 155, 0.05)', border: '1px solid rgba(142, 182, 155, 0.15)', borderRadius: 12, padding: 16 }}>
                                         <div style={{ fontSize: 11, fontWeight: 700, color: '#FF2CF5', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 12 }}>🧠 AI Disease Prediction</div>
                                         {aiPredictions.map(pred => (
                                             <div key={pred.name} style={{ marginBottom: 10 }}>
@@ -332,7 +333,7 @@ export default function ConsultationPage() {
                                 <textarea value={notes} onChange={e => setNotes(e.target.value)} disabled={isCompleted} rows={3} placeholder="Clinical notes..." className="form-input" style={{ marginBottom: 16, resize: 'vertical' }} />
                                 <input value={diagnosis} onChange={e => setDiagnosis(e.target.value)} disabled={isCompleted} placeholder="Final diagnosis..." className="form-input" style={{ marginBottom: 16 }} />
                                 {!isCompleted && (
-                                    <button onClick={saveSymptoms} style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '10px 20px', background: 'rgba(13, 92, 126, 0.1)', border: '1px solid rgba(13, 92, 126, 0.25)', borderRadius: 10, color: 'var(--accent-primary)', fontWeight: 700, fontSize: 13, cursor: 'pointer' }}>
+                                    <button onClick={saveSymptoms} style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '10px 20px', background: 'rgba(35, 83, 71, 0.1)', border: '1px solid rgba(35, 83, 71, 0.25)', borderRadius: 10, color: 'var(--accent-primary)', fontWeight: 700, fontSize: 13, cursor: 'pointer' }}>
                                         <Save size={14} /> Save
                                     </button>
                                 )}
@@ -346,7 +347,7 @@ export default function ConsultationPage() {
                             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
                                 <div style={{ fontWeight: 700, fontSize: 14, color: 'var(--text-primary)' }}>Digital Prescription</div>
                                 {!isCompleted && (
-                                    <button onClick={() => setRxItems([...rxItems, { medicineName: '', dosage: '', frequency: '', duration: '' }])} style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '7px 14px', background: 'rgba(24, 155, 130, 0.1)', border: '1px solid rgba(24, 155, 130, 0.25)', borderRadius: 8, color: 'var(--risk-low-text)', fontSize: 12, fontWeight: 700, cursor: 'pointer' }}>
+                                    <button onClick={() => setRxItems([...rxItems, { medicineName: '', dosage: '', frequency: '', duration: '' }])} style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '7px 14px', background: 'rgba(63, 138, 102, 0.1)', border: '1px solid rgba(63, 138, 102, 0.25)', borderRadius: 8, color: 'var(--risk-low-text)', fontSize: 12, fontWeight: 700, cursor: 'pointer' }}>
                                         <Plus size={13} /> Add Medicine
                                     </button>
                                 )}
@@ -373,7 +374,7 @@ export default function ConsultationPage() {
                                         <input value={item.duration} disabled={isCompleted} onChange={e => { const n = [...rxItems]; n[idx].duration = e.target.value; setRxItems(n); }} placeholder="5 days" className="form-input" />
                                     </div>
                                     {!isCompleted && (
-                                        <button onClick={() => setRxItems(rxItems.filter((_, i) => i !== idx))} style={{ marginTop: 24, padding: 8, background: 'rgba(209, 63, 74, 0.1)', border: '1px solid rgba(209, 63, 74, 0.2)', borderRadius: 8, color: 'var(--risk-critical-text)', cursor: 'pointer' }}>
+                                        <button onClick={() => setRxItems(rxItems.filter((_, i) => i !== idx))} style={{ marginTop: 24, padding: 8, background: 'rgba(200, 67, 75, 0.1)', border: '1px solid rgba(200, 67, 75, 0.2)', borderRadius: 8, color: 'var(--risk-critical-text)', cursor: 'pointer' }}>
                                             <Trash2 size={13} />
                                         </button>
                                     )}
@@ -381,12 +382,12 @@ export default function ConsultationPage() {
                             ))}
                             <textarea value={rxNotes} disabled={isCompleted} onChange={e => setRxNotes(e.target.value)} rows={2} placeholder="Additional notes for pharmacist..." className="form-input" style={{ marginTop: 8, marginBottom: 16, resize: 'vertical' }} />
                             {!isCompleted && (
-                                <button onClick={savePrescription} disabled={savingRx} style={{ padding: '11px 24px', background: 'linear-gradient(135deg, var(--accent-primary), #0096AA)', border: 'none', borderRadius: 10, color: 'var(--bg-primary)', fontWeight: 800, fontSize: 13, cursor: 'pointer' }}>
+                                <button onClick={savePrescription} disabled={savingRx} style={{ padding: '11px 24px', background: 'linear-gradient(135deg, var(--accent-primary), var(--accent-magenta))', border: 'none', borderRadius: 10, color: 'var(--bg-primary)', fontWeight: 800, fontSize: 13, cursor: 'pointer' }}>
                                     <Pill size={14} style={{ display: 'inline', marginRight: 6 }} />
                                     {savingRx ? 'Saving...' : 'Save Prescription'}
                                 </button>
                             )}
-                            <button onClick={downloadPrescriptionPDF} style={{ padding: '11px 18px', background: 'rgba(13, 92, 126, 0.08)', border: '1px solid rgba(13, 92, 126, 0.25)', borderRadius: 10, color: 'var(--accent-primary)', fontWeight: 700, fontSize: 13, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 8 }}>
+                            <button onClick={downloadPrescriptionPDF} style={{ padding: '11px 18px', background: 'rgba(35, 83, 71, 0.08)', border: '1px solid rgba(35, 83, 71, 0.25)', borderRadius: 10, color: 'var(--accent-primary)', fontWeight: 700, fontSize: 13, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 8 }}>
                                 <Download size={14} /> Download PDF
                             </button>
                         </div>
@@ -401,8 +402,8 @@ export default function ConsultationPage() {
                                     {LAB_TEST_OPTIONS.map(t => (
                                         <label key={t.value} style={{
                                             display: 'flex', alignItems: 'center', gap: 12, padding: '12px 16px',
-                                            background: labTests.includes(t.value) ? 'rgba(232, 131, 58, 0.1)' : 'var(--surface-2)',
-                                            border: `1px solid ${labTests.includes(t.value) ? 'rgba(232, 131, 58, 0.3)' : 'var(--surface-border)'}`,
+                                            background: labTests.includes(t.value) ? 'rgba(217, 122, 58, 0.1)' : 'var(--surface-2)',
+                                            border: `1px solid ${labTests.includes(t.value) ? 'rgba(217, 122, 58, 0.3)' : 'var(--surface-border)'}`,
                                             borderRadius: 12, cursor: 'pointer',
                                         }}>
                                             <input type="checkbox" checked={labTests.includes(t.value)} disabled={isCompleted}

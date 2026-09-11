@@ -77,7 +77,7 @@ export default function PatientsPage() {
                         borderRadius: 10, padding: '8px 12px',
                         transition: 'all 0.2s',
                     }}
-                        onFocus={e => (e.currentTarget as HTMLDivElement).style.borderColor = 'rgba(13, 92, 126, 0.3)'}
+                        onFocus={e => (e.currentTarget as HTMLDivElement).style.borderColor = 'rgba(35, 83, 71, 0.3)'}
                         onBlur={e => (e.currentTarget as HTMLDivElement).style.borderColor = 'var(--surface-border)'}
                     >
                         <Search size={14} color="var(--text-muted)" style={{ flexShrink: 0 }} />
@@ -132,7 +132,7 @@ export default function PatientsPage() {
                     <div style={{ display: 'flex', justifyContent: 'center', padding: 60 }}>
                         <div style={{
                             width: 36, height: 36, borderRadius: '50%',
-                            border: '3px solid rgba(13, 92, 126, 0.15)',
+                            border: '3px solid rgba(35, 83, 71, 0.15)',
                             borderTopColor: 'var(--accent-primary)',
                             animation: 'spin 0.8s linear infinite',
                         }} />
@@ -200,9 +200,9 @@ export default function PatientsPage() {
                                                     <span style={{
                                                         display: 'inline-flex', alignItems: 'center', gap: 4,
                                                         padding: '2px 9px', borderRadius: 9999,
-                                                        background: 'rgba(209, 63, 74, 0.10)',
+                                                        background: 'rgba(200, 67, 75, 0.10)',
                                                         color: 'var(--risk-critical-text)', fontWeight: 700, fontSize: 12,
-                                                        border: '1px solid rgba(209, 63, 74, 0.20)',
+                                                        border: '1px solid rgba(200, 67, 75, 0.20)',
                                                     }}>
                                                         {p.alerts.length}
                                                     </span>

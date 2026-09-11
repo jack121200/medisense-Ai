@@ -9,6 +9,7 @@ import {
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import SymptomChecker from '../components/SymptomChecker';
+import { doctorName } from '../utils/doctorName';
 
 const RISK_COLORS: Record<string, string> = {
     CRITICAL: 'var(--risk-critical)', HIGH: 'var(--risk-high)', MEDIUM: 'var(--risk-medium)', LOW: 'var(--risk-low)',
@@ -113,13 +114,13 @@ export default function DoctorDashboardPage() {
                         <Stethoscope size={12} style={{ display: 'inline', marginRight: 6 }} />DOCTOR DASHBOARD
                     </div>
                     <h1 style={{ fontSize: 28, fontWeight: 900, color: 'var(--text-primary)', letterSpacing: '-0.02em', marginBottom: 4 }}>
-                        Good {new Date().getHours() < 12 ? 'Morning' : new Date().getHours() < 18 ? 'Afternoon' : 'Evening'}, Dr. {user?.firstName}
+                        Good {new Date().getHours() < 12 ? 'Morning' : new Date().getHours() < 18 ? 'Afternoon' : 'Evening'}, {doctorName(user?.firstName)}
                     </h1>
                     <div style={{ fontSize: 13, color: 'var(--text-muted)' }}>{today}</div>
                 </div>
                 <button onClick={() => navigate('/my-patients')} style={{
                     display: 'flex', alignItems: 'center', gap: 8, padding: '12px 22px',
-                    background: 'linear-gradient(135deg, var(--accent-primary), #0096AA)', border: 'none',
+                    background: 'linear-gradient(135deg, var(--accent-primary), var(--accent-magenta))', border: 'none',
                     borderRadius: 12, color: 'var(--bg-primary)', fontWeight: 800, fontSize: 14, cursor: 'pointer',
                 }}>
                     <User size={18} /> My Patients
@@ -140,7 +141,7 @@ export default function DoctorDashboardPage() {
                     }}>
                         <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 2, background: s.color, opacity: 0.6 }} />
                         <div style={{ color: s.color, marginBottom: 10 }}>{s.icon}</div>
-                        <div style={{ fontSize: 32, fontWeight: 900, color: 'var(--text-primary)', fontFamily: 'monospace' }}>{s.val}</div>
+                        <div style={{ fontSize: 32, fontWeight: 900, color: 'var(--text-primary)', fontFamily: 'var(--font-mono)' }}>{s.val}</div>
                         <div style={{ fontSize: 11.5, color: 'var(--text-muted)', marginTop: 4 }}>{s.label}</div>
                     </div>
                 ))}
@@ -153,7 +154,7 @@ export default function DoctorDashboardPage() {
                         style={{
                             display: 'flex', alignItems: 'center', gap: 7, padding: '9px 18px', borderRadius: 10, border: 'none', cursor: 'pointer', fontWeight: 700, fontSize: 13, transition: 'all 0.15s',
                             background: activeTab === id ? 'linear-gradient(135deg, var(--accent-primary), var(--accent-magenta))' : 'var(--surface-2)',
-                            color: activeTab === id ? 'var(--text-primary)' : 'var(--text-secondary)',
+                            color: activeTab === id ? '#fff' : 'var(--text-secondary)',
                         }}>
                         {icon}{label}
                     </button>
@@ -221,7 +222,7 @@ export default function DoctorDashboardPage() {
                                             disabled={isStarting}
                                             style={{
                                                 display: 'flex', alignItems: 'center', gap: 6,
-                                                padding: '9px 18px', background: 'linear-gradient(135deg, var(--accent-primary), #0096AA)',
+                                                padding: '9px 18px', background: 'linear-gradient(135deg, var(--accent-primary), var(--accent-magenta))',
                                                 border: 'none', borderRadius: 10, color: 'var(--bg-primary)',
                                                 fontWeight: 800, fontSize: 13, cursor: 'pointer', flexShrink: 0,
                                                 opacity: isStarting ? 0.6 : 1,

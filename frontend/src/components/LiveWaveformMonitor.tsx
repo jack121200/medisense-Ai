@@ -45,7 +45,7 @@ export default function LiveWaveformMonitor() {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
 
             // Draw Grid Lines
-            ctx.strokeStyle = 'rgba(13, 92, 126, 0.05)';
+            ctx.strokeStyle = 'rgba(35, 83, 71, 0.05)';
             ctx.lineWidth = 1;
             for (let x = 0; x < canvas.width; x += 20) {
                 ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, canvas.height); ctx.stroke();
@@ -63,7 +63,7 @@ export default function LiveWaveformMonitor() {
             ctx.lineWidth = 2.5;
             ctx.strokeStyle = result?.is_anomaly ? 'var(--risk-critical)' : 'var(--risk-low)';
             ctx.shadowBlur = 8;
-            ctx.shadowColor = result?.is_anomaly ? 'rgba(209, 63, 74, 0.6)' : 'rgba(24, 155, 130, 0.6)';
+            ctx.shadowColor = result?.is_anomaly ? 'rgba(200, 67, 75, 0.6)' : 'rgba(63, 138, 102, 0.6)';
 
             ctx.beginPath();
             const sliceWidth = canvas.width / raw.length;
@@ -102,7 +102,7 @@ export default function LiveWaveformMonitor() {
     return (
         <div style={{
             background: 'var(--surface-1)',
-            border: '1px solid rgba(209, 63, 74, 0.25)',
+            border: '1px solid rgba(200, 67, 75, 0.25)',
             borderRadius: 20,
             padding: 24,
             marginBottom: 24,
@@ -113,8 +113,8 @@ export default function LiveWaveformMonitor() {
                 <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
                     <div style={{
                         width: 44, height: 44, borderRadius: 14,
-                        background: 'linear-gradient(135deg, rgba(209, 63, 74, 0.2), rgba(18, 121, 163, 0.05))',
-                        border: '1px solid rgba(209, 63, 74, 0.3)',
+                        background: 'linear-gradient(135deg, rgba(200, 67, 75, 0.2), rgba(46, 107, 91, 0.05))',
+                        border: '1px solid rgba(200, 67, 75, 0.3)',
                         display: 'flex', alignItems: 'center', justifyContent: 'center'
                     }}>
                         <Activity size={22} color="var(--risk-critical-text)" />
@@ -126,7 +126,7 @@ export default function LiveWaveformMonitor() {
                             </h2>
                             <span style={{
                                 fontSize: 10, fontWeight: 800, padding: '2px 8px', borderRadius: 12,
-                                background: 'rgba(209, 63, 74, 0.15)', color: 'var(--risk-critical-text)', border: '1px solid rgba(209, 63, 74, 0.3)'
+                                background: 'rgba(200, 67, 75, 0.15)', color: 'var(--risk-critical-text)', border: '1px solid rgba(200, 67, 75, 0.3)'
                             }}>
                                 UNIT IV & VI — DEEP AUTOENCODER
                             </span>
@@ -215,7 +215,7 @@ export default function LiveWaveformMonitor() {
 
             {/* Live HTML5 Canvas Waveform Monitor */}
             <div style={{
-                background: 'rgba(13, 45, 62, 0.16)', border: `1px solid ${result?.is_anomaly ? 'rgba(209, 63, 74, 0.5)' : 'rgba(24, 155, 130, 0.3)'}`,
+                background: 'rgba(5, 31, 32, 0.16)', border: `1px solid ${result?.is_anomaly ? 'rgba(200, 67, 75, 0.5)' : 'rgba(63, 138, 102, 0.3)'}`,
                 borderRadius: 14, padding: 16, position: 'relative', overflow: 'hidden'
             }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 }}>
@@ -224,7 +224,7 @@ export default function LiveWaveformMonitor() {
                         REAL-TIME ECG WAVEFORM & TEMPORAL ATTENTION HEATMAP OVERLAY
                     </div>
                     {result?.is_anomaly && (
-                        <span style={{ fontSize: 11, fontWeight: 800, color: 'var(--risk-critical-text)', background: 'rgba(209, 63, 74, 0.15)', padding: '2px 8px', borderRadius: 8, border: '1px solid rgba(209, 63, 74, 0.3)' }}>
+                        <span style={{ fontSize: 11, fontWeight: 800, color: 'var(--risk-critical-text)', background: 'rgba(200, 67, 75, 0.15)', padding: '2px 8px', borderRadius: 8, border: '1px solid rgba(200, 67, 75, 0.3)' }}>
                             🚨 ANOMALOUS SEGMENT HIGHLIGHTED IN RED
                         </span>
                     )}
@@ -237,8 +237,8 @@ export default function LiveWaveformMonitor() {
             {result?.recommendation && (
                 <div style={{
                     marginTop: 16, padding: '12px 16px', borderRadius: 10,
-                    background: result.is_anomaly ? 'rgba(209, 63, 74, 0.1)' : 'rgba(24, 155, 130, 0.06)',
-                    border: `1px solid ${result.is_anomaly ? 'rgba(209, 63, 74, 0.25)' : 'rgba(24, 155, 130, 0.2)'}`,
+                    background: result.is_anomaly ? 'rgba(200, 67, 75, 0.1)' : 'rgba(63, 138, 102, 0.06)',
+                    border: `1px solid ${result.is_anomaly ? 'rgba(200, 67, 75, 0.25)' : 'rgba(63, 138, 102, 0.2)'}`,
                     fontSize: 12, color: 'var(--text-primary)', display: 'flex', alignItems: 'center', gap: 10
                 }}>
                     <Zap size={16} color={result.is_anomaly ? 'var(--risk-critical)' : 'var(--risk-low)'} />

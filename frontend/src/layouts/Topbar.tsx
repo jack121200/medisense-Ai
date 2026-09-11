@@ -41,7 +41,7 @@ export default function Topbar({ onOpenNotifications }: TopbarProps) {
             }}
                 onFocus={e => {
                     (e.currentTarget as HTMLDivElement).style.borderColor = 'var(--accent-primary)';
-                    (e.currentTarget as HTMLDivElement).style.boxShadow = '0 0 0 3px rgba(13, 92, 126, 0.12)';
+                    (e.currentTarget as HTMLDivElement).style.boxShadow = '0 0 0 3px rgba(35, 83, 71, 0.12)';
                 }}
                 onBlur={e => {
                     (e.currentTarget as HTMLDivElement).style.borderColor = 'var(--surface-border-md)';
