@@ -230,7 +230,7 @@ def predict_heart_risk(req: HeartRiskRequest):
         recommendations.append("Blood pressure elevated — target <130/80 mmHg with lifestyle + medication")
     if req.cholestoral > 240:
         recommendations.append("High cholesterol — consider statin therapy and dietary fat reduction")
-    if req.fasting_blood_sugar in ("Greater than 120 mg/dl", "1"):
+    if req.fasting_blood_sugar in ("Greater than 120 mg/ml", "1"):
         recommendations.append("Elevated fasting blood sugar — strict glycaemic control protects the heart")
     if req.exercise_induced_angina in ("Yes", "1", 1):
         recommendations.append("Exercise-induced angina present — avoid strenuous activity until evaluated")

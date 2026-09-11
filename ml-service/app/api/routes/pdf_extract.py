@@ -126,8 +126,8 @@ _HEART_CAT = {
         "Asymptomatic":     [r"\basymptomatic\b"],
     },
     "fasting_blood_sugar": {
-        "Greater than 120 mg/dl": [r"fasting.{0,20}>\s*120", r"fasting.{0,20}high"],
-        "Lower than 120 mg/dl":   [r"fasting.{0,20}<\s*120", r"fasting.{0,20}normal"],
+        "Greater than 120 mg/ml": [r"fasting.{0,20}>\s*120", r"fasting.{0,20}high"],
+        "Lower than 120 mg/ml":   [r"fasting.{0,20}<\s*120", r"fasting.{0,20}normal"],
     },
     "rest_ecg": {
         "Normal":                         [r"ecg\s*normal", r"normal\s+ecg"],

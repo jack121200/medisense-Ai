@@ -130,7 +130,7 @@ export default function PatientDetailPage() {
                 chest_pain_type: 'Asymptomatic',
                 resting_blood_pressure: latestV?.systolicBP || 120,
                 cholestoral: 200,
-                fasting_blood_sugar: patient.hasDiabetes ? 'Greater than 120 mg/dl' : 'Lower than 120 mg/dl',
+                fasting_blood_sugar: patient.hasDiabetes ? 'Greater than 120 mg/ml' : 'Lower than 120 mg/ml',
                 rest_ecg: 'Normal',
                 Max_heart_rate: latestV?.heartRate || 150,
                 exercise_induced_angina: patient.hasHeartDisease ? 'Yes' : 'No',

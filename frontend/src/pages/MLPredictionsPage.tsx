@@ -68,7 +68,12 @@ function InputField({ label, value, onChange, type = 'number', placeholder = '' 
 }
 
 function SelectField({ label, value, onChange, options }: {
-    label: string; value: string; onChange: (v: string) => void; options: string[]
+    label: string; value: string; onChange: (v: string) => void;
+    // Usually the value the model wants is also what a clinician should read,
+    // so a plain string covers it. A [value, label] pair separates the two for
+    // fasting_blood_sugar, whose training data spells the unit "mg/ml" while
+    // the correct clinical unit is mg/dL — we send the former, show the latter.
+    options: Array<string | [string, string]>
 }) {
     return (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
@@ -76,7 +81,10 @@ function SelectField({ label, value, onChange, options }: {
             <select value={value} onChange={e => onChange(e.target.value)}
                 style={{ padding: '10px 14px', background: 'var(--surface-0)', border: '1px solid var(--surface-border-md)', borderRadius: 10, color: 'var(--text-primary)', fontSize: 14, outline: 'none', fontFamily: 'inherit', cursor: 'pointer' }}>
                 <option value="">— select —</option>
-                {options.map(o => <option key={o} value={o}>{o}</option>)}
+                {options.map(o => {
+                    const [val, text] = Array.isArray(o) ? o : [o, o];
+                    return <option key={val} value={val}>{text}</option>;
+                })}
             </select>
         </div>
     );
@@ -203,7 +211,7 @@ function HeartRiskTab() {
                             <InputField label="ST Depression (Oldpeak)" value={form.oldpeak} onChange={set('oldpeak')} placeholder="e.g. 1.5" />
                             <SelectField label="Sex" value={form.sex} onChange={set('sex')} options={['Male', 'Female']} />
                             <SelectField label="Chest Pain Type" value={form.chest_pain_type} onChange={set('chest_pain_type')} options={['Typical angina', 'Atypical angina', 'Non-anginal pain', 'Asymptomatic']} />
-                            <SelectField label="Fasting Blood Sugar" value={form.fasting_blood_sugar} onChange={set('fasting_blood_sugar')} options={['Greater than 120 mg/dl', 'Lower than 120 mg/dl']} />
+                            <SelectField label="Fasting Blood Sugar" value={form.fasting_blood_sugar} onChange={set('fasting_blood_sugar')} options={[['Greater than 120 mg/ml', 'Greater than 120 mg/dL'], ['Lower than 120 mg/ml', 'Lower than 120 mg/dL']]} />
                             <SelectField label="Resting ECG" value={form.rest_ecg} onChange={set('rest_ecg')} options={['Normal', 'ST-T wave abnormality', 'Left ventricular hypertrophy']} />
                             <SelectField label="Exercise-Induced Angina" value={form.exercise_induced_angina} onChange={set('exercise_induced_angina')} options={['Yes', 'No']} />
                             <SelectField label="Slope of ST" value={form.slope} onChange={set('slope')} options={['Upsloping', 'Flat', 'Downsloping']} />
