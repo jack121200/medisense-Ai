@@ -161,7 +161,7 @@ ml-service/       Python/FastAPI
   app/rag/          retriever + curated corpus (53 documents)
   train/            reproducible training scripts, one per model
   models_manifest.json   metrics and artifact hashes — the source of truth
-  tests/            22 tests — retrieval quality, red-flag surfacing
+  tests/            29 tests — retrieval quality, red-flag surfacing, ECG route
 
 frontend/         React 18 + Vite + Zustand
   src/index.css     design tokens — one palette, swapped by editing values
