@@ -43,7 +43,7 @@ async function main() {
         { email: 'admin@medisense.ai', firstName: 'Admin', lastName: 'User', role: 'ADMIN' },
         { email: 'doctor@medisense.ai', firstName: 'Dr. Sarah', lastName: 'Chen', role: 'DOCTOR' },
         { email: 'nurse@medisense.ai', firstName: 'Nurse Rahul', lastName: 'Sharma', role: 'NURSE' },
-        { email: 'analyst@medisense.ai', firstName: 'Dr. Priya', lastName: 'Analytics', role: 'ANALYST' },
+        { email: 'analyst@medisense.ai', firstName: 'Dr. Arjun', lastName: 'Analytics', role: 'ANALYST' },
     ];
     for (const u of users) {
         await prisma.user.upsert({

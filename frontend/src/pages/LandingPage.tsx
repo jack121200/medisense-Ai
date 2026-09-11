@@ -172,7 +172,7 @@ export default function LandingPage() {
     const PLUM   = 'var(--vitals-bp)';
 
     const features = [
-        { icon: '🗣️', title: 'AI Doctor — Voice Consultation', color: TERRA, delay: 0, desc: 'Speak to Priya, an AI health assistant, in Hindi, English or Hinglish. She takes a structured 9-phase OPD-style history, then produces a written assessment for your doctor to review.' },
+        { icon: '🗣️', title: 'AI Doctor — Voice Consultation', color: TERRA, delay: 0, desc: 'Speak to Dr. Arjun, an AI health assistant, in Hindi, English or Hinglish. He takes a structured 9-phase OPD-style history, then produces a written assessment for your doctor to review.' },
         { icon: '🌿', title: 'Grounded Ayurvedic Guidance', color: SAGE, delay: 60, desc: 'Advice is retrieved from a curated remedy knowledge base rather than improvised, and every suggestion is screened against your recorded medicines and conditions for interactions.' },
         { icon: '❤️', title: 'Heart Disease Risk Model', color: TERRA, delay: 120, desc: 'An XGBoost model reads 13 clinical parameters — chest pain type, ST depression, thalassemia, ECG findings — and returns a risk probability with per-feature importance.' },
         { icon: '🩸', title: 'CBC Blood Analyzer', color: CLAY, delay: 180, desc: 'Enter or upload a blood report. 20 CBC parameters are checked against reference ranges, with unsupervised anomaly detection flagging unusual overall patterns.' },
@@ -344,7 +344,7 @@ export default function LandingPage() {
                 />
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 20 }}>
                     {[
-                        { n: '01', color: TERRA, title: 'Describe how you feel', desc: 'Start a voice call and talk normally in Hindi, English or Hinglish. Priya asks one question at a time and works through a structured clinical history — complaint, duration, past illness, medicines, lifestyle, diet.' },
+                        { n: '01', color: TERRA, title: 'Describe how you feel', desc: 'Start a voice call and talk normally in Hindi, English or Hinglish. Dr. Arjun asks one question at a time and works through a structured clinical history — complaint, duration, past illness, medicines, lifestyle, diet.' },
                         { n: '02', color: SAGE, title: 'The system checks its own advice', desc: 'Remedies are retrieved from a curated knowledge base, screened against your recorded medicines for interactions, and the transcript is scanned for emergency red flags independently of the model.' },
                         { n: '03', color: CLAY, title: 'Your doctor gets a real report', desc: 'A structured assessment — summary, possible conditions, suggested actions, red flags and urgency — lands on the clinician dashboard, downloadable as a PDF. Anything urgent raises a live alert.' },
                     ].map(item => (

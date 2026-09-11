@@ -61,7 +61,7 @@ async function main() {
         { email: 'admin@medisense.ai', firstName: 'Admin', lastName: 'User', role: 'ADMIN' as const },
         { email: 'doctor@medisense.ai', firstName: 'Dr. Sarah', lastName: 'Chen', role: 'DOCTOR' as const },
         { email: 'nurse@medisense.ai', firstName: 'Nurse Rahul', lastName: 'Sharma', role: 'NURSE' as const },
-        { email: 'analyst@medisense.ai', firstName: 'Dr. Priya', lastName: 'Analytics', role: 'ANALYST' as const },
+        { email: 'analyst@medisense.ai', firstName: 'Dr. Arjun', lastName: 'Analytics', role: 'ANALYST' as const },
         { email: 'patient@medisense.ai', firstName: 'Patient', lastName: 'Demo', role: 'PATIENT' as const },
     ];
 

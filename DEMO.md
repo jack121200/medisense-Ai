@@ -46,17 +46,17 @@ or Hinglish — that is the point.
 Say something like: *"Do hafte se pet mein jalan ho rahi hai, khaas kar raat
 ko khaane ke baad."*
 
-Let Priya take history for a couple of turns. Point out while it runs:
+Let Dr. Arjun take history for a couple of turns. Point out while it runs:
 
-- She opens by stating she is an AI and not a real doctor, without being
+- He opens by stating he is an AI and not a real doctor, without being
   asked.
-- She asks one question at a time — a real back-and-forth, not a form.
-- She works through a structured 9-phase history: complaint, duration, past
+- He asks one question at a time — a real back-and-forth, not a form.
+- He works through a structured 9-phase history: complaint, duration, past
   illness, medicines, lifestyle, diet.
 
 End the call. While the report generates:
 
-> "Her advice isn't recalled from the model's memory — it's retrieved from a
+> "His advice isn't recalled from the model's memory — it's retrieved from a
 > curated knowledge base of 53 documents. And underneath the model there are
 > three deterministic checks that don't depend on the LLM noticing anything."
 

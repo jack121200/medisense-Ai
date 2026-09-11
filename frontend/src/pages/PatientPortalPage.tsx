@@ -31,7 +31,7 @@ function getFaqReply(message: string): string {
     for (const rule of FAQ_RULES) {
         if (rule.keywords.some(k => new RegExp(`\\b${escapeRegex(k)}\\b`).test(lower))) return rule.reply;
     }
-    return 'I only have fixed answers on fever, cough, chest pain, headache, stomach upset, diabetes, blood pressure and booking.\n\nFor your own symptoms, talk to Priya, the AI Doctor, or book an appointment. In an emergency call 112 or 108 (ambulance).';
+    return 'I only have fixed answers on fever, cough, chest pain, headache, stomach upset, diabetes, blood pressure and booking.\n\nFor your own symptoms, talk to Dr. Arjun, the AI Doctor, or book an appointment. In an emergency call 112 or 108 (ambulance).';
 }
 
 const TIME_SLOTS = [
@@ -73,7 +73,7 @@ export default function PatientPortalPage() {
 
     // Chat
     const [chatMessages, setChatMessages] = useState<Array<{ role: 'user' | 'bot'; text: string }>>([
-        { role: 'bot', text: 'These are fixed answers to common questions — not AI, and not advice for you specifically.\n\nFor your own symptoms, talk to Priya, the AI Doctor.' }
+        { role: 'bot', text: 'These are fixed answers to common questions — not AI, and not advice for you specifically.\n\nFor your own symptoms, talk to Dr. Arjun, the AI Doctor.' }
     ]);
     const [chatInput, setChatInput] = useState('');
 
@@ -221,7 +221,7 @@ export default function PatientPortalPage() {
                             </span>
                         </div>
                         <div style={{ fontSize: 12.5, color: 'var(--text-secondary)', marginTop: 3 }}>
-                            Talk to Priya, an AI health assistant, in Hindi, English or Hinglish. She takes your history and writes a report for your doctor to review — she is not a doctor and does not diagnose.
+                            Talk to Dr. Arjun, an AI health assistant, in Hindi, English or Hinglish. He takes your history and writes a report for your doctor to review — he is not a real doctor and does not diagnose.
                         </div>
                     </div>
                 </div>
@@ -534,7 +534,7 @@ export default function PatientPortalPage() {
                             <div style={{ fontSize: 11, color: 'var(--text-muted)' }}>Fixed answers to common questions — not AI</div>
                         </div>
                         <button onClick={() => navigate('/ai-doctor')} className="btn-ghost" style={{ fontSize: 12, padding: '6px 12px' }}>
-                            Talk to Priya →
+                            Talk to Dr. Arjun →
                         </button>
                     </div>
                     <div style={{ flex: 1, overflowY: 'auto', padding: '20px 24px', display: 'flex', flexDirection: 'column', gap: 14 }}>

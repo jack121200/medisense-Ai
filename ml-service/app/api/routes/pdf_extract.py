@@ -455,7 +455,7 @@ async def extract_text(file: UploadFile = File(...)):
     """
     Returns raw extracted text from a PDF or DOCX file.
     Used by the AI Doctor pre-call form so patients can upload any medical report
-    and have its text injected into Dr. Priya Sharma's system prompt.
+    and have its text injected into Dr. Arjun's system prompt.
     """
     _validate_file(file)
     content = await file.read()

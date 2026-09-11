@@ -32,13 +32,13 @@ const groqClient = axios.create({
     timeout: 30000,
 });
 
-// ── Dr. Priya Sharma — MBBS MD — OPD Consultation System Prompt ──────────────
+// ── Dr. Arjun — MBBS MD — OPD Consultation System Prompt ──────────────
 // Kept deliberately short: this entire block is re-sent to the model on every
 // single turn of the call. A long prompt directly adds latency (more input
 // tokens to process each turn) and, worse, biases the model toward long
 // multi-question monologues instead of a real back-and-forth conversation.
 function buildSystemPrompt(patientContext: string): string {
-    return `You are "Dr. Priya Sharma", an AI health assistant designed to sound like a warm, experienced Indian General Physician (integrative/Ayurvedic focus) on a live voice call. You are NOT a real doctor and must never claim to be a licensed human physician — if the patient directly asks whether you are an AI/bot/real doctor, say clearly and warmly that you are an AI health assistant, not a human doctor, and that your suggestions are not a medical diagnosis.
+    return `You are "Dr. Arjun", an AI health assistant designed to sound like a warm, experienced Indian General Physician (integrative/Ayurvedic focus) on a live voice call. You are NOT a real doctor and must never claim to be a licensed human physician — if the patient directly asks whether you are an AI/bot/real doctor, say clearly and warmly that you are an AI health assistant, not a human doctor, and that your suggestions are not a medical diagnosis.
 
 LANGUAGE: Mirror the patient exactly — Hindi, English, or Hinglish, matching their style. Always "aap", never "tum".
 
@@ -51,7 +51,7 @@ This is a live call, not an essay. Ask ONE question, then STOP and wait for the 
 BEDSIDE MANNER: Calm, empathetic, unhurried. Always let the patient finish before you speak.
 
 OPENING — start with EXACTLY this (or the natural English equivalent if the patient opens in English). The AI-assistant disclosure is part of the opening line itself, not something the patient has to ask for:
-"Namaste! Main Priya hoon, aapki AI health assistant — ek real doctor nahi, lekin main aapki baat dhyan se sunungi aur kuch natural suggestions doongi. Bilkul ghabrao mat — aaram se batao apni problem. Toh aaj kya takleef hai?"
+"Namaste! Main Dr. Arjun hoon, aapka AI health assistant — ek real doctor nahi, lekin main aapki baat dhyan se sununga aur kuch natural suggestions doonga. Bilkul ghabrao mat — aaram se batao apni problem. Toh aaj kya takleef hai?"
 
 CONSULTATION FLOW — before giving any advice, cover these one question at a time, in order (skip areas clearly irrelevant to the complaint):
 1. Chief complaint — what's wrong, since when, sudden or gradual, severity 1-10
@@ -284,7 +284,7 @@ async function generateDoctorSuggestions(callId: string, transcript: any[], pati
     const transcriptText = Array.isArray(transcript)
         ? transcript
             .filter((m: any) => m.role !== 'system')
-            .map((m: any) => `${m.role === 'user' ? 'Patient' : 'Dr. Priya Sharma'}: ${m.message || m.content || ''}`)
+            .map((m: any) => `${m.role === 'user' ? 'Patient' : 'Dr. Arjun'}: ${m.message || m.content || ''}`)
             .join('\n')
         : String(transcript || '');
 
@@ -304,7 +304,7 @@ ${reportKnowledge.promptBlock}
 `
         : '';
 
-    const prompt = `You are Dr. Priya Sharma, senior Integrative & General Physician reviewing an OPD consultation transcript.
+    const prompt = `You are Dr. Arjun, senior Integrative & General Physician reviewing an OPD consultation transcript.
 
 Patient Name: ${patientName}
 
@@ -472,7 +472,7 @@ export const aiDoctorService = {
             patientId: patient.id,
             patientName: `${patient.firstName} ${patient.lastName}`,
             assistantConfig: {
-                name: 'Priya (AI Health Assistant)',
+                name: 'Dr. Arjun (AI Health Assistant)',
                 model: {
                     // Groq/Llama 3.3 70B instead of OpenAI: ~280 tokens/sec on Groq's
                     // LPU hardware vs GPT-4o-mini's much slower generation — this is
@@ -542,7 +542,7 @@ export const aiDoctorService = {
                 // above — both carry the same AI-assistant disclosure, since
                 // Vapi speaks this literal string first before the LLM turn loop
                 // even starts.
-                firstMessage: 'Namaste! Main Priya hoon, aapki AI health assistant — ek real doctor nahi, lekin main aapki baat dhyan se sunungi aur kuch natural suggestions doongi. Bilkul ghabrao mat — aaram se batao apni problem. Toh aaj kya takleef hai?',
+                firstMessage: 'Namaste! Main Dr. Arjun hoon, aapka AI health assistant — ek real doctor nahi, lekin main aapki baat dhyan se sununga aur kuch natural suggestions doonga. Bilkul ghabrao mat — aaram se batao apni problem. Toh aaj kya takleef hai?',
                 endCallPhrases: ['goodbye', 'bye', 'alvida', 'shukriya doctor', 'thank you doctor', 'bas itna hi tha'],
 
                 // Turn-taking.
