@@ -8,23 +8,30 @@ import { Calendar, Pill, FlaskConical, Receipt, MessageCircle, Send, Bell, Plus,
 import { usePatientSync } from '../hooks/usePatientSync';
 import toast from 'react-hot-toast';
 
-const CHATBOT_RULES: Array<{ keywords: string[]; reply: string }> = [
-    { keywords: ['fever', 'temperature', 'hot'], reply: 'You may have a viral fever. Take rest, drink plenty of fluids, and take Paracetamol 500mg if temperature is above 38°C. If it persists for more than 3 days, consult your doctor.\n\n⚠️ Seek immediate care if temperature exceeds 40°C.' },
-    { keywords: ['cough', 'cold', 'throat'], reply: 'For cough and cold: drink warm water with honey and ginger. Avoid cold drinks. You can take antihistamines for relief. If cough is productive with blood, consult your doctor immediately.' },
-    { keywords: ['chest', 'heart', 'pain', 'pressure'], reply: '⚠️ Chest pain can be serious. If you have sudden chest pressure, pain radiating to arm/jaw, or severe shortness of breath — call emergency services immediately. Do not wait.' },
-    { keywords: ['headache', 'migraine', 'head'], reply: 'For headaches: rest in a quiet dark room, stay hydrated, and take Paracetamol 500mg. Migraine triggers include stress, bright lights, and certain foods. Track your triggers.' },
-    { keywords: ['stomach', 'vomit', 'nausea', 'diarrhea', 'diarrhoea'], reply: 'For stomach issues: stay hydrated with ORS solution. Avoid solid food for a few hours. Eat light foods like rice and bananas once better. See a doctor if vomiting blood or diarrhea lasts >2 days.' },
-    { keywords: ['diabetes', 'sugar', 'glucose'], reply: 'For diabetes management: monitor your blood sugar daily. Eat at regular intervals, avoid sugary drinks, and take your prescribed medication consistently. Exercise 30 minutes daily.' },
-    { keywords: ['bp', 'blood pressure', 'hypertension'], reply: 'For high blood pressure: reduce salt intake, avoid stress, exercise regularly, and take prescribed medication. Monitor BP daily. Target: below 130/80 mmHg.' },
-    { keywords: ['appointment', 'book', 'schedule'], reply: 'You can book appointments directly from the "Book Appointment" tab in your patient portal! Select a doctor, your preferred date, and a time slot.' },
+// Fixed answers to common questions — not AI, and not advice for one person.
+// Matched on whole words, most specific first: substring matching sent
+// "stomach pain" and "blood pressure" to the chest-pain emergency reply. No
+// drug names or doses: the AI Doctor is forbidden to give them, and a canned
+// answer is in no position to.
+const FAQ_RULES: Array<{ keywords: string[]; reply: string }> = [
+    { keywords: ['chest pain', 'chest pressure', 'chest tightness', 'heart attack'], reply: '⚠️ Chest pain can be serious. If it is sudden, crushing, spreading to the arm or jaw, or comes with sweating or breathlessness — call 112 or 108 (ambulance) now. Do not wait.' },
+    { keywords: ['blood pressure', 'bp', 'hypertension'], reply: 'For high blood pressure: less salt, regular exercise, enough sleep, and the medicine your doctor prescribed, taken consistently. Check your BP at home and share the readings with your doctor.' },
+    { keywords: ['diabetes', 'sugar', 'glucose'], reply: 'For diabetes: check your sugar as your doctor advised, eat at regular times, avoid sugary drinks, and walk for 30 minutes a day. Take prescribed medicine consistently.' },
+    { keywords: ['fever', 'temperature'], reply: 'For a fever: rest and drink plenty of fluids. See a doctor if it lasts more than 3 days, goes above 40°C, or comes with a stiff neck, confusion or a rash.' },
+    { keywords: ['cough', 'cold', 'throat'], reply: 'For a cough or cold: warm water with honey and ginger can soothe the throat, and rest helps. See a doctor if you cough up blood, have trouble breathing, or it lasts more than 2 weeks.' },
+    { keywords: ['headache', 'migraine'], reply: 'For a headache: rest somewhere quiet and dark and drink water. Stress, screens and skipped meals are common triggers. A sudden, severe "worst ever" headache needs emergency care.' },
+    { keywords: ['stomach', 'vomit', 'vomiting', 'nausea', 'diarrhea', 'diarrhoea', 'loose motion'], reply: 'For stomach upset: sip ORS or water often and eat light food such as rice or banana once you can. See a doctor if there is blood in vomit or stool, or it lasts more than 2 days.' },
+    { keywords: ['appointment', 'book', 'booking', 'schedule'], reply: 'You can book from the "Book Appointment" tab: choose a doctor, a date and a time slot.' },
 ];
 
-function getBotReply(message: string): string {
+const escapeRegex = (s: string) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+
+function getFaqReply(message: string): string {
     const lower = message.toLowerCase();
-    for (const rule of CHATBOT_RULES) {
-        if (rule.keywords.some(k => lower.includes(k))) return rule.reply;
+    for (const rule of FAQ_RULES) {
+        if (rule.keywords.some(k => new RegExp(`\\b${escapeRegex(k)}\\b`).test(lower))) return rule.reply;
     }
-    return 'I understand you have a health concern. For accurate diagnosis, please consult your doctor.\n\nFor emergencies call 112.\n\nI can help with information about: fever, cough, chest pain, headache, stomach issues, diabetes, or blood pressure.';
+    return 'I only have fixed answers on fever, cough, chest pain, headache, stomach upset, diabetes, blood pressure and booking.\n\nFor your own symptoms, talk to Priya, the AI Doctor, or book an appointment. In an emergency call 112 or 108 (ambulance).';
 }
 
 const TIME_SLOTS = [
@@ -35,13 +42,13 @@ const TIME_SLOTS = [
 ];
 
 const STATUS_COLORS: Record<string, { color: string; bg: string; label: string }> = {
-    PENDING: { color: 'var(--risk-medium-text)', bg: '#FFD16615', label: 'Pending Review' },
-    APPROVED: { color: 'var(--risk-low-text)', bg: '#00FF8715', label: 'Approved ✓' },
-    REJECTED: { color: 'var(--risk-critical-text)', bg: '#FF2D5515', label: 'Rejected' },
-    COUNTER_OFFERED: { color: 'var(--risk-high-text)', bg: '#FF6B3515', label: 'Alternative Offered' },
-    ACCEPTED: { color: 'var(--accent-primary)', bg: '#00E5FF15', label: 'Accepted by Patient' },
-    DECLINED: { color: 'var(--text-muted)', bg: '#aaa15', label: 'Declined' },
-    CANCELLED: { color: 'var(--text-muted)', bg: '#aaa15', label: 'Cancelled' },
+    PENDING: { color: 'var(--risk-medium-text)', bg: 'var(--risk-medium-bg)', label: 'Pending Review' },
+    APPROVED: { color: 'var(--risk-low-text)', bg: 'var(--risk-low-bg)', label: 'Approved ✓' },
+    REJECTED: { color: 'var(--risk-critical-text)', bg: 'var(--risk-critical-bg)', label: 'Rejected' },
+    COUNTER_OFFERED: { color: 'var(--risk-high-text)', bg: 'var(--risk-high-bg)', label: 'Alternative Offered' },
+    ACCEPTED: { color: 'var(--accent-primary)', bg: 'var(--accent-glow-sm)', label: 'Accepted by Patient' },
+    DECLINED: { color: 'var(--text-muted)', bg: 'var(--surface-2)', label: 'Declined' },
+    CANCELLED: { color: 'var(--text-muted)', bg: 'var(--surface-2)', label: 'Cancelled' },
 };
 
 export default function PatientPortalPage() {
@@ -66,7 +73,7 @@ export default function PatientPortalPage() {
 
     // Chat
     const [chatMessages, setChatMessages] = useState<Array<{ role: 'user' | 'bot'; text: string }>>([
-        { role: 'bot', text: 'Hello! I\'m your MediSense AI Health Assistant. How are you feeling today? Describe your symptoms and I\'ll help you understand them.\n\nYou can also ask me about booking appointments! 🏥' }
+        { role: 'bot', text: 'These are fixed answers to common questions — not AI, and not advice for you specifically.\n\nFor your own symptoms, talk to Priya, the AI Doctor.' }
     ]);
     const [chatInput, setChatInput] = useState('');
 
@@ -158,11 +165,8 @@ export default function PatientPortalPage() {
         if (!chatInput.trim()) return;
         const userMsg = chatInput.trim();
         setChatInput('');
-        setChatMessages(prev => [...prev, { role: 'user', text: userMsg }]);
-        setTimeout(() => {
-            const reply = getBotReply(userMsg);
-            setChatMessages(prev => [...prev, { role: 'bot', text: reply }]);
-        }, 600);
+        // No artificial "typing" delay: these are fixed answers, not generated ones.
+        setChatMessages(prev => [...prev, { role: 'user', text: userMsg }, { role: 'bot', text: getFaqReply(userMsg) }]);
     }
 
     const navTabs = [
@@ -172,13 +176,11 @@ export default function PatientPortalPage() {
         { key: 'reports', label: 'Lab Reports', icon: <FlaskConical size={14} /> },
         { key: 'bills', label: 'Bills', icon: <Receipt size={14} /> },
         { key: 'notifications', label: 'Notifications', icon: <Bell size={14} />, badge: unreadCount > 0 ? unreadCount : null },
-        { key: 'chatbot', label: 'Health AI', icon: <MessageCircle size={14} /> },
+        { key: 'chatbot', label: 'Health FAQ', icon: <MessageCircle size={14} /> },
     ] as const;
 
-    const s: React.CSSProperties = { fontFamily: '"Inter", system-ui, sans-serif' };
-
     return (
-        <div style={{ padding: '32px 40px', maxWidth: 1000, margin: '0 auto', ...s }}>
+        <div style={{ padding: '32px 40px', maxWidth: 1000, margin: '0 auto' }}>
             {/* Header */}
             <div style={{ marginBottom: 28 }}>
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 4 }}>
@@ -214,7 +216,7 @@ export default function PatientPortalPage() {
                     <div>
                         <div style={{ fontSize: 16, fontWeight: 800, color: 'var(--text-primary)', display: 'flex', alignItems: 'center', gap: 8 }}>
                             AI Doctor Voice Assistant
-                            <span style={{ fontSize: 10, fontWeight: 800, padding: '3px 8px', borderRadius: 9999, background: '#6366F125', color: 'var(--accent-primary-hover)', border: '1px solid #6366F140' }}>
+                            <span style={{ fontSize: 10, fontWeight: 800, padding: '3px 8px', borderRadius: 9999, background: 'rgba(35, 83, 71, 0.10)', color: 'var(--accent-primary)', border: '1px solid rgba(35, 83, 71, 0.30)' }}>
                                 VOICE AI ACTIVE
                             </span>
                         </div>
@@ -411,7 +413,7 @@ export default function PatientPortalPage() {
                                         <div style={{ fontWeight: 700, color: 'var(--text-primary)', fontSize: 14, marginBottom: 4 }}>{c.diagnosis || 'General Consultation'}</div>
                                         <div style={{ fontSize: 12, color: 'var(--text-muted)' }}>{new Date(c.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' })}</div>
                                     </div>
-                                    <span style={{ fontSize: 11, fontWeight: 700, color: c.status === 'COMPLETED' ? 'var(--risk-low)' : 'var(--risk-medium)', background: c.status === 'COMPLETED' ? '#00FF8715' : '#FFD16615', padding: '4px 12px', borderRadius: 20 }}>{c.status}</span>
+                                    <span style={{ fontSize: 11, fontWeight: 700, color: c.status === 'COMPLETED' ? 'var(--risk-low-text)' : 'var(--risk-medium-text)', background: c.status === 'COMPLETED' ? 'var(--risk-low-bg)' : 'var(--risk-medium-bg)', padding: '4px 12px', borderRadius: 20 }}>{c.status}</span>
                                 </div>
                             ))}
                         </div>
@@ -491,7 +493,7 @@ export default function PatientPortalPage() {
                                             <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 2 }}>{t.testId} · {new Date(t.createdAt).toLocaleDateString()}</div>
                                         </div>
                                         <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
-                                            <span style={{ fontSize: 11, fontWeight: 700, color: t.status === 'COMPLETED' ? 'var(--risk-low)' : 'var(--risk-medium)', background: t.status === 'COMPLETED' ? '#00FF8715' : '#FFD16615', padding: '4px 12px', borderRadius: 20 }}>{t.status}</span>
+                                            <span style={{ fontSize: 11, fontWeight: 700, color: t.status === 'COMPLETED' ? 'var(--risk-low-text)' : 'var(--risk-medium-text)', background: t.status === 'COMPLETED' ? 'var(--risk-low-bg)' : 'var(--risk-medium-bg)', padding: '4px 12px', borderRadius: 20 }}>{t.status}</span>
                                             {t.reportPdfUrl && <a href={t.reportPdfUrl} target="_blank" rel="noreferrer" style={{ fontSize: 12, color: 'var(--accent-primary)', display: 'flex', alignItems: 'center', gap: 4, textDecoration: 'none' }}><ExternalLink size={13} /> PDF Report</a>}
                                         </div>
                                     </div>
@@ -526,11 +528,14 @@ export default function PatientPortalPage() {
             {tab === 'chatbot' && (
                 <div style={{ background: 'var(--surface-1)', border: '1px solid var(--surface-border)', borderRadius: 18, display: 'flex', flexDirection: 'column', height: 540 }}>
                     <div style={{ padding: '16px 24px', borderBottom: '1px solid var(--surface-border)', display: 'flex', gap: 10, alignItems: 'center' }}>
-                        <div style={{ width: 32, height: 32, borderRadius: 10, background: 'linear-gradient(135deg, #10b98122, #6366f122)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 16 }}>🤖</div>
-                        <div>
-                            <div style={{ fontWeight: 800, color: 'var(--text-primary)', fontSize: 14 }}>MediSense Health Assistant</div>
-                            <div style={{ fontSize: 11, color: 'var(--risk-low-text)' }}>● AI Online</div>
+                        <div style={{ width: 32, height: 32, borderRadius: 10, background: 'var(--surface-3)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 16 }}>🤖</div>
+                        <div style={{ flex: 1 }}>
+                            <div style={{ fontWeight: 800, color: 'var(--text-primary)', fontSize: 14 }}>Quick health answers</div>
+                            <div style={{ fontSize: 11, color: 'var(--text-muted)' }}>Fixed answers to common questions — not AI</div>
                         </div>
+                        <button onClick={() => navigate('/ai-doctor')} className="btn-ghost" style={{ fontSize: 12, padding: '6px 12px' }}>
+                            Talk to Priya →
+                        </button>
                     </div>
                     <div style={{ flex: 1, overflowY: 'auto', padding: '20px 24px', display: 'flex', flexDirection: 'column', gap: 14 }}>
                         {chatMessages.map((msg, i) => (
@@ -539,7 +544,7 @@ export default function PatientPortalPage() {
                                     maxWidth: '75%', padding: '12px 16px', borderRadius: msg.role === 'user' ? '18px 18px 4px 18px' : '18px 18px 18px 4px',
                                     background: msg.role === 'user' ? 'linear-gradient(135deg, var(--risk-low), var(--accent-green-dim))' : 'var(--surface-2)',
                                     border: msg.role === 'user' ? 'none' : '1px solid var(--surface-border)',
-                                    color: 'var(--text-primary)', fontSize: 13, lineHeight: 1.6, whiteSpace: 'pre-line',
+                                    color: msg.role === 'user' ? '#fff' : 'var(--text-primary)', fontSize: 13, lineHeight: 1.6, whiteSpace: 'pre-line',
                                 }}>
                                     {msg.text}
                                 </div>
@@ -552,7 +557,7 @@ export default function PatientPortalPage() {
                             value={chatInput}
                             onChange={e => setChatInput(e.target.value)}
                             onKeyDown={e => e.key === 'Enter' && sendChat()}
-                            placeholder="Describe your symptoms..."
+                            placeholder="Ask a common question — fever, cough, BP…"
                             style={{ flex: 1, padding: '11px 14px', borderRadius: 10, border: '1px solid var(--surface-border-md)', background: 'var(--surface-1)', color: 'var(--text-primary)', fontSize: 14, outline: 'none' }}
                         />
                         <button onClick={sendChat} disabled={!chatInput.trim()} style={{ padding: '11px 18px', background: 'linear-gradient(135deg, var(--risk-low), var(--accent-green-dim))', border: 'none', borderRadius: 10, color: '#fff', cursor: 'pointer', opacity: chatInput.trim() ? 1 : 0.4 }}>

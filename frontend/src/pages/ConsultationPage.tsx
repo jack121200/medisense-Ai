@@ -2,12 +2,23 @@ import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../store/authStore';
 import { consultationApi, labApi } from '../api/hospitalApi';
+import { mlApi } from '../api/ml.api';
 import { Plus, Trash2, FlaskConical, Pill, Brain, CheckCircle, ChevronLeft, Save, Activity, Download } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { doctorName } from '../utils/doctorName';
 
-const SYMPTOM_OPTIONS = ['Fever', 'Cough', 'Chest Pain', 'Fatigue', 'Headache', 'Vomiting', 'Nausea', 'Diarrhea',
-    'Shortness of Breath', 'Body Pain', 'Chills', 'Sore Throat', 'Loss of Appetite', 'Dizziness', 'Swelling', 'Rash'];
+// Each chip is paired with the term the symptom model was trained on (its
+// 132-symptom vocabulary). This page used to "predict" from a hardcoded
+// four-rule table behind a fake 1.2s delay, falling back to random numbers,
+// and presented the result to doctors as AI output.
+const SYMPTOM_OPTIONS: Array<[label: string, modelTerm: string]> = [
+    ['Fever', 'high_fever'], ['Cough', 'cough'], ['Chest Pain', 'chest_pain'], ['Fatigue', 'fatigue'],
+    ['Headache', 'headache'], ['Vomiting', 'vomiting'], ['Nausea', 'nausea'], ['Diarrhea', 'diarrhoea'],
+    ['Shortness of Breath', 'breathlessness'], ['Body Pain', 'muscle_pain'], ['Chills', 'chills'],
+    ['Sore Throat', 'throat_irritation'], ['Loss of Appetite', 'loss_of_appetite'], ['Dizziness', 'dizziness'],
+    ['Swelling', 'swollen_extremeties'], ['Rash', 'skin_rash'],
+];
+const MODEL_TERM: Record<string, string> = Object.fromEntries(SYMPTOM_OPTIONS);
 
 const LAB_TEST_OPTIONS = [
     { value: 'BLOOD_TEST', label: 'Blood Test', price: 700 },
@@ -20,35 +31,20 @@ const LAB_TEST_OPTIONS = [
     { value: 'STOOL_TEST', label: 'Stool Test', price: 250 },
 ];
 
-// Disease prediction based on symptoms (client-side AI logic)
-function predictDiseases(symptoms: string[]) {
-    const rules: Record<string, { diseases: { name: string; prob: number }[] }> = {
-        'Fever,Headache,Vomiting': { diseases: [{ name: 'Dengue', prob: 65 }, { name: 'Viral Fever', prob: 25 }, { name: 'Malaria', prob: 10 }] },
-        'Fever,Cough,Sore Throat': { diseases: [{ name: 'Influenza', prob: 60 }, { name: 'COVID-19', prob: 25 }, { name: 'Common Cold', prob: 15 }] },
-        'Chest Pain,Shortness of Breath,Fatigue': { diseases: [{ name: 'Cardiac Issue', prob: 55 }, { name: 'Pneumonia', prob: 30 }, { name: 'Anxiety', prob: 15 }] },
-        'Vomiting,Diarrhea,Fatigue': { diseases: [{ name: 'Gastroenteritis', prob: 70 }, { name: 'Food Poisoning', prob: 20 }, { name: 'Cholera', prob: 10 }] },
-    };
-    const sSet = symptoms.join(',');
-    // Find best match
-    let best = null;
-    let bestOverlap = 0;
-    for (const [key, val] of Object.entries(rules)) {
-        const ruleSymptoms = key.split(',');
-        const overlap = ruleSymptoms.filter(s => symptoms.includes(s)).length;
-        if (overlap > bestOverlap) { bestOverlap = overlap; best = val; }
-    }
-    if (bestOverlap < 2) {
-        // Generic fallback
-        const generic = [
-            { name: 'Viral Infection', prob: 40 + Math.floor(Math.random() * 20) },
-            { name: 'Bacterial Infection', prob: 30 + Math.floor(Math.random() * 10) },
-            { name: 'Stress/Fatigue', prob: 15 + Math.floor(Math.random() * 10) },
-        ];
-        const total = generic.reduce((s, g) => s + g.prob, 0);
-        return generic.map(g => ({ ...g, prob: Math.round(g.prob / total * 100) }));
-    }
-    return best!.diseases;
-}
+// Literal hex (the text-safe shade of each status) so the alpha-suffixed tint
+// behind it is valid CSS — a var() reference cannot take an alpha suffix.
+const STATUS_COLORS: Record<string, string> = {
+    PENDING: '#7A5C14', ACCEPTED: '#235347', SAMPLE_COLLECTED: '#924E21', COMPLETED: '#2B6A4F',
+};
+const RISK_TEXT: Record<string, string> = {
+    LOW: 'var(--risk-low-text)', MEDIUM: 'var(--risk-medium-text)', HIGH: 'var(--risk-high-text)', CRITICAL: 'var(--risk-critical-text)',
+};
+
+// Everything written into the print window is escaped: that window shares this
+// app's origin, and patient names come from public self-registration.
+const esc = (v: unknown) => String(v ?? '').replace(/[&<>"']/g, c => (
+    { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' } as Record<string, string>
+)[c]);
 
 export default function ConsultationPage() {
     const { id } = useParams<{ id: string }>();
@@ -105,14 +101,23 @@ export default function ConsultationPage() {
     }
 
     async function runAI() {
-        if (symptoms.length < 2) return toast.error('Add at least 2 symptoms for AI prediction');
+        const terms = symptoms.map(s => MODEL_TERM[s]).filter(Boolean);
+        if (terms.length < 2) return toast.error('Select at least 2 symptoms for a prediction');
         setPredicting(true);
-        await new Promise(r => setTimeout(r, 1200)); // simulate processing
-        const preds = predictDiseases(symptoms);
-        setAiPredictions(preds);
-        await consultationApi.update(id!, { symptoms, aiDiseasePred: preds });
-        setPredicting(false);
-        toast.success('AI disease prediction complete');
+        try {
+            const res = await mlApi.predictDisease(terms);
+            const result = res.data?.data ?? res.data;
+            // alternatives[0] is the top prediction itself.
+            const ranked = result.alternatives?.length ? result.alternatives : [{ disease: result.disease, confidence: result.confidence }];
+            const preds = ranked.slice(0, 3).map((a: any) => ({ name: a.disease, prob: Math.round(a.confidence) }));
+            setAiPredictions(preds);
+            await consultationApi.update(id!, { symptoms, aiDiseasePred: preds });
+            toast.success('Prediction ready');
+        } catch (e: any) {
+            toast.error(e?.response?.data?.message || 'The symptom model is unavailable — try again shortly');
+        } finally {
+            setPredicting(false);
+        }
     }
 
     async function saveSymptoms() {
@@ -170,16 +175,16 @@ export default function ConsultationPage() {
         if (validRx.length === 0) { toast.error('No medicines in prescription to print'); return; }
         const printWindow = window.open('', '_blank', 'width=800,height=900');
         if (!printWindow) { toast.error('Please allow popups for PDF download'); return; }
-        const labList = consultation?.labTestRequests?.map((t: any) => `<li>${t.testType.replace(/_/g, ' ')} — <span style="color:#888">${t.status}</span></li>`).join('') || '';
+        const doctor = esc(doctorName(consultation?.doctor?.firstName, consultation?.doctor?.lastName));
+        const labList = consultation?.labTestRequests?.map((t: any) => `<li>${esc(t.testType.replace(/_/g, ' '))} — <span style="color:#888">${esc(t.status)}</span></li>`).join('') || '';
         printWindow.document.write(`
-            <!DOCTYPE html><html><head><title>Prescription — ${p?.firstName} ${p?.lastName}</title>
+            <!DOCTYPE html><html><head><title>Prescription — ${esc(p?.firstName)} ${esc(p?.lastName)}</title>
             <style>
                 body { font-family: 'Arial', sans-serif; padding: 40px; color: #111; max-width: 720px; margin: 0 auto; }
                 h1 { font-size: 22px; margin: 0; } .sub { color: #666; font-size: 13px; }
                 .header { border-bottom: 2px solid #235347; padding-bottom: 16px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: flex-start; }
                 .section { margin-bottom: 20px; } .section h3 { font-size: 13px; text-transform: uppercase; letter-spacing: 0.06em; color: #235347; border-bottom: 1px solid #ddd; padding-bottom: 6px; margin-bottom: 10px; }
                 table { width: 100%; border-collapse: collapse; font-size: 13px; } th { text-align: left; padding: 8px; background: #f5f5f5; font-size: 11px; text-transform: uppercase; } td { padding: 8px; border-bottom: 1px solid #eee; }
-                .badge { display: inline-block; padding: 2px 10px; border-radius: 20px; font-size: 11px; font-weight: bold; background: #e8f8f5; color: #006655; }
                 .footer { margin-top: 40px; padding-top: 20px; border-top: 1px solid #ddd; font-size: 12px; color: #888; display: flex; justify-content: space-between; }
                 .sig { text-align: right; } .sig .line { border-top: 1px solid #333; width: 180px; margin-top: 40px; padding-top: 4px; font-size: 11px; }
                 @media print { body { padding: 20px; } }
@@ -191,31 +196,31 @@ export default function ConsultationPage() {
                 </div>
                 <div style="text-align:right">
                     <div style="font-size:13px;font-weight:bold">Date: ${new Date().toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' })}</div>
-                    <div class="sub">${doctorName(consultation?.doctor?.firstName, consultation?.doctor?.lastName)}</div>
-                    ${consultation?.doctor?.specialization ? `<div class="sub">${consultation.doctor.specialization}</div>` : ''}
+                    <div class="sub">${doctor}</div>
+                    ${consultation?.doctor?.specialization ? `<div class="sub">${esc(consultation.doctor.specialization)}</div>` : ''}
                 </div>
             </div>
             <div class="section">
                 <h3>Patient Details</h3>
                 <table><tbody>
-                    <tr><td><b>Name:</b></td><td>${p?.firstName} ${p?.lastName}</td><td><b>Patient ID:</b></td><td>${p?.patientCode || '—'}</td></tr>
-                    <tr><td><b>Age / Gender:</b></td><td>${age} yrs / ${p?.gender || '—'}</td><td><b>Blood Group:</b></td><td>${p?.bloodGroup?.replace('_','') || '—'}</td></tr>
-                    ${p?.phone ? `<tr><td><b>Phone:</b></td><td>${p.phone}</td><td></td><td></td></tr>` : ''}
+                    <tr><td><b>Name:</b></td><td>${esc(p?.firstName)} ${esc(p?.lastName)}</td><td><b>Patient ID:</b></td><td>${esc(p?.patientCode || '—')}</td></tr>
+                    <tr><td><b>Age / Gender:</b></td><td>${esc(age)} yrs / ${esc(p?.gender || '—')}</td><td><b>Blood Group:</b></td><td>${esc(p?.bloodGroup?.replace('_', '') || '—')}</td></tr>
+                    ${p?.phone ? `<tr><td><b>Phone:</b></td><td>${esc(p.phone)}</td><td></td><td></td></tr>` : ''}
                 </tbody></table>
             </div>
-            ${symptoms.length > 0 ? `<div class="section"><h3>Symptoms</h3><p>${symptoms.join(', ')}</p></div>` : ''}
-            ${diagnosis ? `<div class="section"><h3>Diagnosis</h3><p><b>${diagnosis}</b></p></div>` : ''}
+            ${symptoms.length > 0 ? `<div class="section"><h3>Symptoms</h3><p>${esc(symptoms.join(', '))}</p></div>` : ''}
+            ${diagnosis ? `<div class="section"><h3>Diagnosis</h3><p><b>${esc(diagnosis)}</b></p></div>` : ''}
             <div class="section">
                 <h3>Prescription (Rx)</h3>
                 <table><thead><tr><th>#</th><th>Medicine</th><th>Dosage</th><th>Frequency</th><th>Duration</th><th>Instructions</th></tr></thead><tbody>
-                    ${validRx.map((rx: any, i: number) => `<tr><td>${i+1}</td><td><b>${rx.medicineName}</b></td><td>${rx.dosage||'—'}</td><td>${rx.frequency||'—'}</td><td>${rx.duration||'—'}</td><td>${rx.instructions||''}</td></tr>`).join('')}
+                    ${validRx.map((rx: any, i: number) => `<tr><td>${i + 1}</td><td><b>${esc(rx.medicineName)}</b></td><td>${esc(rx.dosage || '—')}</td><td>${esc(rx.frequency || '—')}</td><td>${esc(rx.duration || '—')}</td><td>${esc(rx.instructions || '')}</td></tr>`).join('')}
                 </tbody></table>
-                ${rxNotes ? `<p style="font-size:12px;color:#666;margin-top:10px"><i>Notes: ${rxNotes}</i></p>` : ''}
+                ${rxNotes ? `<p style="font-size:12px;color:#666;margin-top:10px"><i>Notes: ${esc(rxNotes)}</i></p>` : ''}
             </div>
             ${labList ? `<div class="section"><h3>Lab Tests Ordered</h3><ul style="font-size:13px">${labList}</ul></div>` : ''}
             <div class="footer">
                 <div><p style="font-size:11px;color:#888">⚠️ This prescription is generated digitally via MediSense AI.<br/>This is not valid without the doctor's physical signature.</p></div>
-                <div class="sig"><div class="line">${doctorName(consultation?.doctor?.firstName, consultation?.doctor?.lastName)}<br>Signature & Stamp</div></div>
+                <div class="sig"><div class="line">${doctor}<br>Signature & Stamp</div></div>
             </div>
             </body></html>`);
         printWindow.document.close();
@@ -249,9 +254,9 @@ export default function ConsultationPage() {
             </button>
 
             {/* Patient Header */}
-            <div style={{ background: 'var(--surface-1)', border: '1px solid var(--surface-border)', borderRadius: 18, padding: '20px 24px', marginBottom: 24, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+            <div style={{ background: 'var(--surface-1)', border: '1px solid var(--surface-border)', borderRadius: 18, padding: '20px 24px', marginBottom: 24, display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 16, flexWrap: 'wrap' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 20 }}>
-                    <div style={{ width: 52, height: 52, borderRadius: 14, background: 'linear-gradient(135deg, #00E5FF22, #FF2CF522)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 22 }}>👤</div>
+                    <div style={{ width: 52, height: 52, borderRadius: 14, background: 'var(--surface-3)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 22 }}>👤</div>
                     <div>
                         <div style={{ fontSize: 20, fontWeight: 900, color: 'var(--text-primary)' }}>{p?.firstName} {p?.lastName}</div>
                         <div style={{ fontSize: 12, color: 'var(--text-muted)', marginTop: 3 }}>{p?.patientCode} · {p?.phone}</div>
@@ -259,11 +264,11 @@ export default function ConsultationPage() {
                 </div>
                 <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
                     {isCompleted ? (
-                        <span style={{ fontSize: 12, fontWeight: 700, color: 'var(--risk-low-text)', background: '#00FF8720', padding: '6px 14px', borderRadius: 20, border: '1px solid #00FF8730' }}>✓ COMPLETED</span>
+                        <span style={{ fontSize: 12, fontWeight: 700, color: 'var(--risk-low-text)', background: 'var(--risk-low-bg)', padding: '6px 14px', borderRadius: 20, border: '1px solid rgba(63, 138, 102, 0.3)' }}>✓ COMPLETED</span>
                     ) : (
                         <button onClick={closeAndBill} disabled={closing} style={{
-                            padding: '10px 20px', background: 'linear-gradient(135deg, var(--risk-low), #00A858)',
-                            border: 'none', borderRadius: 10, color: 'var(--bg-primary)', fontWeight: 800, fontSize: 13, cursor: 'pointer',
+                            padding: '10px 20px', background: 'var(--accent-green-dim)',
+                            border: 'none', borderRadius: 10, color: '#fff', fontWeight: 800, fontSize: 13, cursor: 'pointer',
                         }}>
                             {closing ? 'Closing...' : '✓ Close & Generate Bill'}
                         </button>
@@ -271,11 +276,11 @@ export default function ConsultationPage() {
                 </div>
             </div>
 
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 300px', gap: 20 }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) 300px', gap: 20 }}>
                 {/* Main Panel */}
                 <div>
                     {/* Tabs */}
-                    <div style={{ display: 'flex', gap: 4, marginBottom: 20, background: 'var(--surface-1)', padding: 6, borderRadius: 14, border: '1px solid var(--surface-border)' }}>
+                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4, marginBottom: 20, background: 'var(--surface-1)', padding: 6, borderRadius: 14, border: '1px solid var(--surface-border)' }}>
                         {tab('Symptoms & Diagnosis', 'symptoms', <Activity size={14} />)}
                         {tab('Prescription', 'prescription', <Pill size={14} />)}
                         {tab('Lab Tests', 'lab', <FlaskConical size={14} />)}
@@ -288,42 +293,45 @@ export default function ConsultationPage() {
                             <div style={{ background: 'var(--surface-1)', border: '1px solid var(--surface-border)', borderRadius: 16, padding: 24, marginBottom: 16 }}>
                                 <div style={{ fontWeight: 700, fontSize: 14, color: 'var(--text-primary)', marginBottom: 16 }}>Select Symptoms</div>
                                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginBottom: 20 }}>
-                                    {SYMPTOM_OPTIONS.map(s => (
+                                    {SYMPTOM_OPTIONS.map(([s]) => (
                                         <button key={s} onClick={() => !isCompleted && toggleSymptom(s)} style={{
                                             padding: '6px 14px', borderRadius: 20, fontSize: 12.5, fontWeight: 600, cursor: 'pointer',
                                             background: symptoms.includes(s) ? 'rgba(35, 83, 71, 0.15)' : 'var(--surface-2)',
-                                            border: `1px solid ${symptoms.includes(s) ? '#00E5FF44' : 'var(--surface-border-md)'}`,
+                                            border: `1px solid ${symptoms.includes(s) ? 'rgba(35, 83, 71, 0.4)' : 'var(--surface-border-md)'}`,
                                             color: symptoms.includes(s) ? 'var(--accent-primary)' : 'var(--text-secondary)',
                                             transition: 'all 0.15s',
                                         }}>{s}</button>
                                     ))}
                                 </div>
 
-                                {/* AI Disease Prediction */}
+                                {/* Symptom model prediction */}
                                 {!isCompleted && (
                                     <button onClick={runAI} disabled={predicting || symptoms.length < 2} style={{
                                         display: 'flex', alignItems: 'center', gap: 8, padding: '10px 20px',
-                                        background: 'linear-gradient(135deg, #FF2CF5, #AA00AA)', border: 'none',
-                                        borderRadius: 10, color: '#fff', fontWeight: 700, fontSize: 13, cursor: 'pointer', opacity: symptoms.length < 2 ? 0.5 : 1,
+                                        background: 'var(--accent-primary)', border: 'none',
+                                        borderRadius: 10, color: '#fff', fontWeight: 700, fontSize: 13,
+                                        cursor: predicting || symptoms.length < 2 ? 'not-allowed' : 'pointer', opacity: symptoms.length < 2 ? 0.5 : 1,
                                     }}>
-                                        <Brain size={16} /> {predicting ? 'AI Analyzing...' : '🤖 Run Disease Prediction AI'}
+                                        <Brain size={16} /> {predicting ? 'Running symptom model…' : 'Run symptom model'}
                                     </button>
                                 )}
                                 {aiPredictions.length > 0 && (
-                                    <div style={{ marginTop: 16, background: 'rgba(142, 182, 155, 0.05)', border: '1px solid rgba(142, 182, 155, 0.15)', borderRadius: 12, padding: 16 }}>
-                                        <div style={{ fontSize: 11, fontWeight: 700, color: '#FF2CF5', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 12 }}>🧠 AI Disease Prediction</div>
+                                    <div style={{ marginTop: 16, background: 'var(--accent-glow-sm)', border: '1px solid var(--surface-border-md)', borderRadius: 12, padding: 16 }}>
+                                        <div style={{ fontSize: 11, fontWeight: 700, color: 'var(--accent-primary)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 12 }}>🧠 Symptom model — most likely conditions</div>
                                         {aiPredictions.map(pred => (
                                             <div key={pred.name} style={{ marginBottom: 10 }}>
                                                 <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 4 }}>
                                                     <span style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-primary)' }}>{pred.name}</span>
-                                                    <span style={{ fontSize: 13, fontWeight: 900, color: pred.prob > 50 ? '#FF2CF5' : pred.prob > 25 ? 'var(--risk-medium)' : 'var(--risk-low)' }}>{pred.prob}%</span>
+                                                    <span className="font-mono" style={{ fontSize: 13, fontWeight: 800, color: 'var(--accent-primary)' }}>{pred.prob}%</span>
                                                 </div>
                                                 <div style={{ height: 5, background: 'var(--surface-2)', borderRadius: 4 }}>
-                                                    <div style={{ height: '100%', borderRadius: 4, width: `${pred.prob}%`, background: pred.prob > 50 ? '#FF2CF5' : pred.prob > 25 ? 'var(--risk-medium)' : 'var(--risk-low)' }} />
+                                                    <div style={{ height: '100%', borderRadius: 4, width: `${pred.prob}%`, background: 'var(--accent-primary)' }} />
                                                 </div>
                                             </div>
                                         ))}
-                                        <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 8 }}>⚠️ AI suggestion only — Doctor makes the final diagnosis</div>
+                                        <div style={{ fontSize: 11.5, color: 'var(--text-secondary)', marginTop: 10, lineHeight: 1.55 }}>
+                                            Random Forest trained on a public dataset in which every disease has a clean, fixed symptom pattern. Treat this as a prompt for the differential — the diagnosis is yours.
+                                        </div>
                                     </div>
                                 )}
                             </div>
@@ -374,22 +382,23 @@ export default function ConsultationPage() {
                                         <input value={item.duration} disabled={isCompleted} onChange={e => { const n = [...rxItems]; n[idx].duration = e.target.value; setRxItems(n); }} placeholder="5 days" className="form-input" />
                                     </div>
                                     {!isCompleted && (
-                                        <button onClick={() => setRxItems(rxItems.filter((_, i) => i !== idx))} style={{ marginTop: 24, padding: 8, background: 'rgba(200, 67, 75, 0.1)', border: '1px solid rgba(200, 67, 75, 0.2)', borderRadius: 8, color: 'var(--risk-critical-text)', cursor: 'pointer' }}>
+                                        <button onClick={() => setRxItems(rxItems.filter((_, i) => i !== idx))} aria-label="Remove medicine" style={{ marginTop: 24, padding: 8, background: 'rgba(200, 67, 75, 0.1)', border: '1px solid rgba(200, 67, 75, 0.2)', borderRadius: 8, color: 'var(--risk-critical-text)', cursor: 'pointer' }}>
                                             <Trash2 size={13} />
                                         </button>
                                     )}
                                 </div>
                             ))}
                             <textarea value={rxNotes} disabled={isCompleted} onChange={e => setRxNotes(e.target.value)} rows={2} placeholder="Additional notes for pharmacist..." className="form-input" style={{ marginTop: 8, marginBottom: 16, resize: 'vertical' }} />
-                            {!isCompleted && (
-                                <button onClick={savePrescription} disabled={savingRx} style={{ padding: '11px 24px', background: 'linear-gradient(135deg, var(--accent-primary), var(--accent-magenta))', border: 'none', borderRadius: 10, color: 'var(--bg-primary)', fontWeight: 800, fontSize: 13, cursor: 'pointer' }}>
-                                    <Pill size={14} style={{ display: 'inline', marginRight: 6 }} />
-                                    {savingRx ? 'Saving...' : 'Save Prescription'}
+                            <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
+                                {!isCompleted && (
+                                    <button onClick={savePrescription} disabled={savingRx} style={{ padding: '11px 24px', background: 'var(--accent-primary)', border: 'none', borderRadius: 10, color: '#fff', fontWeight: 800, fontSize: 13, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6 }}>
+                                        <Pill size={14} /> {savingRx ? 'Saving...' : 'Save Prescription'}
+                                    </button>
+                                )}
+                                <button onClick={downloadPrescriptionPDF} style={{ padding: '11px 18px', background: 'rgba(35, 83, 71, 0.08)', border: '1px solid rgba(35, 83, 71, 0.25)', borderRadius: 10, color: 'var(--accent-primary)', fontWeight: 700, fontSize: 13, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 8 }}>
+                                    <Download size={14} /> Download PDF
                                 </button>
-                            )}
-                            <button onClick={downloadPrescriptionPDF} style={{ padding: '11px 18px', background: 'rgba(35, 83, 71, 0.08)', border: '1px solid rgba(35, 83, 71, 0.25)', borderRadius: 10, color: 'var(--accent-primary)', fontWeight: 700, fontSize: 13, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 8 }}>
-                                <Download size={14} /> Download PDF
-                            </button>
+                            </div>
                         </div>
                     )}
 
@@ -398,7 +407,7 @@ export default function ConsultationPage() {
                         <div>
                             <div style={{ background: 'var(--surface-1)', border: '1px solid var(--surface-border)', borderRadius: 16, padding: 24, marginBottom: 16 }}>
                                 <div style={{ fontWeight: 700, fontSize: 14, color: 'var(--text-primary)', marginBottom: 16 }}>Order Lab Tests</div>
-                                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 10, marginBottom: 20 }}>
+                                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 10, marginBottom: 20 }}>
                                     {LAB_TEST_OPTIONS.map(t => (
                                         <label key={t.value} style={{
                                             display: 'flex', alignItems: 'center', gap: 12, padding: '12px 16px',
@@ -417,8 +426,8 @@ export default function ConsultationPage() {
                                     ))}
                                 </div>
                                 {!isCompleted && (
-                                    <button onClick={orderLabTests} disabled={orderingLab || labTests.length === 0} style={{ padding: '11px 24px', background: 'linear-gradient(135deg, var(--risk-high), #CC4400)', border: 'none', borderRadius: 10, color: '#fff', fontWeight: 800, fontSize: 13, cursor: 'pointer', opacity: labTests.length === 0 ? 0.5 : 1 }}>
-                                        <FlaskConical size={14} style={{ display: 'inline', marginRight: 6 }} />
+                                    <button onClick={orderLabTests} disabled={orderingLab || labTests.length === 0} style={{ padding: '11px 24px', background: 'var(--risk-high-text)', border: 'none', borderRadius: 10, color: '#fff', fontWeight: 800, fontSize: 13, cursor: 'pointer', opacity: labTests.length === 0 ? 0.5 : 1, display: 'flex', alignItems: 'center', gap: 6 }}>
+                                        <FlaskConical size={14} />
                                         {orderingLab ? 'Ordering...' : `Order ${labTests.length > 0 ? labTests.length : ''} Test(s)`}
                                     </button>
                                 )}
@@ -428,15 +437,14 @@ export default function ConsultationPage() {
                                 <div style={{ background: 'var(--surface-1)', border: '1px solid var(--surface-border)', borderRadius: 16, padding: 24 }}>
                                     <div style={{ fontWeight: 700, fontSize: 14, color: 'var(--text-primary)', marginBottom: 14 }}>Ordered Tests ({consultation.labTestRequests.length})</div>
                                     {consultation.labTestRequests.map((t: any) => {
-                                        const statusColors: Record<string, string> = { PENDING: 'var(--risk-medium)', ACCEPTED: 'var(--accent-primary)', SAMPLE_COLLECTED: 'var(--risk-high)', COMPLETED: 'var(--risk-low)' };
-                                        const sc = statusColors[t.status] || 'var(--text-muted)';
+                                        const sc = STATUS_COLORS[t.status] || '#4F6B62';
                                         return (
                                             <div key={t.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '10px 0', borderBottom: '1px solid var(--surface-border)' }}>
                                                 <div>
-                                                    <span style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-primary)' }}>{t.testType.replace('_', ' ')}</span>
+                                                    <span style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-primary)' }}>{t.testType.replace(/_/g, ' ')}</span>
                                                     <span style={{ fontSize: 11, color: 'var(--text-muted)', marginLeft: 8 }}>{t.testId}</span>
                                                 </div>
-                                                <span style={{ fontSize: 11, fontWeight: 700, color: sc, background: `${sc}15`, padding: '3px 10px', borderRadius: 20 }}>{t.status}</span>
+                                                <span style={{ fontSize: 11, fontWeight: 700, color: sc, background: `${sc}1A`, padding: '3px 10px', borderRadius: 20 }}>{t.status.replace(/_/g, ' ')}</span>
                                             </div>
                                         );
                                     })}
@@ -460,7 +468,7 @@ export default function ConsultationPage() {
                                                 </div>
                                                 <div style={{ textAlign: 'right' }}>
                                                     <div style={{ fontSize: 11, color: 'var(--text-muted)', marginBottom: 4 }}>STATUS</div>
-                                                    <div style={{ fontSize: 13, fontWeight: 700, color: inv.isPaid ? 'var(--risk-low)' : 'var(--risk-medium)' }}>{inv.isPaid ? `✓ PAID (${inv.paymentMethod})` : '⏳ UNPAID'}</div>
+                                                    <div style={{ fontSize: 13, fontWeight: 700, color: inv.isPaid ? 'var(--risk-low-text)' : 'var(--risk-medium-text)' }}>{inv.isPaid ? `✓ PAID (${inv.paymentMethod})` : '⏳ UNPAID'}</div>
                                                 </div>
                                             </div>
                                             <div style={{ borderTop: '1px solid var(--surface-border)', paddingTop: 16, marginBottom: 16 }}>
@@ -499,14 +507,14 @@ export default function ConsultationPage() {
                         <div style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 14 }}>Patient Profile</div>
                         {[
                             { label: 'Blood Group', val: p?.bloodGroup?.replace('_', ' ') },
-                            { label: 'Risk Level', val: p?.currentRiskLevel, color: 'var(--risk-critical-text)' },
+                            { label: 'Risk Level', val: p?.currentRiskLevel, color: RISK_TEXT[p?.currentRiskLevel] },
                             { label: 'Diabetes', val: p?.hasDiabetes ? 'Yes' : 'No' },
                             { label: 'Hypertension', val: p?.hasHypertension ? 'Yes' : 'No' },
                             { label: 'Heart Disease', val: p?.hasHeartDisease ? 'Yes' : 'No' },
                         ].map(f => (
                             <div key={f.label} style={{ display: 'flex', justifyContent: 'space-between', padding: '6px 0', borderBottom: '1px solid var(--surface-border)' }}>
                                 <span style={{ fontSize: 12, color: 'var(--text-muted)' }}>{f.label}</span>
-                                <span style={{ fontSize: 12, fontWeight: 700, color: (f as any).color || 'var(--text-primary)' }}>{f.val || '—'}</span>
+                                <span style={{ fontSize: 12, fontWeight: 700, color: f.color || 'var(--text-primary)' }}>{f.val || '—'}</span>
                             </div>
                         ))}
                     </div>
@@ -526,4 +534,3 @@ export default function ConsultationPage() {
         </div>
     );
 }
-

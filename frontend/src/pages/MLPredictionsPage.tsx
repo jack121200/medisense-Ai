@@ -1,34 +1,49 @@
 import React, { useState, useRef } from 'react';
-import { Brain, Heart, Droplets, Upload, FileText, AlertTriangle, CheckCircle, Info, Activity } from 'lucide-react';
+import { Brain, Heart, Droplets, Upload, FileText } from 'lucide-react';
 import { mlApi } from '../api/ml.api';
 import { useAuthStore } from '../store/authStore';
 import toast from 'react-hot-toast';
 import apiClient from '../api/axiosInstance';
 import LipidProfileTab from '../components/ml/LipidProfileTab';
+import SymptomChecker from '../components/SymptomChecker';
+import BayesianUncertaintyCard from '../components/BayesianUncertaintyCard';
+import FuzzyDosingCard from '../components/FuzzyDosingCard';
+import LiveWaveformMonitor from '../components/LiveWaveformMonitor';
 
 // ── Colour tokens ──────────────────────────────────────────────────────────────
+// Literal hex, mirrored from index.css. Tints here are built by appending an
+// alpha suffix (`${C.accent}18`), which a var() reference cannot take — with
+// variables every one of those backgrounds and borders was silently dropped.
 const C = {
-    crimson:  'var(--accent-primary)',
-    rose:     'var(--accent-primary-hover)',
-    gold:     'var(--risk-medium)',
-    teal:     'var(--risk-low)',
-    lavender: 'var(--vitals-bp)',
-    bg:       'var(--surface-1)',
-    border:   'var(--surface-border)',
+    accent: '#235347',      // --accent-primary
+    accentHover: '#2E6B5B', // --accent-primary-hover
+    accentDim: '#163832',   // --accent-primary-dim
+    lavender: '#7A68AE',    // --vitals-bp
+    bg: 'var(--surface-1)',
+    border: 'var(--surface-border)',
 };
+// Text-safe semantic shades (--risk-*-text). Risk is shown in these, never in
+// the brand accent: a HIGH heart-risk result used to render in brand green.
+const RISK = { critical: '#B0363F', high: '#924E21', medium: '#7A5C14', low: '#2B6A4F', info: '#256876' };
+
+const primaryButton = (color: string, busy: boolean): React.CSSProperties => ({
+    padding: '12px 32px', borderRadius: 12, border: 'none',
+    background: busy ? 'var(--surface-3)' : color,
+    color: busy ? 'var(--text-muted)' : '#fff', fontWeight: 800, fontSize: 14, cursor: busy ? 'not-allowed' : 'pointer',
+});
 
 // ── Sub-components ─────────────────────────────────────────────────────────────
 
 function RiskBadge({ level, probability }: { level: string; probability: number }) {
-    const cfg: Record<string, { color: string; bg: string; icon: string }> = {
-        HIGH:   { color: C.crimson, bg: `${C.crimson}15`, icon: '🔴' },
-        MEDIUM: { color: C.gold,    bg: `${C.gold}15`,    icon: '🟡' },
-        LOW:    { color: C.teal,    bg: `${C.teal}15`,    icon: '🟢' },
+    const cfg: Record<string, { color: string; icon: string }> = {
+        HIGH:   { color: RISK.critical, icon: '🔴' },
+        MEDIUM: { color: RISK.medium,   icon: '🟡' },
+        LOW:    { color: RISK.low,      icon: '🟢' },
     };
     const s = cfg[level] || cfg.LOW;
     const safeProb = typeof probability === 'number' ? probability : 0;
     return (
-        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8, padding: 32, background: s.bg, border: `2px solid ${s.color}30`, borderRadius: 20 }}>
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8, padding: 32, background: `${s.color}14`, border: `2px solid ${s.color}40`, borderRadius: 20 }}>
             <div style={{ fontSize: 52 }}>{s.icon}</div>
             <div style={{ fontSize: 28, fontWeight: 900, color: s.color }}>{level} RISK</div>
             <div style={{ fontSize: 36, fontWeight: 900, color: s.color, fontFamily: 'var(--font-mono)' }}>{safeProb.toFixed(1)}%</div>
@@ -45,8 +60,8 @@ function InputField({ label, value, onChange, type = 'number', placeholder = '' 
             <label style={{ fontSize: 12, fontWeight: 700, color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.07em' }}>{label}</label>
             <input type={type} value={value} onChange={e => onChange(e.target.value)} placeholder={placeholder}
                 style={{ padding: '10px 14px', background: 'var(--surface-1)', border: '1px solid var(--surface-border-md)', borderRadius: 10, color: 'var(--text-primary)', fontSize: 14, outline: 'none', fontFamily: 'inherit' }}
-                onFocus={e => (e.currentTarget.style.border = `1px solid ${C.crimson}50`)}
-                onBlur={e => (e.currentTarget.style.border = '1px solid var(--surface-border)')}
+                onFocus={e => (e.currentTarget.style.border = `1px solid ${C.accent}80`)}
+                onBlur={e => (e.currentTarget.style.border = '1px solid var(--surface-border-md)')}
             />
         </div>
     );
@@ -67,8 +82,45 @@ function SelectField({ label, value, onChange, options }: {
     );
 }
 
+function ModeToggle<T extends string>({ modes, value, onChange, color }: {
+    modes: Array<[T, React.ReactNode]>; value: T; onChange: (m: T) => void; color: string;
+}) {
+    return (
+        <div style={{ display: 'flex', gap: 6, marginBottom: 20, background: 'var(--surface-1)', border: '1px solid var(--surface-border)', borderRadius: 10, padding: 4, width: 'fit-content' }}>
+            {modes.map(([m, label]) => (
+                <button key={m} onClick={() => onChange(m)} style={{
+                    padding: '7px 18px', borderRadius: 8, border: 'none', cursor: 'pointer',
+                    background: value === m ? `${color}18` : 'transparent',
+                    color: value === m ? color : 'var(--text-muted)',
+                    fontWeight: 700, fontSize: 12.5, display: 'flex', alignItems: 'center', gap: 6,
+                }}>
+                    {label}
+                </button>
+            ))}
+        </div>
+    );
+}
+
+function UploadBox({ icon, title, hint, accept, busy, busyLabel, color, onFile }: {
+    icon: string; title: string; hint: React.ReactNode; accept: string; busy: boolean; busyLabel: string; color: string; onFile: (f: File) => void;
+}) {
+    const ref = useRef<HTMLInputElement>(null);
+    return (
+        <div style={{ border: `2px dashed ${color}4D`, borderRadius: 14, padding: 40, textAlign: 'center' }}>
+            <input ref={ref} type="file" accept={accept} style={{ display: 'none' }}
+                onChange={e => e.target.files?.[0] && onFile(e.target.files[0])} />
+            <div style={{ fontSize: 36, marginBottom: 12 }}>{icon}</div>
+            <div style={{ fontSize: 14, color: 'var(--text-primary)', fontWeight: 700, marginBottom: 6 }}>{title}</div>
+            <div style={{ fontSize: 12, color: 'var(--text-muted)', marginBottom: 20, lineHeight: 1.65 }}>{hint}</div>
+            <button onClick={() => ref.current?.click()} disabled={busy} style={{ ...primaryButton(color, busy), padding: '11px 28px' }}>
+                {busy ? busyLabel : '📂 Choose file'}
+            </button>
+        </div>
+    );
+}
+
 // ══════════════════════════════════════════════════════════════════════════════
-// TAB 1 — Heart Disease Risk
+// Heart Disease Risk
 // ══════════════════════════════════════════════════════════════════════════════
 
 function HeartRiskTab() {
@@ -79,10 +131,8 @@ function HeartRiskTab() {
     });
     const [result, setResult] = useState<any>(null);
     const [loading, setLoading] = useState(false);
-
     const [inputMode, setInputMode] = useState<'manual' | 'pdf'>('manual');
     const [pdfLoading, setPdfLoading] = useState(false);
-    const fileRef = useRef<HTMLInputElement>(null);
 
     const set = (k: string) => (v: string) => setForm(f => ({ ...f, [k]: v }));
 
@@ -103,10 +153,11 @@ function HeartRiskTab() {
             setPdfLoading(false);
         }
     };
+
     const submit = async () => {
-        const required = Object.entries(form).filter(([, v]) => !v);
-        if (required.length > 0) {
-            toast.error(`Please fill all ${required.length} remaining fields`);
+        const missing = Object.entries(form).filter(([, v]) => !v);
+        if (missing.length > 0) {
+            toast.error(`Please fill all ${missing.length} remaining fields`);
             return;
         }
         setLoading(true);
@@ -130,44 +181,19 @@ function HeartRiskTab() {
     };
 
     return (
-        <div style={{ display: 'grid', gridTemplateColumns: result ? '1fr 360px' : '1fr', gap: 24 }}>
+        <div style={{ display: 'grid', gridTemplateColumns: result ? 'minmax(0, 1fr) 360px' : '1fr', gap: 24 }}>
             <div style={{ background: C.bg, border: `1px solid ${C.border}`, borderRadius: 18, padding: 28 }}>
-                {/* Input mode toggle — Manual or Upload PDF/DOCX */}
-                <div style={{ display: 'flex', gap: 6, marginBottom: 22, background: 'var(--surface-1)', border: '1px solid var(--surface-border)', borderRadius: 10, padding: 4, width: 'fit-content' }}>
-                    {(['manual', 'pdf'] as const).map(m => (
-                        <button key={m} onClick={() => setInputMode(m)} style={{
-                            padding: '7px 18px', borderRadius: 8, border: 'none', cursor: 'pointer',
-                            background: inputMode === m ? `${C.crimson}18` : 'transparent',
-                            color: inputMode === m ? C.crimson : 'var(--text-muted)',
-                            fontWeight: 700, fontSize: 12.5, display: 'flex', alignItems: 'center', gap: 6,
-                        }}>
-                            {m === 'manual' ? <><FileText size={13} /> Manual Entry</> : <><Upload size={13} /> Upload PDF / DOCX</>}
-                        </button>
-                    ))}
-                </div>
+                <ModeToggle color={C.accent} value={inputMode} onChange={setInputMode}
+                    modes={[['manual', <><FileText size={13} /> Manual entry</>], ['pdf', <><Upload size={13} /> Upload PDF / DOCX</>]]} />
 
                 {inputMode === 'pdf' ? (
-                    <div style={{ border: '2px dashed rgba(35, 83, 71, 0.3)', borderRadius: 14, padding: 40, textAlign: 'center' }}>
-                        <input ref={fileRef} type="file" accept=".pdf,.docx" style={{ display: 'none' }}
-                            onChange={e => e.target.files?.[0] && handlePdfUpload(e.target.files[0])} />
-                        <div style={{ fontSize: 36, marginBottom: 12 }}>📄</div>
-                        <div style={{ fontSize: 14, color: 'var(--text-primary)', fontWeight: 700, marginBottom: 6 }}>Upload Cardiac Lab Report</div>
-                        <div style={{ fontSize: 12, color: 'var(--text-muted)', marginBottom: 8, lineHeight: 1.65 }}>
-                            Supports <strong style={{color:'var(--text-secondary)'}}>PDF</strong> and <strong style={{color:'var(--text-secondary)'}}>DOCX</strong> formats.<br/>
-                            AI extracts values automatically — unfound fields are left blank.
-                        </div>
-                        <div style={{ fontSize: 11, color: 'var(--text-muted)', marginBottom: 20 }}>You can review &amp; correct all values before predicting.</div>
-                        <button onClick={() => fileRef.current?.click()} disabled={pdfLoading} style={{
-                            padding: '11px 28px', borderRadius: 10, border: 'none', cursor: 'pointer',
-                            background: `linear-gradient(135deg, ${C.crimson}, var(--accent-primary-dim))`, color: '#fff', fontWeight: 700, fontSize: 14,
-                        }}>
-                            {pdfLoading ? '🔄 Extracting...' : '📂 Choose File (PDF / DOCX)'}
-                        </button>
-                    </div>
+                    <UploadBox icon="📄" title="Upload a cardiology report" accept=".pdf,.docx" color={C.accent}
+                        busy={pdfLoading} busyLabel="🔄 Extracting…" onFile={handlePdfUpload}
+                        hint={<>PDF or DOCX. Values found are filled in automatically; anything not found is left blank for you to enter.</>} />
                 ) : (
                     <>
                         <div style={{ fontWeight: 800, fontSize: 17, marginBottom: 24, color: 'var(--text-primary)', display: 'flex', alignItems: 'center', gap: 8 }}>
-                            <Heart size={18} color={C.crimson} /> 14-Feature Cardiac Risk Assessment
+                            <Heart size={18} color={RISK.critical} /> 13-Feature Heart Disease Risk Assessment
                         </div>
                         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: 16, marginBottom: 24 }}>
                             <InputField label="Age" value={form.age} onChange={set('age')} placeholder="e.g. 54" />
@@ -184,13 +210,8 @@ function HeartRiskTab() {
                             <SelectField label="Vessels (Fluoroscopy)" value={form.vessels_colored_by_flourosopy} onChange={set('vessels_colored_by_flourosopy')} options={['Zero', 'One', 'Two', 'Three']} />
                             <SelectField label="Thalassemia" value={form.thalassemia} onChange={set('thalassemia')} options={['Normal', 'Fixed Defect', 'Reversable Defect']} />
                         </div>
-                        <button onClick={submit} disabled={loading} style={{
-                            padding: '13px 36px', borderRadius: 12, border: 'none',
-                            background: loading ? 'var(--surface-2)' : `linear-gradient(135deg, ${C.crimson}, var(--accent-primary-dim))`,
-                            color: 'var(--text-primary)', fontWeight: 800, fontSize: 14.5, cursor: loading ? 'not-allowed' : 'pointer',
-                            boxShadow: `0 6px 30px ${C.crimson}30`,
-                        }}>
-                            {loading ? '🔄 Analyzing...' : '❤️ Predict Heart Disease Risk'}
+                        <button onClick={submit} disabled={loading} style={{ ...primaryButton(C.accent, loading), padding: '13px 36px', fontSize: 14.5 }}>
+                            {loading ? '🔄 Analyzing…' : '❤️ Predict heart disease risk'}
                         </button>
                     </>
                 )}
@@ -205,11 +226,11 @@ function HeartRiskTab() {
                     </div>
                     {result.recommendations?.length > 0 && (
                         <div style={{ background: C.bg, border: `1px solid ${C.border}`, borderRadius: 16, padding: 20 }}>
-                            <div style={{ fontSize: 12, fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 12 }}>Cardiac Recommendations</div>
+                            <div style={{ fontSize: 12, fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 12 }}>Recommendations</div>
                             <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
                                 {result.recommendations.map((r: string, i: number) => (
                                     <div key={i} style={{ display: 'flex', gap: 8, alignItems: 'flex-start', fontSize: 13, color: 'var(--text-secondary)', lineHeight: 1.5 }}>
-                                        <span style={{ color: C.gold, flexShrink: 0, marginTop: 1 }}>•</span>{r}
+                                        <span style={{ color: RISK.medium, flexShrink: 0, marginTop: 1 }}>•</span>{r}
                                     </div>
                                 ))}
                             </div>
@@ -222,7 +243,7 @@ function HeartRiskTab() {
 }
 
 // ══════════════════════════════════════════════════════════════════════════════
-// TAB 2 — CBC Analyzer
+// CBC Analyzer
 // ══════════════════════════════════════════════════════════════════════════════
 
 const CBC_FIELDS = [
@@ -243,13 +264,17 @@ const CBC_FIELDS = [
     { key: 'MPV',   label: 'MPV',   unit: 'fL',      placeholder: '7.5–12.5' },
 ];
 
+const CBC_STATUS: Record<string, string> = { HIGH: RISK.critical, LOW: RISK.info, NORMAL: RISK.low };
+// Coloured from the status itself rather than a colour sent by the API, so the
+// panel stays in the palette whatever the service returns.
+const overallTone = (status: string) => status === 'NORMAL' ? RISK.low : status === 'MILD CONCERN' ? RISK.medium : RISK.critical;
+
 function CBCTab() {
     const [form, setForm] = useState<Record<string, string>>({});
     const [result, setResult] = useState<any>(null);
     const [loading, setLoading] = useState(false);
     const [inputMode, setInputMode] = useState<'manual' | 'pdf'>('manual');
     const [pdfLoading, setPdfLoading] = useState(false);
-    const cbcFileRef = React.useRef<HTMLInputElement>(null);
 
     const set = (k: string) => (v: string) => setForm(f => ({ ...f, [k]: v }));
 
@@ -295,46 +320,22 @@ function CBCTab() {
         }
     };
 
-    const statusColor: Record<string, string> = { HIGH: C.crimson, LOW: '#256876', NORMAL: C.teal };
-    const statusBg: Record<string, string>    = { HIGH: `${C.crimson}15`, LOW: 'rgba(46, 122, 138, 0.10)', NORMAL: `${C.teal}10` };
+    const tone = result ? overallTone(result.overall_status) : RISK.low;
 
     return (
         <div>
             <div style={{ background: C.bg, border: `1px solid ${C.border}`, borderRadius: 18, padding: 28, marginBottom: 24 }}>
                 <div style={{ fontWeight: 800, fontSize: 17, marginBottom: 14, color: 'var(--text-primary)', display: 'flex', alignItems: 'center', gap: 8 }}>
-                    <Droplets size={18} color={C.rose} /> CBC Blood Parameters
+                    <Droplets size={18} color={C.accentHover} /> CBC Blood Parameters
                 </div>
 
-                {/* PDF/DOCX toggle */}
-                <div style={{ display: 'flex', gap: 6, marginBottom: 20, background: 'var(--surface-1)', border: '1px solid var(--surface-border)', borderRadius: 10, padding: 4, width: 'fit-content' }}>
-                    {(['manual', 'pdf'] as const).map(m => (
-                        <button key={m} onClick={() => setInputMode(m)} style={{
-                            padding: '7px 18px', borderRadius: 8, border: 'none', cursor: 'pointer',
-                            background: inputMode === m ? `${C.rose}18` : 'transparent',
-                            color: inputMode === m ? C.rose : 'var(--text-muted)',
-                            fontWeight: 700, fontSize: 12.5, display: 'flex', alignItems: 'center', gap: 6,
-                        }}>
-                            {m === 'manual' ? <><FileText size={13} /> Enter Values</> : <><Upload size={13} /> Upload PDF / DOCX</>}
-                        </button>
-                    ))}
-                </div>
+                <ModeToggle color={C.accentHover} value={inputMode} onChange={setInputMode}
+                    modes={[['manual', <><FileText size={13} /> Enter values</>], ['pdf', <><Upload size={13} /> Upload PDF</>]]} />
 
                 {inputMode === 'pdf' ? (
-                    <div style={{ border: '2px dashed rgba(46, 107, 91, 0.3)', borderRadius: 14, padding: 40, textAlign: 'center' }}>
-                        <input ref={cbcFileRef} type="file" accept=".pdf" style={{ display: 'none' }}
-                            onChange={e => e.target.files?.[0] && handleCbcPdf(e.target.files[0])} />
-                        <div style={{ fontSize: 36, marginBottom: 12 }}>🧪</div>
-                        <div style={{ fontSize: 14, color: 'var(--text-primary)', fontWeight: 700, marginBottom: 6 }}>Upload CBC Lab Report (PDF)</div>
-                        <div style={{ fontSize: 12, color: 'var(--text-muted)', marginBottom: 20, lineHeight: 1.65 }}>
-                            AI will automatically extract all 20 CBC parameters.<br />You can review values before running the analysis.
-                        </div>
-                        <button onClick={() => cbcFileRef.current?.click()} disabled={pdfLoading} style={{
-                            padding: '11px 28px', borderRadius: 10, border: 'none', cursor: 'pointer',
-                            background: `linear-gradient(135deg, ${C.rose}, var(--accent-primary-dim))`, color: '#fff', fontWeight: 700, fontSize: 14,
-                        }}>
-                            {pdfLoading ? '🔄 Extracting...' : '📂 Choose PDF File'}
-                        </button>
-                    </div>
+                    <UploadBox icon="🧪" title="Upload a CBC lab report (PDF)" accept=".pdf" color={C.accentHover}
+                        busy={pdfLoading} busyLabel="🔄 Extracting…" onFile={handleCbcPdf}
+                        hint={<>The CBC parameters found in the report are filled in for you to review before analysis.</>} />
                 ) : (
                     <>
                         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(160px, 1fr))', gap: 14, marginBottom: 22 }}>
@@ -347,29 +348,25 @@ function CBCTab() {
                                     <input type="number" step="any" value={form[f.key] || ''} onChange={e => set(f.key)(e.target.value)}
                                         placeholder={f.placeholder}
                                         style={{ padding: '9px 12px', background: 'var(--surface-1)', border: '1px solid var(--surface-border-md)', borderRadius: 9, color: 'var(--text-primary)', fontSize: 13.5, outline: 'none', fontFamily: 'inherit' }}
-                                        onFocus={e => (e.currentTarget.style.border = `1px solid ${C.rose}50`)}
-                                        onBlur={e => (e.currentTarget.style.border = '1px solid var(--surface-border)')} />
+                                        onFocus={e => (e.currentTarget.style.border = `1px solid ${C.accentHover}80`)}
+                                        onBlur={e => (e.currentTarget.style.border = '1px solid var(--surface-border-md)')} />
                                 </div>
                             ))}
                         </div>
-                        <button onClick={submit} disabled={loading} style={{
-                            padding: '12px 32px', borderRadius: 12, border: 'none',
-                            background: loading ? 'var(--surface-2)' : `linear-gradient(135deg, ${C.rose}, var(--accent-primary-dim))`,
-                            color: 'var(--text-primary)', fontWeight: 800, fontSize: 14, cursor: loading ? 'not-allowed' : 'pointer',
-                        }}>
-                            {loading ? '🔄 Analyzing...' : '🩸 Analyze CBC Report'}
+                        <button onClick={submit} disabled={loading} style={primaryButton(C.accentHover, loading)}>
+                            {loading ? '🔄 Analyzing…' : '🩸 Analyze CBC report'}
                         </button>
                     </>
                 )}
             </div>
 
             {result && (
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 340px', gap: 20 }}>
+                <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) 340px', gap: 20 }}>
                     {/* Findings table */}
                     <div style={{ background: C.bg, border: `1px solid ${C.border}`, borderRadius: 18, overflow: 'hidden' }}>
                         <div style={{ padding: '18px 22px', borderBottom: `1px solid ${C.border}`, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                             <div style={{ fontWeight: 800, fontSize: 15, color: 'var(--text-primary)' }}>CBC Results</div>
-                            <div style={{ padding: '5px 14px', borderRadius: 9999, background: statusBg[result.overall_status === 'NORMAL' ? 'NORMAL' : result.overall_status === 'MILD CONCERN' ? 'LOW' : 'HIGH'], color: statusColor[result.overall_status === 'NORMAL' ? 'NORMAL' : result.overall_status === 'MILD CONCERN' ? 'LOW' : 'HIGH'], fontSize: 12, fontWeight: 700 }}>
+                            <div style={{ padding: '5px 14px', borderRadius: 9999, background: `${tone}1A`, color: tone, fontSize: 12, fontWeight: 700 }}>
                                 {result.overall_status}
                             </div>
                         </div>
@@ -383,21 +380,21 @@ function CBCTab() {
                                     </tr>
                                 </thead>
                                 <tbody>
-                                     {Object.entries(result?.findings || {}).map(([key, f]: [string, any]) => (
-                                        <tr key={key} style={{ borderBottom: `1px solid var(--surface-border)` }}
-                                            onMouseOver={e => (e.currentTarget as HTMLTableRowElement).style.background = 'var(--surface-1)'}
-                                            onMouseOut={e => (e.currentTarget as HTMLTableRowElement).style.background = ''}
-                                        >
-                                            <td style={{ padding: '10px 16px', fontWeight: 700, color: 'var(--text-primary)' }}>{f.name}</td>
-                                            <td style={{ padding: '10px 16px', fontFamily: 'var(--font-mono)', color: statusColor[f.status] || 'var(--text-primary)', fontWeight: 700 }}>{f.value}</td>
-                                            <td style={{ padding: '10px 16px', color: 'var(--text-muted)', fontSize: 12 }}>{f.unit}</td>
-                                            <td style={{ padding: '10px 16px', color: 'var(--text-muted)', fontSize: 12 }}>{f.reference}</td>
-                                            <td style={{ padding: '10px 16px' }}>
-                                                <span style={{ padding: '3px 10px', borderRadius: 9999, background: statusBg[f.status] || 'transparent', color: statusColor[f.status] || 'var(--surface-0)', fontSize: 11, fontWeight: 700 }}>{f.status}</span>
-                                            </td>
-                                            <td style={{ padding: '10px 16px', fontSize: 16 }}>{f.flag}</td>
-                                        </tr>
-                                    ))}
+                                    {Object.entries(result?.findings || {}).map(([key, f]: [string, any]) => {
+                                        const sc = CBC_STATUS[f.status];
+                                        return (
+                                            <tr key={key} style={{ borderBottom: '1px solid var(--surface-border)' }}>
+                                                <td style={{ padding: '10px 16px', fontWeight: 700, color: 'var(--text-primary)' }}>{f.name}</td>
+                                                <td style={{ padding: '10px 16px', fontFamily: 'var(--font-mono)', color: sc || 'var(--text-primary)', fontWeight: 700 }}>{f.value}</td>
+                                                <td style={{ padding: '10px 16px', color: 'var(--text-muted)', fontSize: 12 }}>{f.unit}</td>
+                                                <td style={{ padding: '10px 16px', color: 'var(--text-muted)', fontSize: 12 }}>{f.reference}</td>
+                                                <td style={{ padding: '10px 16px' }}>
+                                                    <span style={{ padding: '3px 10px', borderRadius: 9999, background: sc ? `${sc}1A` : 'transparent', color: sc || 'var(--text-secondary)', fontSize: 11, fontWeight: 700 }}>{f.status}</span>
+                                                </td>
+                                                <td style={{ padding: '10px 16px', fontSize: 16 }}>{f.flag}</td>
+                                            </tr>
+                                        );
+                                    })}
                                 </tbody>
                             </table>
                         </div>
@@ -405,13 +402,13 @@ function CBCTab() {
 
                     {/* Interpretation panel */}
                     <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-                        <div style={{ background: `${result.overall_color}10`, border: `1px solid ${result.overall_color}30`, borderRadius: 16, padding: 20, textAlign: 'center' }}>
+                        <div style={{ background: `${tone}12`, border: `1px solid ${tone}40`, borderRadius: 16, padding: 20, textAlign: 'center' }}>
                             <div style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 8 }}>Overall Status</div>
-                            <div style={{ fontSize: 22, fontWeight: 900, color: result.overall_color }}>{result.overall_status}</div>
+                            <div style={{ fontSize: 22, fontWeight: 900, color: tone }}>{result.overall_status}</div>
                             <div style={{ fontSize: 13, color: 'var(--text-secondary)', marginTop: 6 }}>{result.abnormal_count} abnormal / {result.parameters_tested} tested</div>
                         </div>
                         <div style={{ background: C.bg, border: `1px solid ${C.border}`, borderRadius: 16, padding: 18 }}>
-                            <div style={{ fontSize: 12, fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 12 }}>AI Interpretation</div>
+                            <div style={{ fontSize: 12, fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 12 }}>Interpretation</div>
                             <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
                                 {result.interpretations?.map((msg: string, i: number) => (
                                     <div key={i} style={{ display: 'flex', gap: 8, fontSize: 12.5, color: 'var(--text-secondary)', lineHeight: 1.6 }}>
@@ -421,14 +418,14 @@ function CBCTab() {
                             </div>
                         </div>
                         {result.cardiac_note && (
-                            <div style={{ background: `${C.crimson}10`, border: `1px solid ${C.crimson}25`, borderRadius: 14, padding: 16 }}>
-                                <div style={{ fontSize: 12, color: C.crimson, fontWeight: 700, lineHeight: 1.6 }}>{result.cardiac_note}</div>
+                            <div style={{ background: `${C.accent}0F`, border: `1px solid ${C.accent}30`, borderRadius: 14, padding: 16 }}>
+                                <div style={{ fontSize: 12, color: C.accent, fontWeight: 700, lineHeight: 1.6 }}>{result.cardiac_note}</div>
                             </div>
                         )}
                         {result.anomaly_detection?.available && (
                             <div style={{ background: C.bg, border: `1px solid ${C.border}`, borderRadius: 14, padding: 16 }}>
                                 <div style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', marginBottom: 8 }}>ML Anomaly Detector</div>
-                                <div style={{ fontSize: 13, color: result.anomaly_detection.is_anomaly ? C.crimson : C.teal, fontWeight: 700 }}>{result.anomaly_detection.flag}</div>
+                                <div style={{ fontSize: 13, color: result.anomaly_detection.is_anomaly ? RISK.critical : RISK.low, fontWeight: 700 }}>{result.anomaly_detection.flag}</div>
                                 <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 4 }}>Score: {result.anomaly_detection.score}</div>
                             </div>
                         )}
@@ -440,137 +437,51 @@ function CBCTab() {
 }
 
 // ══════════════════════════════════════════════════════════════════════════════
-// TAB 3 — AI Symptom Checker
+// Symptom Checker
 // ══════════════════════════════════════════════════════════════════════════════
 
+// The picker (SymptomChecker) replaces free-text entry, which asked people to
+// type the model's snake_case terms. Symptoms read from an uploaded document
+// drop into the picker for review.
 function SymptomTab() {
-    const [symptoms, setSymptoms] = useState('');
-    const [result, setResult] = useState<any>(null);
-    const [loading, setLoading] = useState(false);
-    const [inputMode, setInputMode] = useState<'manual' | 'pdf'>('manual');
+    const [inputMode, setInputMode] = useState<'pick' | 'pdf'>('pick');
     const [docLoading, setDocLoading] = useState(false);
-    const symFileRef = useRef<HTMLInputElement>(null);
+    const [seed, setSeed] = useState<string[]>([]);
 
-    // OCR upload for symptoms
     const handleSymptomFile = async (file: File) => {
         setDocLoading(true);
         try {
             const fd = new FormData();
             fd.append('file', file);
             const res = await apiClient.post('/ml/pdf-extract/symptoms', fd);
-            const csv = res.data.symptoms_csv || '';
-            if (csv) {
-                setSymptoms(prev => prev ? prev + ', ' + csv : csv);
-                toast.success(`Found ${res.data.symptoms_found} symptom(s) in document. Review before predicting.`);
+            const found = String(res.data.symptoms_csv || '')
+                .split(',').map(s => s.trim().toLowerCase().replace(/ /g, '_')).filter(Boolean);
+            if (found.length) {
+                setSeed(found);
+                toast.success(`Found ${found.length} symptom(s) in the document — review them before predicting.`);
+                setInputMode('pick');
             } else {
-                toast(`⚠️ ${res.data.message || 'No known symptoms detected.'}`, { icon: '📍', duration: 4000 });
+                toast(res.data.message || 'No known symptoms found in that document.', { icon: '📍', duration: 4000 });
             }
-            setInputMode('manual');
         } catch {
-            toast.error('File extraction failed — please enter symptoms manually');
+            toast.error('File extraction failed — pick symptoms instead');
         } finally {
             setDocLoading(false);
         }
     };
 
-    const submit = async () => {
-        const list = symptoms.split(',').map(s => s.trim().toLowerCase().replace(/ /g, '_')).filter(Boolean);
-        if (list.length < 1) { toast.error('Enter at least one symptom'); return; }
-        setLoading(true);
-        try {
-            const res = await mlApi.predictDisease(list);
-            // Backend wraps ML response in { success, data: {...} }
-            setResult(res.data?.data ?? res.data);
-        } catch {
-            toast.error('Disease model not ready — run train_disease_model.py first');
-        } finally {
-            setLoading(false);
-        }
-    };
-
     return (
-        <div style={{ display: 'grid', gridTemplateColumns: result ? '1fr 340px' : '1fr', gap: 24 }}>
-            <div style={{ background: C.bg, border: `1px solid ${C.border}`, borderRadius: 18, padding: 28 }}>
-                <div style={{ fontWeight: 800, fontSize: 17, marginBottom: 8, color: 'var(--text-primary)', display: 'flex', alignItems: 'center', gap: 8 }}>
-                    <Brain size={18} color={C.lavender} /> AI Symptom Checker
+        <div style={{ maxWidth: 760 }}>
+            <ModeToggle color={C.lavender} value={inputMode} onChange={setInputMode}
+                modes={[['pick', <><Brain size={13} /> Pick symptoms</>], ['pdf', <><Upload size={13} /> Upload PDF / DOCX</>]]} />
+            {inputMode === 'pdf' ? (
+                <div style={{ background: C.bg, border: `1px solid ${C.border}`, borderRadius: 18, padding: 28 }}>
+                    <UploadBox icon="🧠" title="Upload a patient report or referral letter" accept=".pdf,.docx" color={C.lavender}
+                        busy={docLoading} busyLabel="🔄 Scanning for symptoms…" onFile={handleSymptomFile}
+                        hint={<>PDF or DOCX. Recognised symptoms are added to the picker so you can review them before predicting.</>} />
                 </div>
-
-                {/* Manual / PDF+DOCX toggle */}
-                <div style={{ display: 'flex', gap: 6, marginBottom: 18, background: 'var(--surface-1)', border: '1px solid var(--surface-border)', borderRadius: 10, padding: 4, width: 'fit-content' }}>
-                    {(['manual', 'pdf'] as const).map(m => (
-                        <button key={m} onClick={() => setInputMode(m)} style={{
-                            padding: '7px 18px', borderRadius: 8, border: 'none', cursor: 'pointer',
-                            background: inputMode === m ? `${C.lavender}20` : 'transparent',
-                            color: inputMode === m ? C.lavender : 'var(--text-muted)',
-                            fontWeight: 700, fontSize: 12.5, display: 'flex', alignItems: 'center', gap: 6,
-                        }}>
-                            {m === 'manual' ? <><FileText size={13} /> Type Symptoms</> : <><Upload size={13} /> Upload PDF / DOCX</>}
-                        </button>
-                    ))}
-                </div>
-
-                {inputMode === 'pdf' ? (
-                    <div style={{ border: '2px dashed rgba(122, 104, 174, 0.3)', borderRadius: 14, padding: 40, textAlign: 'center', marginBottom: 0 }}>
-                        <input ref={symFileRef} type="file" accept=".pdf,.docx" style={{ display: 'none' }}
-                            onChange={e => e.target.files?.[0] && handleSymptomFile(e.target.files[0])} />
-                        <div style={{ fontSize: 36, marginBottom: 12 }}>🧠</div>
-                        <div style={{ fontSize: 14, color: 'var(--text-primary)', fontWeight: 700, marginBottom: 6 }}>Upload Patient Report / Referral Letter</div>
-                        <div style={{ fontSize: 12, color: 'var(--text-muted)', marginBottom: 8, lineHeight: 1.65 }}>
-                            Supports <strong style={{color:'var(--text-secondary)'}}>PDF</strong> and <strong style={{color:'var(--text-secondary)'}}>DOCX</strong> formats.<br/>
-                            AI scans for 50+ symptom keywords — only matched symptoms are added.
-                        </div>
-                        <div style={{ fontSize: 11, color: 'var(--text-muted)', marginBottom: 20 }}>Extracted symptoms will appear in the text box. You can edit before predicting.</div>
-                        <button onClick={() => symFileRef.current?.click()} disabled={docLoading} style={{
-                            padding: '11px 28px', borderRadius: 10, border: 'none', cursor: 'pointer',
-                            background: `linear-gradient(135deg, ${C.lavender}, #7B2FF7)`, color: '#fff', fontWeight: 700, fontSize: 14,
-                        }}>
-                            {docLoading ? '🔄 Scanning for Symptoms...' : '📂 Choose File (PDF / DOCX)'}
-                        </button>
-                    </div>
-                ) : (
-                    <>
-                        <p style={{ fontSize: 13.5, color: 'var(--text-secondary)', marginBottom: 16, lineHeight: 1.65 }}>
-                            Enter patient symptoms separated by commas. The AI predicts the most likely condition from 134 symptom patterns.
-                        </p>
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: 6, marginBottom: 22 }}>
-                            <label style={{ fontSize: 12, fontWeight: 700, color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.07em' }}>Symptoms (comma-separated)</label>
-                            <textarea value={symptoms} onChange={e => setSymptoms(e.target.value)}
-                                placeholder="e.g. chest_pain, shortness_of_breath, fatigue, dizziness"
-                                rows={4}
-                                style={{ padding: '12px 16px', background: 'var(--surface-1)', border: '1px solid var(--surface-border-md)', borderRadius: 10, color: 'var(--text-primary)', fontSize: 14, outline: 'none', fontFamily: 'inherit', resize: 'vertical' }}
-                            />
-                        </div>
-                        <button onClick={submit} disabled={loading} style={{
-                            padding: '12px 32px', borderRadius: 12, border: 'none',
-                            background: loading ? 'var(--surface-2)' : `linear-gradient(135deg, ${C.lavender}, #7B2FF7)`,
-                            color: 'var(--text-primary)', fontWeight: 800, fontSize: 14, cursor: loading ? 'not-allowed' : 'pointer',
-                        }}>
-                            {loading ? '🔄 Checking...' : '🧠 Predict Condition'}
-                        </button>
-                    </>
-                )}
-            </div>
-
-            {result && (
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-                    <div style={{ background: `${C.lavender}12`, border: `1px solid ${C.lavender}30`, borderRadius: 18, padding: 24 }}>
-                        <div style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 10 }}>Primary Diagnosis</div>
-                        <div style={{ fontSize: 20, fontWeight: 900, color: 'var(--text-primary)', marginBottom: 6 }}>{result.disease}</div>
-                        <div style={{ fontSize: 28, fontWeight: 900, color: C.lavender, fontFamily: 'var(--font-mono)' }}>{result.confidence}%</div>
-                        <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 4 }}>Confidence</div>
-                    </div>
-                    <div style={{ background: C.bg, border: `1px solid ${C.border}`, borderRadius: 16, padding: 20 }}>
-                        <div style={{ fontSize: 12, fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', marginBottom: 12 }}>Top Alternatives</div>
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-                            {result.alternatives?.slice(1).map((a: any) => (
-                                <div key={a.disease} style={{ display: 'flex', justifyContent: 'space-between', padding: '8px 12px', background: 'var(--surface-1)', borderRadius: 8 }}>
-                                    <span style={{ fontSize: 13, color: 'var(--text-secondary)' }}>{a.disease}</span>
-                                    <span style={{ fontSize: 13, color: C.lavender, fontFamily: 'var(--font-mono)', fontWeight: 700 }}>{a.confidence}%</span>
-                                </div>
-                            ))}
-                        </div>
-                    </div>
-                </div>
+            ) : (
+                <SymptomChecker seedSymptoms={seed} />
             )}
         </div>
     );
@@ -580,33 +491,36 @@ function SymptomTab() {
 // MAIN PAGE
 // ══════════════════════════════════════════════════════════════════════════════
 
-import BayesianUncertaintyCard from '../components/BayesianUncertaintyCard';
-import FuzzyDosingCard from '../components/FuzzyDosingCard';
-import LiveWaveformMonitor from '../components/LiveWaveformMonitor';
-
+// Tab colours are literal hex for the same reason as C above.
 const TABS = [
-    { id: 'bayesian',label: '🔮 Bayesian Engine',      icon: Brain,    color: 'var(--accent-primary)' },
-    { id: 'fuzzy',   label: '🎛️ Fuzzy Dosing Engine', icon: Heart,    color: 'var(--risk-medium-text)' },
-    { id: 'deep',    label: '⚡ Deep Waveform Monitor',icon: Activity, color: 'var(--risk-critical-text)' },
-    { id: 'lipid',   label: '🫀 Lipid Profile',      icon: Heart,    color: 'var(--accent-primary)' },
-    { id: 'cbc',     label: '🩸 CBC Analyzer',        icon: Droplets, color: 'var(--accent-primary-hover)' },
-    { id: 'symptom', label: '🧠 Symptom Checker',     icon: Brain,    color: 'var(--vitals-bp)' },
+    { id: 'heart',   label: '❤️ Heart Risk',          color: '#924E21' },
+    { id: 'bayesian',label: '🔮 Bayesian Engine',     color: '#235347' },
+    { id: 'fuzzy',   label: '🎛️ Fuzzy Dosing Engine', color: '#7A5C14' },
+    { id: 'deep',    label: '⚡ ECG Beat Screen',     color: '#B0363F' },
+    { id: 'lipid',   label: '🫀 Lipid Profile',       color: '#235347' },
+    { id: 'cbc',     label: '🩸 CBC Analyzer',        color: '#2E6B5B' },
+    { id: 'symptom', label: '🧠 Symptom Checker',     color: '#7A68AE' },
+];
+
+// Heart risk, the Bayesian risk network, fuzzy dosing and ECG beat screening
+// read like clinical instruments — model inputs such as fluoroscopy and ST
+// slope, a raw probability network, a drug-dosing calculator, a single-beat
+// morphology flag meant to be correlated against a full rhythm strip. They
+// are for a clinician's judgement, not a patient's, so patients see only the
+// tools meant to be read directly: CBC report, lipid profile and the symptom
+// checker.
+const PATIENT_TABS = [
+    { id: 'cbc',     label: '🩸 CBC Report',      color: '#2E6B5B' },
+    { id: 'lipid',   label: '🫀 Lipid Profile',   color: '#235347' },
+    { id: 'symptom', label: '🧠 Symptom Checker', color: '#7A68AE' },
 ];
 
 export default function MLPredictionsPage() {
-    const [tab, setTab] = useState('bayesian');
     const { user } = useAuthStore();
     const isPatient = user?.role === 'PATIENT';
+    const tabs = isPatient ? PATIENT_TABS : TABS;
+    const [tab, setTab] = useState(isPatient ? 'cbc' : 'heart');
 
-    const patientTabs = [
-        { id: 'bayesian',label: '🔮 Bayesian Uncertainty', color: 'var(--accent-primary)' },
-        { id: 'fuzzy',   label: '🎛️ Fuzzy Drug Dosing',    color: 'var(--risk-medium-text)' },
-        { id: 'deep',    label: '⚡ Waveform Monitor',     color: 'var(--risk-critical-text)' },
-        { id: 'lipid',   label: '🫀 Lipid Profile',        color: 'var(--accent-primary)' },
-        { id: 'cbc',     label: '🩸 CBC Report',            color: 'var(--accent-primary-hover)' },
-        { id: 'symptom', label: '🧠 Symptom Checker',      color: 'var(--vitals-bp)' },
-    ];
-    const doctorTabs = TABS;
     return (
         <div style={{ padding: '28px 32px', minHeight: '100vh', background: 'var(--bg-primary)' }}>
             {/* Header */}
@@ -614,21 +528,27 @@ export default function MLPredictionsPage() {
                 <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 8 }}>
                     <div style={{ width: 40, height: 40, borderRadius: 12, background: 'linear-gradient(135deg, var(--accent-primary), var(--accent-magenta))', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 20 }}>🫀</div>
                     <div>
-                        <h1 style={{ fontSize: 22, fontWeight: 900, color: 'var(--text-primary)', letterSpacing: '-0.02em' }}>AI Clinical Tools</h1>
-                        <p style={{ fontSize: 13, color: 'var(--text-muted)', marginTop: 2 }}>Research-Grade Medical AI Engine — Bayesian DAG, Mamdani FIS Dosing, Deep Autoencoder, Lipid Profiler, CBC Analyzer</p>
+                        <h1 style={{ fontSize: 22, fontWeight: 900, color: 'var(--text-primary)', letterSpacing: '-0.02em' }}>
+                            {isPatient ? 'AI Health Tools' : 'AI Clinical Tools'}
+                        </h1>
+                        <p style={{ fontSize: 13, color: 'var(--text-muted)', marginTop: 2 }}>
+                            {isPatient
+                                ? 'CBC analyzer, lipid profiler and symptom checker'
+                                : 'Heart disease risk, Bayesian risk network, fuzzy-logic dosing, ECG beat screening, lipid profiler, CBC analyzer and symptom checker'}
+                        </p>
                     </div>
                 </div>
             </div>
 
             {/* Role-aware tab bar */}
-            <div style={{ display: 'flex', gap: 6, marginBottom: 28, background: 'var(--surface-1)', border: '1px solid var(--surface-border)', borderRadius: 14, padding: 6, width: 'fit-content' }}>
-                {(isPatient ? patientTabs : doctorTabs).map((t: any) => (
-                    <button key={t.id} onClick={() => setTab(t.id)} style={{
+            <div role="tablist" style={{ display: 'flex', flexWrap: 'wrap', gap: 6, marginBottom: 28, background: 'var(--surface-1)', border: '1px solid var(--surface-border)', borderRadius: 14, padding: 6, width: 'fit-content', maxWidth: '100%' }}>
+                {tabs.map(t => (
+                    <button key={t.id} role="tab" aria-selected={tab === t.id} onClick={() => setTab(t.id)} style={{
                         padding: '10px 22px', borderRadius: 10, border: 'none', cursor: 'pointer',
                         background: tab === t.id ? `${t.color}18` : 'transparent',
                         color: tab === t.id ? t.color : 'var(--text-secondary)',
                         fontWeight: tab === t.id ? 800 : 600, fontSize: 13.5,
-                        boxShadow: tab === t.id ? `0 0 0 1px ${t.color}35` : 'none',
+                        boxShadow: tab === t.id ? `0 0 0 1px ${t.color}40` : 'none',
                         transition: 'all 0.15s',
                     }}>
                         {t.label}
@@ -636,13 +556,16 @@ export default function MLPredictionsPage() {
                 ))}
             </div>
 
-            {/* Content */}
-            {tab === 'bayesian' && <BayesianUncertaintyCard />}
-            {tab === 'fuzzy'    && <FuzzyDosingCard />}
-            {tab === 'deep'     && <LiveWaveformMonitor />}
-            {tab === 'lipid'    && <LipidProfileTab />}
-            {tab === 'cbc'      && <CBCTab />}
-            {tab === 'symptom'  && <SymptomTab />}
+            {/* Content — clinician-only tools are gated even if `tab` were ever
+                forced to one of their ids, since a patient's tab bar cannot
+                set it there. */}
+            {!isPatient && tab === 'heart'    && <HeartRiskTab />}
+            {!isPatient && tab === 'bayesian' && <BayesianUncertaintyCard />}
+            {!isPatient && tab === 'fuzzy'    && <FuzzyDosingCard />}
+            {!isPatient && tab === 'deep'     && <LiveWaveformMonitor />}
+            {tab === 'lipid'                  && <LipidProfileTab />}
+            {tab === 'cbc'                    && <CBCTab />}
+            {tab === 'symptom'                && <SymptomTab />}
         </div>
     );
 }
