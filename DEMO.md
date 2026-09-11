@@ -18,7 +18,7 @@ distinctive and gets ahead of the questions an examiner will ask anyway.
       able to show you already documented it is worth more than any answer
       improvised on the spot.
 
-Accounts: `admin@medisense.ai`, `dr.sonal.jain@medisense.ai`,
+Accounts: `admin@medisense.ai`, `doctor@medisense.ai`,
 `patient@medisense.ai` — password `MediSense@2024`.
 
 ---
@@ -91,7 +91,7 @@ health-adjacent. These run whether or not the model cooperates."*
 
 ## 4. Doctor's view (1 minute)
 
-Log in as the doctor, open a patient, scroll to AI Doctor Consultations.
+Log in as `doctor@medisense.ai`, open a patient, scroll to AI Doctor Consultations.
 
 > "The consultation lands on the clinical side. Summary, possible conditions,
 > red flags, urgency — and the same PDF. This data used to be siloed in the

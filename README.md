@@ -69,7 +69,7 @@ every required variable at boot and exits with the name of whichever one is
 missing.
 
 Demo accounts use password `MediSense@2024`:
-`admin@medisense.ai` · `dr.sonal.jain@medisense.ai` · `patient@medisense.ai`
+`admin@medisense.ai` · `doctor@medisense.ai` · `patient@medisense.ai`
 
 ### Tests
 
