@@ -75,7 +75,7 @@ const LoginPage = () => {
             <div style={{ position: 'absolute', top: '-20%', left: '-10%', width: 600, height: 600, borderRadius: '50%', background: 'radial-gradient(circle, rgba(35, 83, 71, 0.07) 0%, transparent 70%)', pointerEvents: 'none' }} />
             <div style={{ position: 'absolute', bottom: '-20%', right: '-10%', width: 500, height: 500, borderRadius: '50%', background: 'radial-gradient(circle, rgba(46, 107, 91, 0.05) 0%, transparent 70%)', pointerEvents: 'none' }} />
 
-            <div style={{ width: '100%', maxWidth: step === 'role' ? 900 : 440, transition: 'max-width 0.4s ease', position: 'relative' }}>
+            <div style={{ width: '100%', maxWidth: step === 'role' ? 980 : 440, transition: 'max-width 0.4s ease', position: 'relative' }}>
                 {/* Header */}
                 <div style={{ textAlign: 'center', marginBottom: 36 }}>
                     <Link to="/" style={{ display: 'inline-flex', alignItems: 'center', gap: 10, marginBottom: 16, textDecoration: 'none' }}>
@@ -94,14 +94,14 @@ const LoginPage = () => {
 
                 {/* Step 1: Role tiles */}
                 {step === 'role' && (
-                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(210px, 1fr))', gap: 16 }}>
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', gap: 16 }}>
                         {ROLES.map(role => (
                             <button
                                 key={role.id}
                                 onClick={() => handleRoleSelect(role.id)}
                                 style={{
                                     background: 'var(--surface-1)', border: '1px solid var(--surface-border)', borderRadius: 16,
-                                    padding: '28px 24px', cursor: 'pointer', textAlign: 'left', transition: 'all 0.2s ease',
+                                    padding: '24px 20px', cursor: 'pointer', textAlign: 'left', transition: 'all 0.2s ease',
                                 }}
                                 onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-3px)'; e.currentTarget.style.background = 'var(--surface-2)'; }}
                                 onMouseLeave={e => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.background = 'var(--surface-1)'; }}
