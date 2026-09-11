@@ -5,12 +5,27 @@ import { useVitalsStore } from '../store/vitalsStore';
 import { useAlertStore } from '../store/alertStore';
 import toast from 'react-hot-toast';
 
-const SOCKET_URL = import.meta.env.VITE_SOCKET_URL || 'http://localhost:5000';
+// Same host as the API, or — when neither is configured — the page's own
+// origin, which nginx proxies /socket.io/ from. A hardcoded localhost:5000
+// fallback only worked on the development machine.
+const SOCKET_URL = import.meta.env.VITE_SOCKET_URL || import.meta.env.VITE_API_URL || window.location.origin;
+
+// Toasts in the forest palette: deep pine ground, mint text, and a border in
+// the semantic colour for the event.
+const TONE = { critical: '#C8434B', warning: '#C99A2A', info: '#8EB69B', success: '#3F8A66' } as const;
+const toastStyle = (tone: keyof typeof TONE) => ({
+    background: '#0B2B26', color: '#DAF1DE', border: `1px solid ${TONE[tone]}`, fontSize: '13px',
+});
+
+// crypto.randomUUID exists only in secure contexts (HTTPS or localhost). Over
+// plain HTTP it is undefined, and calling it threw inside the alert handler,
+// losing the alert.
+const localId = () => globalThis.crypto?.randomUUID?.() ?? `${Date.now()}-${Math.random().toString(36).slice(2)}`;
 
 let socketInstance: Socket | null = null;
 
 export function useSocket() {
-    const { accessToken, isAuthenticated, user } = useAuthStore();
+    const { accessToken, isAuthenticated } = useAuthStore();
     const { updateVitals } = useVitalsStore();
     const { addAlert } = useAlertStore();
     const connected = useRef(false);
@@ -19,25 +34,20 @@ export function useSocket() {
         if (!isAuthenticated || !accessToken || connected.current) return;
 
         socketInstance = io(SOCKET_URL, {
-            auth: { token: accessToken },
+            // A function, so every connection attempt sends the current token:
+            // an automatic reconnect after the access token was refreshed would
+            // otherwise replay the expired one and be refused.
+            auth: (cb) => cb({ token: useAuthStore.getState().accessToken }),
             transports: ['websocket'],
             reconnection: true,
             reconnectionAttempts: 5,
             reconnectionDelay: 2000,
         });
 
+        // The server authenticates the connection and places it in this
+        // user's and role's rooms itself; the client no longer names rooms.
         socketInstance.on('connect', () => {
             connected.current = true;
-            console.log('🔌 Socket.IO connected:', socketInstance?.id);
-
-            // Join user-specific room for targeted notifications
-            if ((user as any)?.id) {
-                socketInstance?.emit('join:user-room', (user as any).id);
-            }
-            // Join role room for broadcast events
-            if (user?.role) {
-                socketInstance?.emit('join:role-room', user.role);
-            }
         });
 
         // ── Real-time vitals ────────────────────────────────────────────────
@@ -54,10 +64,10 @@ export function useSocket() {
             });
         });
 
-        // ── Alerts ─────────────────────────────────────────────────────────
+        // ── Alerts (staff only — the server sends these to the staff room) ──
         socketInstance.on('alert:new', (data) => {
             addAlert({
-                id: data.alertId || crypto.randomUUID(),
+                id: data.alertId || localId(),
                 patientId: data.patientId,
                 patientName: data.patientName,
                 type: data.type,
@@ -68,26 +78,16 @@ export function useSocket() {
                 isResolved: false,
             });
 
-            const prefix = data.severity === 'CRITICAL' ? '🚨' : data.severity === 'WARNING' ? '⚠️' : 'ℹ️';
+            const prefix = data.severity === 'CRITICAL' || data.severity === 'EMERGENCY' ? '🚨' : data.severity === 'WARNING' ? '⚠️' : 'ℹ️';
             const name = data.patientName ? `${data.patientName}: ` : '';
             const label = `${prefix} [${data.severity}] ${name}${data.message}`;
 
             if (data.severity === 'CRITICAL' || data.severity === 'EMERGENCY') {
-                toast.error(label, {
-                    duration: 8000,
-                    style: { background: '#1A2340', color: '#F0F4FF', border: '1px solid #FF2D55', fontSize: '13px' },
-                });
+                toast.error(label, { duration: 8000, style: toastStyle('critical') });
             } else if (data.severity === 'WARNING') {
-                toast(label, {
-                    duration: 5000,
-                    icon: '⚠️',
-                    style: { background: '#1A2340', color: '#F0F4FF', border: '1px solid #FFD166', fontSize: '13px' },
-                });
+                toast(label, { duration: 5000, icon: '⚠️', style: toastStyle('warning') });
             } else {
-                toast(label, {
-                    duration: 4000,
-                    style: { background: '#1A2340', color: '#F0F4FF', border: '1px solid #00B4D8', fontSize: '13px' },
-                });
+                toast(label, { duration: 4000, style: toastStyle('info') });
             }
         });
 
@@ -95,10 +95,7 @@ export function useSocket() {
         socketInstance.on('risk:escalated', (data) => {
             toast.error(
                 `⚠️ ${data.patientName}: Risk escalated ${data.previousRisk} → ${data.newRisk}`,
-                {
-                    duration: 10000,
-                    style: { background: '#1A2340', color: '#F0F4FF', border: '1px solid #FF2D55' },
-                }
+                { duration: 10000, style: toastStyle('critical') },
             );
         });
 
@@ -108,10 +105,7 @@ export function useSocket() {
         socketInstance.on('prescription:new', (data) => {
             toast.success(
                 `💊 New prescription ready (${data.itemCount} medication${data.itemCount > 1 ? 's' : ''})`,
-                {
-                    duration: 7000,
-                    style: { background: '#1A2340', color: '#F0F4FF', border: '1px solid #06D6A0', fontSize: '13px' },
-                }
+                { duration: 7000, style: toastStyle('success') },
             );
             // Trigger a custom event so patient portal pages can refetch without reload
             window.dispatchEvent(new CustomEvent('medisense:prescription:new', { detail: data }));
@@ -124,14 +118,7 @@ export function useSocket() {
                 isPaid
                     ? `✅ Payment confirmed — Invoice #${data.invoiceNumber}`
                     : `🧾 Invoice ready — ₹${(data.totalAmount ?? 0).toLocaleString('en-IN')} (Invoice #${data.invoiceNumber})`,
-                {
-                    duration: 6000,
-                    icon: isPaid ? '✅' : '🧾',
-                    style: {
-                        background: '#1A2340', color: '#F0F4FF',
-                        border: `1px solid ${isPaid ? '#06D6A0' : '#FFD166'}`, fontSize: '13px',
-                    },
-                }
+                { duration: 6000, icon: isPaid ? '✅' : '🧾', style: toastStyle(isPaid ? 'success' : 'warning') },
             );
             window.dispatchEvent(new CustomEvent('medisense:invoice:new', { detail: data }));
         });
@@ -140,64 +127,40 @@ export function useSocket() {
         socketInstance.on('lab_report:uploaded', (data) => {
             toast.success(
                 `🧪 Lab report ready — ${(data.testType as string)?.replace('_', ' ')}`,
-                {
-                    duration: 7000,
-                    style: { background: '#1A2340', color: '#F0F4FF', border: '1px solid #06D6A0', fontSize: '13px' },
-                }
+                { duration: 7000, style: toastStyle('success') },
             );
             window.dispatchEvent(new CustomEvent('medisense:lab_report:uploaded', { detail: data }));
         });
 
         // Consultation completed → patient portal refresh
         socketInstance.on('consultation:completed', (data) => {
-            toast.success(
-                `✅ Consultation complete. Check your prescriptions & reports.`,
-                {
-                    duration: 7000,
-                    style: { background: '#1A2340', color: '#F0F4FF', border: '1px solid #06D6A0', fontSize: '13px' },
-                }
-            );
+            toast.success('✅ Consultation complete. Check your prescriptions & reports.', { duration: 7000, style: toastStyle('success') });
             window.dispatchEvent(new CustomEvent('medisense:consultation:completed', { detail: data }));
         });
 
         // Appointment events
         socketInstance.on('appointment_request:approved', (data) => {
-            toast.success('📅 Appointment approved!', {
-                duration: 6000,
-                style: { background: '#1A2340', color: '#F0F4FF', border: '1px solid #06D6A0', fontSize: '13px' },
-            });
+            toast.success('📅 Appointment approved!', { duration: 6000, style: toastStyle('success') });
             window.dispatchEvent(new CustomEvent('medisense:appointment:approved', { detail: data }));
         });
 
         socketInstance.on('appointment_request:counter_offer', (data) => {
-            toast('📅 New appointment slot offered — accept or decline', {
-                duration: 8000,
-                icon: '📅',
-                style: { background: '#1A2340', color: '#F0F4FF', border: '1px solid #FFD166', fontSize: '13px' },
-            });
+            toast('📅 New appointment slot offered — accept or decline', { duration: 8000, icon: '📅', style: toastStyle('warning') });
             window.dispatchEvent(new CustomEvent('medisense:appointment:counter_offer', { detail: data }));
         });
 
         socketInstance.on('appointment_request:new', (data) => {
-            toast('📋 New appointment request received', {
-                duration: 5000,
-                icon: '📋',
-                style: { background: '#1A2340', color: '#F0F4FF', border: '1px solid #C77DFF', fontSize: '13px' },
-            });
+            toast('📋 New appointment request received', { duration: 5000, icon: '📋', style: toastStyle('info') });
             window.dispatchEvent(new CustomEvent('medisense:appointment:new', { detail: data }));
         });
 
         // In-app notification
         socketInstance.on('notification:new', (data) => {
-            toast(data.message || 'New notification', {
-                duration: 5000,
-                style: { background: '#1A2340', color: '#F0F4FF', border: '1px solid #00B4D8', fontSize: '13px' },
-            });
+            toast(data.message || 'New notification', { duration: 5000, style: toastStyle('info') });
         });
 
         socketInstance.on('disconnect', () => {
             connected.current = false;
-            console.log('🔌 Socket.IO disconnected');
         });
 
         return () => {

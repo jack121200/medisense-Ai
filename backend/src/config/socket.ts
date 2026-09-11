@@ -1,9 +1,28 @@
-import { Server as SocketIOServer } from 'socket.io';
+import { Server as SocketIOServer, Socket } from 'socket.io';
 import { Server as HTTPServer } from 'http';
+import jwt from 'jsonwebtoken';
 import { env } from './env';
 import { logger } from './logger';
+import { prisma } from './database';
 
 let io: SocketIOServer | null = null;
+
+// Every connection is authenticated and placed in its rooms by the server.
+//
+// Previously the handshake token was never checked and clients joined
+// whatever rooms they named: anyone — logged in or not — could join another
+// user's room and receive their prescriptions, invoices and appointments, or
+// join a role room ('RECEPTIONIST') and receive every invoice. Clinical
+// alerts, risk escalations and all patients' vitals were broadcast to every
+// connected socket, patients included.
+
+interface SocketUser { id: string; role: string }
+
+const STAFF_ROOM = 'staff';
+
+function userOf(socket: Socket): SocketUser {
+    return socket.data.user as SocketUser;
+}
 
 export function initSocketIO(server: HTTPServer): SocketIOServer {
     io = new SocketIOServer(server, {
@@ -20,27 +39,55 @@ export function initSocketIO(server: HTTPServer): SocketIOServer {
         transports: ['websocket', 'polling'],
     });
 
+    // Same checks as the HTTP `authenticate` middleware: a valid access token
+    // for an account that still exists and is active.
+    io.use(async (socket, next) => {
+        try {
+            const token = socket.handshake.auth?.token;
+            if (typeof token !== 'string' || !token) return next(new Error('UNAUTHORIZED'));
+            const decoded = jwt.verify(token, env.JWT_ACCESS_SECRET) as { id: string };
+            const user = await prisma.user.findUnique({
+                where: { id: decoded.id, isActive: true },
+                select: { id: true, role: true },
+            });
+            if (!user) return next(new Error('UNAUTHORIZED'));
+            socket.data.user = { id: user.id, role: user.role } satisfies SocketUser;
+            next();
+        } catch {
+            next(new Error('UNAUTHORIZED'));
+        }
+    });
+
     io.on('connection', (socket) => {
-        logger.info(`🔌 Socket connected: ${socket.id}`);
+        const user = userOf(socket);
+        socket.join(`user:${user.id}`);
+        socket.join(`role:${user.role}`);
+        if (user.role !== 'PATIENT') socket.join(STAFF_ROOM);
+        logger.info(`🔌 Socket connected: ${socket.id} (${user.role})`);
 
-        // User-specific room (for targeted notifications)
-        socket.on('join:user-room', (userId: string) => {
-            socket.join(`user:${userId}`);
+        // Live vitals for one patient. Staff may follow any patient; a patient
+        // only their own record.
+        socket.on('join:patient-room', async (patientId: unknown) => {
+            if (typeof patientId !== 'string' || !patientId) return;
+            if (user.role !== 'PATIENT') {
+                socket.join(`patient:${patientId}`);
+                return;
+            }
+            try {
+                const own = await prisma.patient.findFirst({ where: { userId: user.id }, select: { id: true } });
+                if (own?.id === patientId) socket.join(`patient:${patientId}`);
+            } catch (err: any) {
+                logger.warn(`Socket patient-room check failed: ${err?.message}`);
+            }
         });
 
-        // Legacy patient room
-        socket.on('join:patient-room', (patientId: string) => {
-            socket.join(`patient:${patientId}`);
+        socket.on('leave:patient', (patientId: unknown) => {
+            if (typeof patientId === 'string') socket.leave(`patient:${patientId}`);
         });
 
-        // Ward room
-        socket.on('join:ward', (ward: string) => {
-            socket.join(`ward:${ward}`);
-        });
-
-        // Role broadcast room (e.g. 'RECEPTIONIST', 'LAB_TECHNICIAN', 'DOCTOR')
-        socket.on('join:role-room', (role: string) => {
-            socket.join(`role:${role}`);
+        // Ward room — staff only
+        socket.on('join:ward', (ward: unknown) => {
+            if (user.role !== 'PATIENT' && typeof ward === 'string') socket.join(`ward:${ward}`);
         });
 
         socket.on('disconnect', () => {
@@ -66,23 +113,28 @@ function emitToRole(role: string, event: string, data: Record<string, unknown>):
     getIO().to(`role:${role}`).emit(event, data);
 }
 
+function emitToStaff(event: string, data: Record<string, unknown>): void {
+    getIO().to(STAFF_ROOM).emit(event, data);
+}
+
 // ── Vitals & Alerts ───────────────────────────────────────────────────────────
+// Clinical data about other people: staff only, never every connection.
 
 export function emitVitalsUpdate(patientId: string, data: Record<string, unknown>): void {
     getIO().to(`patient:${patientId}`).emit('vitals:update', { patientId, ...data });
-    getIO().emit('vitals:update:global', { patientId, ...data });
+    emitToStaff('vitals:update:global', { patientId, ...data });
 }
 
 export function emitNewAlert(alertData: Record<string, unknown>): void {
-    getIO().emit('alert:new', alertData);
+    emitToStaff('alert:new', alertData);
 }
 
 export function emitRiskEscalation(data: Record<string, unknown>): void {
-    getIO().emit('risk:escalated', data);
+    emitToStaff('risk:escalated', data);
 }
 
 export function emitModelRetrained(data: Record<string, unknown>): void {
-    getIO().emit('model:retrained', data);
+    emitToStaff('model:retrained', data);
 }
 
 // ── In-app Notification ───────────────────────────────────────────────────────
