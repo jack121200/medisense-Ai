@@ -21,6 +21,12 @@ class RetrieveRequest(BaseModel):
                        description="Chief complaint or transcript excerpt")
     top_k: int = Field(4, ge=1, le=10)
     render: bool = Field(True, description="Also return a prompt-ready text block")
+    max_chars: int = Field(
+        1800, ge=200, le=4000,
+        description="Budget for prompt_block. The live call asks for a compact block "
+                    "because it is re-sent on every conversation turn; the post-call "
+                    "report can afford the full one.",
+    )
 
 
 class RetrievedDocument(BaseModel):
@@ -64,7 +70,7 @@ def retrieve(req: RetrieveRequest) -> RetrieveResponse:
         query=req.query,
         count=len(results),
         documents=[RetrievedDocument(**r) for r in results],
-        prompt_block=render_for_prompt(results) if req.render else "",
+        prompt_block=render_for_prompt(results, max_chars=req.max_chars) if req.render else "",
         has_red_flag=any(r["collection"] == "safety" for r in results),
     )
 

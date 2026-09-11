@@ -67,7 +67,7 @@ CONSULTATION FLOW — before giving any advice, cover these one question at a ti
 TREATMENT PHILOSOPHY: "Dawa se pehle dua, dua se pehle prakriti" — Ayurveda, diet and lifestyle first; 80% of conditions respond to natural care. NEVER name or prescribe allopathic drugs (no tablet/syrup names).
 
 Once history-taking feels complete, give advice in this order, always with an EXACT dose/recipe/timing/duration — never vague (e.g. "1 tsp haldi + pinch kali mirch + 1 tsp ghee in 200ml warm milk, raat ko sone se pehle, 21 din" not "kuch haldi le lo"):
-1. 🌿 One Ayurvedic remedy (herb + form + exact dose + timing + duration + brief why) — draw on your own knowledge (Ashwagandha, Triphala, Giloy, Brahmi, Arjuna, Shatavari, Punarnava, Neem, Tulsi etc. are all in your toolkit)
+1. 🌿 One Ayurvedic remedy (herb + form + exact dose + timing + duration + brief why) — take it from the VERIFIED KNOWLEDGE BASE below when it covers the complaint, using its stated dose and honouring its "Avoid if" line
 2. 🏠 One kitchen/home remedy with an exact recipe
 3. 🧘 One yoga/pranayama or lifestyle change with timing
 4. 🥗 Simple diet guidance (eat by 7pm, avoid maida/sugar/packaged food, more whole grains & veggies)
@@ -452,7 +452,12 @@ export const aiDoctorService = {
             patient.hasHypertension && 'high blood pressure',
             patient.hasHeartDisease && 'heart disease',
         ].filter(Boolean).join(' ');
-        const knowledge = await retrieveKnowledge(retrievalQuery);
+        // Compact block for the live call: this prompt is re-sent to the model
+        // on every conversation turn, so every retrieved character is paid for
+        // again in time-to-first-token on each reply. Three documents at ~900
+        // chars keeps the grounding and roughly halves that cost. The
+        // post-call report retrieves the full block, since it runs once.
+        const knowledge = await retrieveKnowledge(retrievalQuery, 3, 900);
         if (knowledge.documentIds.length) {
             logger.info(`[RAG] Grounded call for patient ${patient.id} with: ${knowledge.documentIds.join(', ')}`);
         }
@@ -493,9 +498,22 @@ export const aiDoctorService = {
                     voiceId: env.AI_DOCTOR_TTS_VOICE_ID,
                 },
                 transcriber: {
+                    // nova-3 + "multi", NOT nova-2 + "hi".
+                    //
+                    // This is why the assistant could not hear the patient. Locking
+                    // the transcriber to pure Hindi means an utterance like "pet mein
+                    // BURNING ho raha hai, two weeks se" — which is how people
+                    // actually speak — transcribes to noise or to nothing at all.
+                    // With no transcript the model never receives a turn, so the
+                    // assistant delivers its opening line and then sits silent
+                    // regardless of what is said to it.
+                    //
+                    // nova-3 with language "multi" is Deepgram's code-switching
+                    // model and handles Hindi/English within a single sentence,
+                    // which is the actual target language here.
                     provider: 'deepgram',
-                    model: 'nova-2',
-                    language: 'hi', // Enables Hindi & Hinglish Speech-to-Text
+                    model: 'nova-3',
+                    language: 'multi',
                 },
                 firstMessageMode: 'assistant-speaks-first',
                 // Must stay in sync with the OPENING line in buildSystemPrompt()
@@ -504,29 +522,43 @@ export const aiDoctorService = {
                 // even starts.
                 firstMessage: 'Namaste! Main Priya hoon, aapki AI health assistant — ek real doctor nahi, lekin main aapki baat dhyan se sunungi aur kuch natural suggestions doongi. Bilkul ghabrao mat — aaram se batao apni problem. Toh aaj kya takleef hai?',
                 endCallPhrases: ['goodbye', 'bye', 'alvida', 'shukriya doctor', 'thank you doctor', 'bas itna hi tha'],
-                // Turn-taking tuning — Vapi's defaults are English-tuned and were
-                // actively breaking this call in two ways:
-                //  1) stopSpeakingPlan.numWords > 0 makes interruption wait for the
-                //     transcriber to recognize whole words (200-500ms extra delay,
-                //     and on noisy/Hindi speech this can simply never fire) — set to
-                //     0 to use raw voice-activity detection instead (~50-100ms).
-                //  2) No smartEndpointingPlan meant Vapi used its English-only
-                //     LiveKit-style defaults for turn-end detection on a Hindi call —
-                //     'vapi' is the provider explicitly meant for non-English use.
+
+                // Turn-taking. Two corrections from the previous configuration:
+                //
+                // 1) smartEndpointingPlan is removed. It takes precedence over
+                //    transcriptionEndpointingPlan, so the endpointing values tuned
+                //    below were being silently discarded. Vapi's own docs recommend
+                //    text-based transcription endpointing for non-English work
+                //    because it is language-agnostic, where the smart models are
+                //    tuned per language.
+                //
+                // 2) numWords is no longer 0. Zero means pure voice-activity
+                //    interruption: any sound cuts the assistant off, including its
+                //    own voice echoing back from laptop speakers when the patient
+                //    is not wearing headphones — which reads as the assistant
+                //    talking over itself and stalling. Requiring two real words
+                //    means only actual speech interrupts. It was set to 0 to work
+                //    around interruption never firing, but that was the broken
+                //    transcriber above, not this setting.
                 startSpeakingPlan: {
                     waitSeconds: 0.4,
-                    smartEndpointingPlan: { provider: 'vapi' },
                     transcriptionEndpointingPlan: {
-                        onPunctuationSeconds: 0.2,
-                        onNoPunctuationSeconds: 1.4,
+                        onPunctuationSeconds: 0.1,
+                        // Hindi speakers pause mid-sentence more than the English
+                        // default assumes; cutting in at 1.4s talked over people.
+                        onNoPunctuationSeconds: 1.8,
                         onNumberSeconds: 0.5,
                     },
                 },
                 stopSpeakingPlan: {
-                    numWords: 0,        // VAD-based interruption — fixes "interrupt karu toh bhi nahi chalta"
-                    voiceSeconds: 0.2,
-                    backoffSeconds: 0.6, // was 1 — doctor resumes/responds faster after being interrupted
+                    numWords: 2,
+                    voiceSeconds: 0.3,
+                    backoffSeconds: 1.0,
                 },
+                // Without this a patient who steps away leaves the call open,
+                // burning metered voice minutes against a finite trial credit.
+                silenceTimeoutSeconds: 45,
+                maxDurationSeconds: 900,
                 backgroundSound: 'off',
             },
         };

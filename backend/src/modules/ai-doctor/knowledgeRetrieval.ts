@@ -35,7 +35,7 @@ const EMPTY: RetrievedKnowledge = { promptBlock: '', hasRedFlag: false, document
  * degrades the answer to un-grounded (which is what the assistant did before
  * this existed), and that is strictly better than failing the call.
  */
-export async function retrieveKnowledge(query: string, topK = 4): Promise<RetrievedKnowledge> {
+export async function retrieveKnowledge(query: string, topK = 4, maxChars = 1800): Promise<RetrievedKnowledge> {
     const trimmed = (query || '').trim();
     if (!trimmed) return EMPTY;
 
@@ -44,6 +44,7 @@ export async function retrieveKnowledge(query: string, topK = 4): Promise<Retrie
             query: trimmed.slice(0, 4000),
             top_k: topK,
             render: true,
+            max_chars: maxChars,
         });
         return {
             promptBlock: data?.prompt_block || '',
