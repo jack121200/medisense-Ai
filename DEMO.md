@@ -28,8 +28,9 @@ Accounts: `admin@medisense.ai`, `doctor@medisense.ai`,
 Open the landing page and scroll to the ML section.
 
 > "Five models, and we report the real held-out numbers — including the
-> weakest one, which is a screening aid at 0.75 recall. Those figures come
-> straight from the training manifest."
+> weakest one, the ECG screen, which catches 62% of ventricular beats on
+> patients it never saw. Those figures come straight from the training
+> manifest."
 
 **Why start here:** it sets the frame for everything that follows. Volunteer
 your weakest number in the first thirty seconds and the panel stops hunting
@@ -109,11 +110,12 @@ Open AI Clinical Tools and run the heart risk prediction.
 
 If you have time, show the ECG screen:
 
-> "This one we rebuilt. It was an autoencoder at 0.26 recall — missing three
-> of four abnormal beats. Replacing it with a supervised classifier that
-> actually uses the labels took recall to 0.75. And we evaluate inter-patient,
-> holding out whole records, because beats from one patient are correlated
-> and a random split leaks patient identity."
+> "This one we rebuilt twice. It started as an autoencoder at 0.26 recall.
+> Now it's a supervised ensemble on the standard DS1/DS2 benchmark — trained
+> on 22 patients, scored once on 22 others. It catches 62% of ventricular
+> beats while flagging under 1% of normal ones. It misses supraventricular
+> beats, and we can say exactly why: they arrive early, and a single-beat
+> window can't see timing."
 
 ---
 
@@ -150,10 +152,11 @@ If you have time, show the ECG screen:
 > different population, and expanding the interaction rules beyond 14 herbs.
 
 **"What's the weakest part?"**
-> The ECG screen. 0.75 recall means it still misses a quarter of abnormal
-> beats, and precision of 0.59 means four in ten flags are false alarms. It's
-> a triage aid for human review, not a diagnostic test — and we report those
-> numbers rather than the intra-patient ones that would look better.
+> The ECG screen. On patients it never saw it catches 62% of ventricular beats
+> but almost no supraventricular ones, so overall recall is 0.39 — though what
+> it does flag is usually right (precision 0.84). It's a triage aid for human
+> review, and we report benchmark numbers rather than the intra-patient ones
+> that would look better.
 
 ---
 

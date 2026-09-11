@@ -40,7 +40,7 @@ recorded in `models_manifest.json`:
 |---|---|---|
 | Heart disease risk | XGBoost | 0.995 ROC-AUC, 95.5% accuracy |
 | Symptom checker | Random Forest | 100% — [read why that's a caveat](LIMITATIONS.md#2-the-models) |
-| ECG beat screening | Supervised 1D-CNN | 0.899 ROC-AUC, 0.753 recall (inter-patient) |
+| ECG beat screening | Supervised 1D-CNN ensemble | 0.818 ROC-AUC on 22 unseen patients (MIT-BIH DS2); catches 62% of ventricular beats at 0.9% false alarms |
 | CBC analyzer | IsolationForest + KMeans | Unsupervised — no accuracy to quote |
 | Bayesian risk engine | pgmpy, 7-node DAG | CPDs fit from 1,025 records |
 

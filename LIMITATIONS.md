@@ -37,30 +37,53 @@ This number describes clean-case performance and says nothing about
 real-world diagnostic ability. It is labelled that way in the manifest, on
 the landing page and in the UI.
 
-### ECG beat screening — genuinely improved, still the weakest model
-Supervised 1D-CNN. On held-out patients: 0.899 ROC-AUC, 0.753 recall, 0.586
-precision, 0.659 F1.
+### ECG beat screening — an honest benchmark, still the weakest model
+A supervised 1D-CNN ensemble, evaluated on the standard inter-patient
+benchmark: trained and tuned on the 22 patients of MIT-BIH DS1, then scored
+once on the 22 different patients of DS2 (de Chazal et al., 2004; the four
+paced records excluded, as AAMI EC57 recommends).
+
+| On DS2 — 22 patients never seen in training | |
+|---|---|
+| ROC-AUC | 0.818 |
+| Specificity (normal beats left unflagged) | 0.991 |
+| Precision | 0.839 |
+| Recall, all abnormal beats | 0.388 |
+| Ventricular beats caught | 62% |
+| Supraventricular beats caught | 1% |
+| Calibration error (ECE) | 0.050 |
 
 It replaced a reconstruction-error autoencoder that scored 0.750 ROC-AUC and
-**0.255 recall** — it was missing roughly three of every four abnormal beats.
-The cause was framing: the autoencoder trained only on normal beats and
-ignored the 5,946 labelled abnormal beats the annotations provide.
+**0.255 recall**: trained only on normal beats, it ignored the labelled
+abnormal beats the annotations provide.
 
-Three things to be able to defend:
+Things to be able to defend:
 
-- **Evaluation is inter-patient.** Whole records (106, 213, 223) are held
-  out, never individual beats. Beats from one patient are highly correlated,
-  so a random beat-level split leaks patient identity. Papers quoting 95%+ on
-  MIT-BIH are usually intra-patient; those numbers are not comparable to
-  these and do not survive contact with a new patient.
-- **The threshold targets recall, not F1.** F1 treats a missed arrhythmia and
-  a false alarm as equally costly, which is wrong for a screening aid. The
-  F1-optimal threshold scored 0.60 recall; this one scores 0.75 and accepts
-  worse precision for it.
-- **It still misses a quarter of abnormal beats**, and precision of 0.586
-  means roughly four in ten flags are false alarms. It is a triage aid that
-  surfaces beats for human review. It is not a diagnostic test, and it does
-  not classify arrhythmia *type* — only normal vs abnormal morphology.
+- **Why DS1/DS2.** An earlier version trained on 12 records and tested on
+  three. Its threshold was tuned on a validation set where one patient
+  supplied 97% of the abnormal beats; it held 0.90 recall there and 0.63 on
+  the test patients. With that few patients, the numbers mostly measured which
+  patients were picked. DS1/DS2 is the split published inter-patient work
+  uses, so these figures can be compared with it. Intra-patient splits, with
+  beats from the same person in both train and test, routinely report 95%+
+  and do not survive a new patient.
+- **Why supraventricular beats are missed.** They differ from normal beats
+  mainly in timing — they arrive early — and a single 0.7-second beat window
+  cannot see timing. Published DS2 models that detect them add RR-interval
+  features (time since the previous beat), which need a rhythm strip rather
+  than one beat. Record 232 alone holds 1,382 of them, so they dominate the
+  overall recall figure.
+- **The operating point is strict by design, and landed stricter.** The
+  threshold targets flagging at most 1 in 20 normal beats, chosen on
+  cross-validated predictions. The served model averages four patient-fold
+  networks, which made it more conservative: on DS2 it flagged about 1 in 110.
+  It was not re-tuned on DS2 — that would be fitting the test set.
+- **Patients unlike anyone in training are hard.** In cross-validation, the
+  fold holding out the right-bundle-branch-block patient (record 118) scored
+  0.66 ROC-AUC: those beats are wide like ventricular ones but count as normal.
+- **It is a triage aid.** It surfaces beats for human review, states which
+  kinds it catches and which it misses, and does not classify arrhythmia
+  *type* — only normal vs abnormal morphology.
 
 ### CBC analyzer — unsupervised, so there is no accuracy to quote
 IsolationForest + KMeans over 20 parameters on 416 samples. There are no
@@ -157,8 +180,10 @@ rather than per user.
 ## 5. Testing
 
 38 backend tests (auth, RBAC, herb interactions, emergency detection, webhook
-verification, PDF generation) and 22 ml-service tests (retrieval quality in
-English and Hinglish, red-flag surfacing, prompt budget).
+verification, PDF generation) and 29 ml-service tests (retrieval quality in
+English and Hinglish, red-flag surfacing, prompt budget, and the ECG route:
+its verdict matches the probability it reports, demo beats are labelled as
+real recordings, and it names the model that actually decided).
 
 Not covered: end-to-end browser tests, load tests, and the live voice call
 path — which cannot be tested without spending call credit.

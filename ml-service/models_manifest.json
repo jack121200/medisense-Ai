@@ -361,58 +361,155 @@
     "ecg_beat_classifier": {
       "status": "trained",
       "training_script": "train/train_ecg_classifier.py",
+      "data_script": "train/prepare_ecg_inter_patient.py",
       "meta": {
-        "architecture": "1D-CNN: Conv(1->32,k7)-BN-ReLU-Pool / Conv(32->64,k5)-BN-ReLU-Pool / Conv(64->128,k3)-BN-ReLU-GAP / Dropout(0.3) / Linear(128->1)",
-        "task": "Binary beat classification \u2014 normal vs abnormal morphology",
-        "evaluation": "INTER-PATIENT: whole records held out. Beats from one patient are highly correlated, so a random beat-level split leaks patient identity and overstates performance on unseen patients.",
-        "train_records": [
-          "100",
-          "101",
-          "103",
-          "112",
-          "115",
-          "208",
-          "217"
+        "architecture": "Ensemble of 4 1D-CNNs (mean logit), each Conv(1->32,k7)-BN-ReLU-Pool / Conv(32->64,k5)-BN-ReLU-Pool / Conv(64->128,k3)-BN-ReLU-GAP / Dropout(0.3) / Linear(128->1)",
+        "task": "Binary beat screen \u2014 normal (AAMI N) vs abnormal (AAMI S, V, F, Q) morphology",
+        "dataset": "PhysioNet MIT-BIH Arrhythmia Database, de Chazal et al. 2004 DS1/DS2 inter-patient split; paced records 102, 104, 107, 217 excluded per AAMI EC57",
+        "evaluation": "INTER-PATIENT: trained and tuned on DS1 (22 patients), scored once on DS2 (22 different patients) \u2014 the standard benchmark, comparable to published inter-patient results",
+        "input_normalization": "per-window z-score (256 samples), identical in training and serving via app.ml.ecg_classifier.per_window_normalize",
+        "n_train": 51000,
+        "n_test": 49693,
+        "cv_folds": [
+          [
+            "108",
+            "109",
+            "207",
+            "208",
+            "215"
+          ],
+          [
+            "101",
+            "114",
+            "118",
+            "201",
+            "223"
+          ],
+          [
+            "106",
+            "112",
+            "116",
+            "122",
+            "124",
+            "209"
+          ],
+          [
+            "115",
+            "119",
+            "203",
+            "205",
+            "220",
+            "230"
+          ]
         ],
-        "val_records": [
-          "108",
-          "200"
+        "cv_fold_roc_auc": [
+          0.8531,
+          0.655,
+          0.8373,
+          0.944
         ],
-        "test_records": [
-          "106",
-          "213",
-          "223"
-        ],
-        "n_train": 15868,
-        "n_val": 4362,
-        "n_test": 7881,
-        "decision_threshold": 0.95,
-        "threshold_method": "highest precision holding validation recall >= 0.9 \u2014 a screening objective, not F1. F1 weights a missed abnormal beat the same as a false alarm, which is the wrong trade for a triage aid.",
-        "model_selection_metric": "validation ROC-AUC (threshold-independent)",
-        "class_weighting": "pos_weight=3.70 (abnormal is the minority class)",
-        "epochs_run": 25,
-        "best_epoch": 16,
-        "seed": 42,
-        "model_selection": "weights from the epoch with the best validation F1, not the final epoch \u2014 train loss keeps falling after validation plateaus",
-        "dataset": "PhysioNet MIT-BIH Arrhythmia Database",
-        "precision": 0.5864,
-        "recall": 0.7527,
-        "f1": 0.6592,
-        "roc_auc": 0.8992,
-        "average_precision": 0.8205,
-        "specificity": 0.8551,
-        "confusion": {
-          "tn": 5294,
-          "fp": 897,
-          "fn": 418,
-          "tp": 1272
+        "cv_out_of_fold": {
+          "recall": 0.4331,
+          "precision": 0.4933,
+          "specificity": 0.95,
+          "roc_auc": 0.8467
         },
-        "note": "Replaces the reconstruction-error autoencoder as the primary detector. The autoencoder measured 0.75 ROC-AUC / 0.26 recall because it was trained only on normal beats and never used the available abnormal labels. Still a binary morphology screen \u2014 it does not classify specific arrhythmia types."
+        "cv_detection_by_class": {
+          "N": {
+            "n": 45846,
+            "flagged": 0.05
+          },
+          "S": {
+            "n": 944,
+            "flagged": 0.1642
+          },
+          "V": {
+            "n": 3788,
+            "flagged": 0.5444
+          },
+          "F": {
+            "n": 414,
+            "flagged": 0.0362
+          },
+          "Q": {
+            "n": 8,
+            "flagged": 0.0
+          }
+        },
+        "decision_threshold": 0.3165,
+        "threshold_scale": "calibrated probability",
+        "threshold_objective": "specificity >= 0.95 on out-of-fold DS1 predictions (at most 1 in 20 normal beats flagged)",
+        "calibration": {
+          "applied": true,
+          "method": "Platt scaling fitted on pooled out-of-fold predictions",
+          "cv_ece_raw": 0.3566,
+          "cv_ece_platt": 0.0347,
+          "a": 0.40055,
+          "b": -2.93378,
+          "test_brier": 0.0734,
+          "test_ece": 0.0498,
+          "test_brier_raw": 0.2548,
+          "test_ece_raw": 0.2871
+        },
+        "class_weighting": "pos_weight ~9.00 (abnormal is the minority class)",
+        "epochs": 15,
+        "seed": 42,
+        "precision": 0.8387,
+        "recall": 0.3883,
+        "f1": 0.5308,
+        "roc_auc": 0.8179,
+        "average_precision": 0.5522,
+        "specificity": 0.9908,
+        "confusion": {
+          "tn": 43834,
+          "fp": 407,
+          "fn": 3335,
+          "tp": 2117
+        },
+        "detection_by_class": {
+          "N": {
+            "n": 44241,
+            "flagged": 0.0092
+          },
+          "S": {
+            "n": 1837,
+            "flagged": 0.0093
+          },
+          "V": {
+            "n": 3220,
+            "flagged": 0.6183
+          },
+          "F": {
+            "n": 388,
+            "flagged": 0.2655
+          },
+          "Q": {
+            "n": 7,
+            "flagged": 0.8571
+          }
+        },
+        "demo_samples": {
+          "abnormal_class": "V (ventricular ectopic, AAMI)",
+          "selection": "random within class (seed 42), not chosen by model score, from DS2 records outside the original 12-record subset, so neither model trained on them",
+          "records": [
+            "111",
+            "117",
+            "210",
+            "214",
+            "221",
+            "222",
+            "228",
+            "232",
+            "233"
+          ]
+        },
+        "provenance": "Earlier iterations used a 12-record subset. Per-window normalisation was chosen there on held-out records that included 213, now part of DS2, so DS2 is not entirely untouched by earlier design decisions.",
+        "note": "A morphology screen over single beats: it cannot see beat timing, so supraventricular beats are largely missed (see detection_by_class). It surfaces beats for review; it does not classify arrhythmia type."
       },
       "artifacts": {
         "ecg_classifier.pt": {
-          "sha256": "e9bf2a2a408d94e8604c4647aa7605889569ae0aeab3dc7840cfd947a847224a",
-          "size_bytes": 153321
+          "sha256": "d3f1c919bdbe80a07015e1cfe931358013db5d77bef47be2f7173b4dda40a22c",
+          "size_bytes": 610877
         }
       }
     }

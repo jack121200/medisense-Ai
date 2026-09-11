@@ -162,36 +162,12 @@ def train():
     with open(os.path.join(MODELS_DIR, "ecg_autoencoder_meta.json"), "w") as f:
         json.dump(meta, f, indent=2)
 
-    # ── Demo samples for the serving route's no-input fallback ───────────────
-    # A hand-crafted synthetic sine-wave "ECG" (the old approach) doesn't
-    # resemble real MIT-BIH beat morphology at all, so this real model
-    # would flag it as anomalous even in "normal demo" mode — confusing,
-    # and dishonest in the opposite direction (a fake signal the model
-    # was never trained on isn't a fair demo of it). Real held-out beats,
-    # saved alongside the model, make the demo mode representative.
-    #
-    # Rather than a random sample, pick the 10 clearest examples of each
-    # class by reconstruction error (lowest-error normals, highest-error
-    # abnormals) — at this model's real recall (~22% at the 95th-pct
-    # threshold), a *random* abnormal beat is more likely than not to
-    # fall under the threshold and demo as "normal," which would make the
-    # "trigger anomaly" demo toggle look broken. These are still real,
-    # unmodified beats from the dataset — just chosen to be ones the
-    # model actually flags, the way any product demo picks a clear
-    # example rather than a coin-flip one.
-    normal_holdout_errors = reconstruction_error(model, normal_holdout)
-    abnormal_errors_full = reconstruction_error(model, abnormal_X)
-    clearest_normal_idx = np.argsort(normal_holdout_errors)[:10]
-    clearest_abnormal_idx = np.argsort(abnormal_errors_full)[::-1][:10]
+    # Demo beats for the serving route are written by train_ecg_classifier.py,
+    # at random from test records neither model trained on. This script used
+    # to write them from its own hold-out — records the classifier now trains
+    # on — and chose the beats this autoencoder flagged most clearly.
 
-    demo_samples = {
-        "normal": normal_holdout[clearest_normal_idx].tolist(),
-        "abnormal": abnormal_X[clearest_abnormal_idx].tolist(),
-    }
-    with open(os.path.join(MODELS_DIR, "ecg_demo_samples.json"), "w") as f:
-        json.dump(demo_samples, f)
-
-    print(f"\nSaved: ecg_autoencoder.pt + ecg_autoencoder_meta.json + ecg_demo_samples.json")
+    print(f"\nSaved: ecg_autoencoder.pt + ecg_autoencoder_meta.json")
     return auc
 
 

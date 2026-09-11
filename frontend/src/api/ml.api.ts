@@ -78,8 +78,8 @@ export const mlApi = {
         drug_name: string;
     }) => api.post('/ml/fuzzy-dose', data),
 
-    // ── Deep LSTM Autoencoder & Waveform Monitor ───────────────────────────────
-    /** Run Deep LSTM Autoencoder Waveform Signal Analyzer */
+    // ── ECG Beat Screening ─────────────────────────────────────────────────────
+    /** Screen one ECG beat: supervised 1D-CNN verdict, autoencoder as a secondary signal */
     runDeepAnomalyStream: (data: {
         signal_waveform?: number[];
         sample_rate_hz?: number;

@@ -174,7 +174,7 @@ export default function LandingPage() {
     const features = [
         { icon: '🗣️', title: 'AI Doctor — Voice Consultation', color: TERRA, delay: 0, desc: 'Speak to Priya, an AI health assistant, in Hindi, English or Hinglish. She takes a structured 9-phase OPD-style history, then produces a written assessment for your doctor to review.' },
         { icon: '🌿', title: 'Grounded Ayurvedic Guidance', color: SAGE, delay: 60, desc: 'Advice is retrieved from a curated remedy knowledge base rather than improvised, and every suggestion is screened against your recorded medicines and conditions for interactions.' },
-        { icon: '❤️', title: 'Heart Disease Risk Model', color: TERRA, delay: 120, desc: 'An XGBoost model reads 13 clinical parameters — chest pain type, ST depression, thalassemia, ECG findings — and returns a calibrated risk probability with per-feature importance.' },
+        { icon: '❤️', title: 'Heart Disease Risk Model', color: TERRA, delay: 120, desc: 'An XGBoost model reads 13 clinical parameters — chest pain type, ST depression, thalassemia, ECG findings — and returns a risk probability with per-feature importance.' },
         { icon: '🩸', title: 'CBC Blood Analyzer', color: CLAY, delay: 180, desc: 'Enter or upload a blood report. 20 CBC parameters are checked against reference ranges, with unsupervised anomaly detection flagging unusual overall patterns.' },
         { icon: '🧠', title: 'Symptom Checker', color: PLUM, delay: 240, desc: 'Describe what you are feeling and get the most probable conditions ranked by confidence, as a starting point for a real consultation — never as a diagnosis.' },
         { icon: '📉', title: 'ECG Beat Screening', color: GOLD, delay: 300, desc: 'A supervised 1D-CNN trained on labelled normal and abnormal beats from the PhysioNet MIT-BIH database, evaluated on patients it never saw in training. A screening aid that surfaces beats for review, not an arrhythmia classifier.' },
@@ -207,9 +207,9 @@ export default function LandingPage() {
             note: 'Unsupervised — cluster severity is recomputed each training run.',
         },
         {
-            name: 'ECG Beat Screen', algo: 'Supervised 1D-CNN · MIT-BIH', color: SAGE,
-            metric: '0.90', metricLabel: 'ROC-AUC', bar: 90,
-            note: 'Inter-patient: whole records held out, not random beats. 0.75 recall — still a screening aid, not a diagnostic test.',
+            name: 'ECG Beat Screen', algo: 'Supervised 1D-CNN ensemble · MIT-BIH', color: SAGE,
+            metric: '0.82', metricLabel: 'ROC-AUC', bar: 82,
+            note: 'Scored once on 22 patients it never saw. Catches 62% of ventricular beats at under 1% false alarms; misses supraventricular ones, which a single beat cannot show.',
         },
     ];
 

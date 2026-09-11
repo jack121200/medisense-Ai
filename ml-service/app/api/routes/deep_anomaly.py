@@ -28,6 +28,7 @@ from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel, Field
 
 from app.ml.ecg_autoencoder import load_autoencoder, WINDOW_LEN
+from app.ml.ecg_classifier import per_window_normalize
 
 router = APIRouter(prefix="/api/deep", tags=["ECG Anomaly Detector"])
 
@@ -87,19 +88,19 @@ def _load_demo_samples():
 class SignalVectorRequest(BaseModel):
     signal_waveform: Optional[List[float]] = Field(default=None, description="ECG time-series vector (any length — resampled to the model's 256-sample window)")
     sample_rate_hz:  int                   = Field(default=100, description="Sampling rate in Hz")
-    trigger_anomaly: bool                  = Field(default=False, description="Demo mode only: inject a synthetic arrhythmia burst into a generated demo signal when no real signal_waveform is provided")
+    trigger_anomaly: bool                  = Field(default=False, description="Demo mode only: when no signal_waveform is supplied, analyse a held-out abnormal MIT-BIH beat instead of a normal one")
 
 
 def _demo_signal(inject_anomaly: bool) -> List[float]:
     """
     Demo-only fallback for exercising the UI when no real signal_waveform
-    is supplied. Uses a REAL held-out beat window from PhysioNet MIT-BIH
-    (saved by train_deep_anomaly.py), not a hand-crafted synthetic sine
+    is supplied. Uses a REAL beat window from PhysioNet MIT-BIH test records
+    neither model trained on (saved by train_ecg_classifier.py), not a hand-crafted synthetic sine
     wave — a synthetic shape doesn't resemble real beat morphology at all,
     so this real model would flag it as anomalous even in "normal" demo
     mode, which is both confusing and an unfair demo of what the model
-    actually does. Explicitly labeled in the response (data_source:
-    "synthetic_demo") either way — never presented as a real analysis.
+    actually does. Labelled data_source "mitbih_demo_sample" in the response, so a
+    held-out demo beat is never presented as the caller's own recording.
     """
     samples = _load_demo_samples()
     if samples:
@@ -149,6 +150,10 @@ def _eval_metrics(detector: str, meta: dict) -> dict:
             "f1": clf.get("f1"),
             "roc_auc": clf.get("roc_auc"),
             "specificity": clf.get("specificity"),
+            # Share of each AAMI beat class flagged on the unseen patients — the
+            # single recall figure hides that ventricular beats are caught and
+            # supraventricular ones mostly are not.
+            "detection_by_class": clf.get("detection_by_class"),
             "evaluation": clf.get("evaluation"),
             "note": clf.get("note"),
         }
@@ -162,14 +167,14 @@ def _eval_metrics(detector: str, meta: dict) -> dict:
     }
 
 
-@router.post("/anomaly-stream", summary="ECG Anomaly Detection via 1D-CNN Autoencoder")
+@router.post("/anomaly-stream", summary="ECG beat screening — supervised 1D-CNN, autoencoder as a secondary signal")
 def analyze_deep_waveform(req: SignalVectorRequest):
     """
-    Resamples the input signal onto the autoencoder's 256-sample window,
-    runs it through the real trained model, and flags an anomaly when
-    reconstruction error exceeds the threshold set during training (95th
-    percentile of error on held-out normal beats — see
-    ecg_autoencoder_meta.json).
+    Resamples the input signal onto a 256-sample beat window and screens it
+    with the supervised 1D-CNN, which makes the call against the threshold
+    recorded in models_manifest.json. The autoencoder's reconstruction error
+    is returned alongside as a secondary signal, and decides only if the
+    classifier checkpoint is missing.
     """
     model = _load_model()
     meta = _load_meta()
@@ -184,12 +189,22 @@ def analyze_deep_waveform(req: SignalVectorRequest):
     raw_signal = req.signal_waveform
     if not raw_signal or len(raw_signal) < 10:
         raw_signal = _demo_signal(inject_anomaly=req.trigger_anomaly)
-        data_source = "synthetic_demo"
+        data_source = "mitbih_demo_sample"
 
-    # ── Resample + per-signal z-score normalize (matches training prep) ──────
+    # ── Feed each model input in the scale it was trained on ───────────────
+    # The autoencoder (secondary signal) was trained on beats z-scored per
+    # RECORD: demo beats are already in that scale, and an uploaded signal is
+    # treated as its own record and normalised once. The classifier is
+    # trained on per-window normalised beats, chosen because that measured
+    # better on held-out patients, and gets exactly that below via the same
+    # function training uses.
     windowed = _resample_to_window(raw_signal, WINDOW_LEN)
-    mu, sigma = float(windowed.mean()), float(windowed.std())
-    sigma = sigma if sigma > 1e-8 else 1.0
+    if data_source == "mitbih_demo_sample":
+        mu, sigma = 0.0, 1.0
+    else:
+        arr = np.asarray(raw_signal, dtype=np.float32)
+        mu, sigma = float(arr.mean()), float(arr.std())
+        sigma = sigma if sigma > 1e-8 else 1.0
     normalized = (windowed - mu) / sigma
 
     # ── Real autoencoder forward pass ─────────────────────────────────────────
@@ -213,14 +228,17 @@ def analyze_deep_waveform(req: SignalVectorRequest):
     # a secondary unsupervised signal rather than the verdict.
     classifier = _load_classifier()
     if classifier is not None:
-        clf_model, clf_threshold = classifier
-        with torch.no_grad():
-            logit = clf_model(torch.tensor(normalized, dtype=torch.float32).view(1, 1, WINDOW_LEN))
-            abnormal_probability = float(torch.sigmoid(logit).item())
-        is_anomaly = abnormal_probability >= clf_threshold
+        # Probability on the scale training chose (raw, or Platt-calibrated if
+        # that improved cross-validated calibration), compared against the
+        # threshold tuned on that same scale — see app/ml/ecg_classifier.py.
+        abnormal_probability = classifier.probability(
+            torch.tensor(per_window_normalize(windowed), dtype=torch.float32).view(1, 1, WINDOW_LEN))
+        decision_threshold = classifier.threshold
+        is_anomaly = abnormal_probability >= decision_threshold
         detector = "supervised_1d_cnn_classifier"
     else:
         abnormal_probability = None
+        decision_threshold = None
         is_anomaly = reconstruction_flag
         detector = "reconstruction_error_autoencoder"
 
@@ -228,27 +246,35 @@ def analyze_deep_waveform(req: SignalVectorRequest):
     # so a value near/over 1.0 marks the samples actually driving the flag.
     attention_heatmap = [min(1.0, round(float(e) / max(threshold, 1e-9), 3)) for e in per_sample_error]
 
-    if is_anomaly:
-        classified_pattern = "Abnormal beat morphology detected"
-        severity = "CRITICAL" if mse_loss > threshold * 3 else "WARNING"
-        recommendation = (
-            "Reconstruction error exceeds the model's learned normal-beat threshold — "
-            "morphology differs from typical sinus rhythm. Clinical correlation and "
-            "telemetry review advised. This model detects abnormal morphology only; "
-            "it does not classify a specific arrhythmia type."
-        )
+    # This used to describe reconstruction error even when the classifier
+    # made the call, and graded severity CRITICAL off the autoencoder's loss.
+    # A single-beat morphology screen cannot support a CRITICAL grade at all:
+    # it raises a flag for review, and says so.
+    if detector == "supervised_1d_cnn_classifier":
+        basis = (f"The screening model estimates a {abnormal_probability:.0%} probability that this "
+                 f"beat's morphology is abnormal (review flag raised at {decision_threshold:.0%}).")
     else:
-        classified_pattern = "Normal sinus rhythm morphology"
+        basis = "Reconstruction error exceeds the autoencoder's learned normal-beat threshold."
+    if is_anomaly:
+        classified_pattern = "Abnormal beat morphology"
+        severity = "FLAGGED"
+        recommendation = (f"{basis} Review the full rhythm strip and correlate clinically. This is a "
+                          "binary morphology screen: it does not identify the arrhythmia type.")
+    else:
+        classified_pattern = "Normal beat morphology"
         severity = "NORMAL"
-        recommendation = "Beat morphology reconstructs within the model's normal range."
+        recommendation = f"{basis} No review flag raised for this beat."
 
     return {
         "success": True,
         "data": {
-            "model_architecture": meta.get("architecture", "1D-CNN autoencoder (PyTorch)"),
+            "model_architecture": (_manifest_meta("ecg_beat_classifier").get("architecture", "Supervised 1D-CNN")
+                                   if detector == "supervised_1d_cnn_classifier"
+                                   else meta.get("architecture", "1D-CNN autoencoder (PyTorch)")),
             "data_source": data_source,
             "detector": detector,
             "abnormal_probability": round(abnormal_probability, 4) if abnormal_probability is not None else None,
+            "decision_threshold": round(decision_threshold, 4) if decision_threshold is not None else None,
             "reconstruction_loss_mse": round(mse_loss, 6),
             "reconstruction_flag": reconstruction_flag,
             "threshold": round(threshold, 6),

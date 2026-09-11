@@ -54,6 +54,8 @@ ml-service/**/*.pt
 # Reproducible training-data cache built by prepare_ecg_dataset.py from
 # PhysioNet — regenerate rather than commit (~7MB, derived, not source).
 ml-service/data/mitbih_beats.npz
+# DS1/DS2 inter-patient cache built by prepare_ecg_inter_patient.py.
+ml-service/data/mitbih_inter_patient.npz
 
 # ============================================================
 # Editor / OS

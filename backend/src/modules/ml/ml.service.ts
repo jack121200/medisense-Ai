@@ -197,7 +197,7 @@ export const mlService = {
     },
 
     /**
-     * Run Deep LSTM Autoencoder Waveform Signal Analyzer
+     * ECG beat screening — supervised 1D-CNN verdict, autoencoder as a secondary signal
      * Calls: POST /api/deep/anomaly-stream
      */
     async runDeepAnomalyStream(signalData: Record<string, any>) {
