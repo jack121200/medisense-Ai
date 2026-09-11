@@ -155,12 +155,12 @@ export default function DashboardPage() {
             </div>
 
             {/* ── KPI Grid ── */}
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(185px, 1fr))', gap: 14, marginBottom: 24 }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(max(220px, calc((100% - 28px) / 3)), 1fr))', gap: 14, marginBottom: 24 }}>
                 {kpis.map((kpi, i) => <KpiCard key={kpi.label} kpi={kpi} delay={i * 55} />)}
             </div>
 
             {/* ── Quick Actions ── */}
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 12, marginBottom: 24 }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: 12, marginBottom: 24 }}>
                 {[
                     { label: '❤️ Heart Risk AI', sub: 'Predict heart disease risk', to: '/ml-predictions', color: 'var(--accent-primary)' },
                     { label: '🩸 CBC Analyzer', sub: 'Analyze blood report', to: '/report-analyzer', color: 'var(--accent-primary-hover)' },
@@ -214,7 +214,7 @@ export default function DashboardPage() {
             </div>
 
             {/* ── Bottom Grid ── */}
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 18, marginBottom: 20 }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: 18, marginBottom: 20 }}>
 
                 {/* High Risk Patients */}
                 <div style={{ background: 'var(--surface-1)', border: '1px solid var(--surface-border)', borderRadius: 18, overflow: 'hidden' }}>

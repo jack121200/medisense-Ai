@@ -221,7 +221,7 @@ export default function PatientPortalPage() {
                             </span>
                         </div>
                         <div style={{ fontSize: 12.5, color: 'var(--text-secondary)', marginTop: 3 }}>
-                            Speak directly with your AI Doctor for instant voice triage, symptom consultation, and medical advice.
+                            Talk to Priya, an AI health assistant, in Hindi, English or Hinglish. She takes your history and writes a report for your doctor to review — she is not a doctor and does not diagnose.
                         </div>
                     </div>
                 </div>

@@ -11,6 +11,8 @@ const ROLES = [
     { id: 'DOCTOR', label: 'Doctor', icon: '🩺', desc: 'Access patient records, write prescriptions, manage consultations' },
     { id: 'RECEPTIONIST', label: 'Receptionist', icon: '📋', desc: 'Manage appointment requests, patient intake and scheduling' },
     { id: 'LAB_TECHNICIAN', label: 'Lab Technician', icon: '🧪', desc: 'Process lab orders and upload patient test reports' },
+    // Administrators had no tile and had to sign in under another role's.
+    { id: 'ADMIN', label: 'Administrator', icon: '🛡️', desc: 'Manage staff accounts, billing and hospital analytics' },
 ];
 
 const inputStyle: React.CSSProperties = {

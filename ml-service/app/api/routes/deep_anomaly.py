@@ -284,9 +284,12 @@ def analyze_deep_waveform(req: SignalVectorRequest):
             "classified_pattern": classified_pattern,
             "recommendation": recommendation,
             "signal_length": WINDOW_LEN,
-            "raw_signal_samples": [round(float(v), 4) for v in windowed[:60]],
-            "reconstructed_samples": [round(float(v), 4) for v in reconstructed[:60]],
-            "attention_heatmap": attention_heatmap[:60],
+            # The whole 256-sample window. Only the first 60 samples were sent,
+            # which is baseline before the R-peak at sample 128: the monitor
+            # never drew the beat it was screening.
+            "raw_signal_samples": [round(float(v), 4) for v in windowed],
+            "reconstructed_samples": [round(float(v), 4) for v in reconstructed],
+            "attention_heatmap": attention_heatmap,
             "model_eval_metrics": _eval_metrics(detector, meta),
         },
     }
