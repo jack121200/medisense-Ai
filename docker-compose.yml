@@ -84,6 +84,11 @@ services:
       - VAPI_PUBLIC_KEY=${VAPI_PUBLIC_KEY}
       - VAPI_WEBHOOK_SECRET=${VAPI_WEBHOOK_SECRET}
       - GROQ_API_KEY=${GROQ_API_KEY}
+      # Spend guard for metered voice calls. Without these the values in .env
+      # never reach the container: the cap silently fell back to 50.
+      - AI_DOCTOR_DAILY_CALL_CAP=${AI_DOCTOR_DAILY_CALL_CAP:-20}
+      - AI_DOCTOR_TTS_PROVIDER=${AI_DOCTOR_TTS_PROVIDER:-azure}
+      - AI_DOCTOR_TTS_VOICE_ID=${AI_DOCTOR_TTS_VOICE_ID:-hi-IN-MadhurNeural}
     depends_on:
       postgres:
         condition: service_healthy
