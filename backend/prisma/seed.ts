@@ -62,6 +62,7 @@ async function main() {
         { email: 'doctor@medisense.ai', firstName: 'Dr. Sarah', lastName: 'Chen', role: 'DOCTOR' as const },
         { email: 'nurse@medisense.ai', firstName: 'Nurse Rahul', lastName: 'Sharma', role: 'NURSE' as const },
         { email: 'analyst@medisense.ai', firstName: 'Dr. Priya', lastName: 'Analytics', role: 'ANALYST' as const },
+        { email: 'patient@medisense.ai', firstName: 'Patient', lastName: 'Demo', role: 'PATIENT' as const },
     ];
 
     for (const u of users) {
@@ -261,6 +262,23 @@ async function main() {
     console.log('   doctor@medisense.ai    / MediSense@2024 (DOCTOR)');
     console.log('   nurse@medisense.ai     / MediSense@2024 (NURSE)');
     console.log('   analyst@medisense.ai   / MediSense@2024 (ANALYST)');
+
+    // ── Demo patient login ──
+    // The AI Doctor and the patient portal resolve everything from the
+    // caller's linked Patient record, so a PATIENT user without one cannot
+    // start a consultation at all. No seed used to create this link, which is
+    // why the documented demo account failed with PATIENT_NOT_FOUND.
+    const demoPatientUser = await prisma.user.findUnique({ where: { email: 'patient@medisense.ai' } });
+    if (demoPatientUser) {
+        const alreadyLinked = await prisma.patient.findFirst({ where: { userId: demoPatientUser.id } });
+        if (!alreadyLinked) {
+            const candidate = await prisma.patient.findFirst({ where: { userId: null }, orderBy: { createdAt: 'asc' } });
+            if (candidate) {
+                await prisma.patient.update({ where: { id: candidate.id }, data: { userId: demoPatientUser.id } });
+            }
+        }
+        console.log('✅ Demo patient account linked to a patient record');
+    }
 }
 
 main()
