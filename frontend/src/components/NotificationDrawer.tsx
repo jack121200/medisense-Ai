@@ -6,6 +6,7 @@ import { isToday, isTomorrow, parseISO, format } from 'date-fns';
 import { useNavigate } from 'react-router-dom';
 
 
+import { tint } from '../utils/tint';
 interface NotificationDrawerProps {
     open: boolean;
     onClose: () => void;
@@ -50,7 +51,7 @@ export default function NotificationDrawer({ open, onClose }: NotificationDrawer
             {count > 0 && (
                 <span style={{
                     marginLeft: 'auto', fontSize: 11, padding: '2px 7px', borderRadius: 9999,
-                    background: `${color}18`, color, fontWeight: 800, border: `1px solid ${color}30`,
+                    background: `${tint(color, '18')}`, color, fontWeight: 800, border: `1px solid ${tint(color, '30')}`,
                 }}>
                     {count}
                 </span>
@@ -156,9 +157,9 @@ export default function NotificationDrawer({ open, onClose }: NotificationDrawer
                                             </div>
                                             <span style={{
                                                 flexShrink: 0, fontSize: 9.5, padding: '2px 7px', borderRadius: 9999, fontWeight: 800,
-                                                background: `${SEV_COLORS[alert.severity] || 'var(--surface-0)'}18`,
+                                                background: `${tint(SEV_COLORS[alert.severity] || 'var(--surface-0)', '18')}`,
                                                 color: SEV_COLORS[alert.severity] || 'var(--text-primary)',
-                                                border: `1px solid ${SEV_COLORS[alert.severity] || 'var(--surface-border-hi)'}30`,
+                                                border: `1px solid ${tint(SEV_COLORS[alert.severity] || 'var(--surface-border-hi)', '30')}`,
                                             }}>
                                                 {alert.severity}
                                             </span>

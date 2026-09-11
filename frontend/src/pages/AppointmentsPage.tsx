@@ -12,16 +12,17 @@ import toast from 'react-hot-toast';
 import { format, isToday, isTomorrow, parseISO } from 'date-fns';
 import { doctorName } from '../utils/doctorName';
 
+import { tint } from '../utils/tint';
 // ─── Shared config ──────────────────────────────────────────────────────────
 
 const STATUS_COLORS: Record<string, { color: string; bg: string; label: string }> = {
-    PENDING: { color: 'var(--risk-medium-text)', bg: '#FFD16615', label: '⏳ Pending' },
-    APPROVED: { color: 'var(--risk-low-text)', bg: '#00FF8715', label: '✅ Approved' },
-    REJECTED: { color: 'var(--risk-critical-text)', bg: '#FF2D5515', label: '❌ Rejected' },
-    COUNTER_OFFERED: { color: 'var(--risk-high-text)', bg: '#FF6B3515', label: '↩ Counter Offered' },
-    ACCEPTED: { color: 'var(--accent-primary)', bg: '#00E5FF15', label: '✅ Patient Accepted' },
-    DECLINED: { color: 'var(--text-muted)', bg: '#aaa15', label: 'Patient Declined' },
-    CANCELLED: { color: 'var(--text-muted)', bg: '#aaa15', label: 'Cancelled' },
+    PENDING: { color: 'var(--risk-medium-text)', bg: 'var(--risk-medium-bg)', label: '⏳ Pending' },
+    APPROVED: { color: 'var(--risk-low-text)', bg: 'var(--risk-low-bg)', label: '✅ Approved' },
+    REJECTED: { color: 'var(--risk-critical-text)', bg: 'var(--risk-critical-bg)', label: '❌ Rejected' },
+    COUNTER_OFFERED: { color: 'var(--risk-high-text)', bg: 'var(--risk-high-bg)', label: '↩ Counter Offered' },
+    ACCEPTED: { color: 'var(--accent-primary)', bg: 'var(--accent-glow-sm)', label: '✅ Patient Accepted' },
+    DECLINED: { color: 'var(--text-muted)', bg: 'var(--surface-2)', label: 'Patient Declined' },
+    CANCELLED: { color: 'var(--text-muted)', bg: 'var(--surface-2)', label: 'Cancelled' },
 };
 
 const TIME_SLOT_LABELS: Record<string, string> = {
@@ -177,7 +178,7 @@ function RequestsTab() {
             {/* Stats */}
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 12, marginBottom: 20 }}>
                 {stats.map(s => (
-                    <div key={s.label} style={{ background: `${s.color}08`, border: `1px solid ${s.color}20`, borderRadius: 14, padding: '14px 18px', position: 'relative', overflow: 'hidden' }}>
+                    <div key={s.label} style={{ background: `${tint(s.color, '08')}`, border: `1px solid ${tint(s.color, '20')}`, borderRadius: 14, padding: '14px 18px', position: 'relative', overflow: 'hidden' }}>
                         <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 2, background: s.color, opacity: 0.7 }} />
                         <div style={{ fontSize: 26, fontWeight: 900, color: s.color, fontFamily: 'var(--font-mono)', marginBottom: 3 }}>{s.val}</div>
                         <div style={{ fontSize: 11.5, color: 'var(--text-muted)' }}>{s.label}</div>
@@ -191,7 +192,7 @@ function RequestsTab() {
                     <button key={f} onClick={() => setFilter(f)} style={{
                         padding: '6px 14px', borderRadius: 20, fontSize: 11.5, fontWeight: 700, cursor: 'pointer',
                         background: filter === f ? 'rgba(35, 83, 71, 0.12)' : 'var(--surface-2)',
-                        border: `1px solid ${filter === f ? '#6366f140' : 'var(--surface-border)'}`,
+                        border: `1px solid ${filter === f ? 'rgba(35, 83, 71, 0.30)' : 'var(--surface-border)'}`,
                         color: filter === f ? 'var(--accent-primary)' : 'var(--text-muted)',
                     }}>
                         {f === 'ALL' ? `All (${requests.length})` : f.replace('_', ' ')}
@@ -231,7 +232,7 @@ function RequestsTab() {
                                         </div>
                                     </div>
                                 </div>
-                                <span style={{ fontSize: 11, fontWeight: 700, color: sc.color, background: sc.bg, padding: '4px 12px', borderRadius: 20, border: `1px solid ${sc.color}30`, whiteSpace: 'nowrap' }}>{sc.label}</span>
+                                <span style={{ fontSize: 11, fontWeight: 700, color: sc.color, background: sc.bg, padding: '4px 12px', borderRadius: 20, border: `1px solid ${tint(sc.color, '30')}`, whiteSpace: 'nowrap' }}>{sc.label}</span>
                             </div>
                             <div style={{ display: 'flex', gap: 16, fontSize: 12, color: 'var(--text-muted)', flexWrap: 'wrap', marginBottom: req.status === 'PENDING' ? 12 : 0 }}>
                                 <span><Calendar size={11} style={{ display: 'inline', marginRight: 4 }} />{new Date(req.requestedDate).toLocaleDateString('en-IN', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' })}</span>

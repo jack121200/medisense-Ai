@@ -6,6 +6,7 @@ import { vitalsApi, alertApi } from '../api/index';
 import { useVitalsStore } from '../store/vitalsStore';
 import { format } from 'date-fns';
 
+import { tint } from '../utils/tint';
 const VITALS_CONFIG = [
     { key: 'HR', label: 'Heart Rate', unit: 'bpm', color: 'var(--risk-critical-text)', criticalLow: 40, criticalHigh: 130, icon: '❤️' },
     { key: 'SpO2', label: 'SpO₂', unit: '%', color: 'var(--accent-primary)', criticalLow: 88, criticalHigh: 101, icon: '🫁' },
@@ -211,7 +212,7 @@ export default function VitalsMonitorPage() {
                             return (
                                 <div key={vc.key} className={`vitals-card ${isCritical ? 'critical' : ''}`} style={{
                                     borderColor: isCritical ? vc.color : 'var(--surface-border)',
-                                    boxShadow: isCritical ? `0 0 20px ${vc.color}30` : undefined,
+                                    boxShadow: isCritical ? `0 0 20px ${tint(vc.color, '30')}` : undefined,
                                 }}>
                                     <div style={{ fontSize: 20, marginBottom: 8 }}>{vc.icon}</div>
                                     <div className="font-mono" style={{

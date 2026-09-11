@@ -14,6 +14,7 @@ import toast from 'react-hot-toast';
 import { reportApi } from '../api/index';
 import { downloadBlob } from '../utils/downloadBlob';
 
+import { tint } from '../utils/tint';
 function InfoRow({ label, value, highlight }: { label: string; value?: string | number | null; highlight?: boolean }) {
     if (!value && value !== 0) return null;
     return (
@@ -26,7 +27,7 @@ function InfoRow({ label, value, highlight }: { label: string; value?: string | 
 
 function Tag({ label, color = 'var(--risk-high)' }: { label: string; color?: string }) {
     return (
-        <span style={{ fontSize: 11, padding: '2px 9px', borderRadius: 20, background: `${color}18`, color, border: `1px solid ${color}30`, fontWeight: 600 }}>
+        <span style={{ fontSize: 11, padding: '2px 9px', borderRadius: 20, background: `${tint(color, '18')}`, color, border: `1px solid ${tint(color, '30')}`, fontWeight: 600 }}>
             {label}
         </span>
     );
@@ -180,7 +181,7 @@ export default function DoctorPatientDetail() {
             }}>
                 <div style={{
                     width: 64, height: 64, borderRadius: '50%', flexShrink: 0,
-                    background: 'linear-gradient(135deg, #00E5FF33, #6366f133)',
+                    background: 'var(--surface-3)',
                     border: '2px solid rgba(35, 83, 71, 0.2)',
                     display: 'flex', alignItems: 'center', justifyContent: 'center',
                     fontSize: 24, fontWeight: 800, color: 'var(--accent-primary)',
@@ -196,8 +197,8 @@ export default function DoctorPatientDetail() {
                             <span style={{
                                 fontSize: 11, fontWeight: 700, padding: '3px 10px', borderRadius: 20,
                                 color: RISK_COLORS[patient.currentRiskLevel] || 'var(--text-muted)',
-                                background: `${RISK_COLORS[patient.currentRiskLevel] || 'var(--surface-2)'}15`,
-                                border: `1px solid ${RISK_COLORS[patient.currentRiskLevel] || 'var(--surface-border)'}30`,
+                                background: `${tint(RISK_COLORS[patient.currentRiskLevel] || 'var(--surface-2)', '15')}`,
+                                border: `1px solid ${tint(RISK_COLORS[patient.currentRiskLevel] || 'var(--surface-border)', '30')}`,
                             }}>{patient.currentRiskLevel} RISK</span>
                         )}
                     </div>
@@ -349,8 +350,8 @@ export default function DoctorPatientDetail() {
                                             <span style={{
                                                 fontSize: 13, fontWeight: 700, padding: '2px 10px', borderRadius: 20,
                                                 color: RISK_COLORS[m.value || ''] || 'var(--text-muted)',
-                                                background: `${RISK_COLORS[m.value || ''] || 'var(--surface-2)'}15`,
-                                                border: `1px solid ${RISK_COLORS[m.value || ''] || 'var(--surface-border)'}30`,
+                                                background: `${tint(RISK_COLORS[m.value || ''] || 'var(--surface-2)', '15')}`,
+                                                border: `1px solid ${tint(RISK_COLORS[m.value || ''] || 'var(--surface-border)', '30')}`,
                                             }}>{m.value}</span>
                                         ) : (
                                             <div style={{ fontSize: 16, fontWeight: 700, color: (m as any).danger ? 'var(--risk-critical)' : 'var(--text-primary)' }}>{m.value}</div>
@@ -394,13 +395,13 @@ export default function DoctorPatientDetail() {
 
             {/* Receptionist view: simple risk badge only */}
             {isReceptionist && patient.currentRiskLevel && (
-                <div style={{ background: 'var(--surface-1)', border: `1px solid ${RISK_COLORS[patient.currentRiskLevel] || 'var(--surface-border)'}25`, borderRadius: 18, padding: 20, display: 'flex', alignItems: 'center', gap: 16 }}>
+                <div style={{ background: 'var(--surface-1)', border: `1px solid ${tint(RISK_COLORS[patient.currentRiskLevel] || 'var(--surface-border)', '25')}`, borderRadius: 18, padding: 20, display: 'flex', alignItems: 'center', gap: 16 }}>
                     <div style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.1em' }}>🏷️ Scheduling Priority</div>
                     <span style={{
                         fontSize: 14, fontWeight: 800, padding: '6px 18px', borderRadius: 20,
                         color: RISK_COLORS[patient.currentRiskLevel] || 'var(--text-muted)',
-                        background: `${RISK_COLORS[patient.currentRiskLevel] || 'var(--surface-2)'}15`,
-                        border: `1px solid ${RISK_COLORS[patient.currentRiskLevel] || 'var(--surface-border)'}30`,
+                        background: `${tint(RISK_COLORS[patient.currentRiskLevel] || 'var(--surface-2)', '15')}`,
+                        border: `1px solid ${tint(RISK_COLORS[patient.currentRiskLevel] || 'var(--surface-border)', '30')}`,
                     }}>{patient.currentRiskLevel} RISK</span>
                     <div style={{ fontSize: 12, color: 'var(--text-muted)' }}>Use this to prioritize appointment scheduling</div>
                 </div>

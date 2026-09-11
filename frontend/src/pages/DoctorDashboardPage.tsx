@@ -11,6 +11,7 @@ import toast from 'react-hot-toast';
 import SymptomChecker from '../components/SymptomChecker';
 import { doctorName } from '../utils/doctorName';
 
+import { tint } from '../utils/tint';
 const RISK_COLORS: Record<string, string> = {
     CRITICAL: 'var(--risk-critical)', HIGH: 'var(--risk-high)', MEDIUM: 'var(--risk-medium)', LOW: 'var(--risk-low)',
 };
@@ -24,8 +25,8 @@ const SLOT_LABELS: Record<string, string> = {
 function TokenBadge({ n }: { n: number }) {
     return (
         <div style={{
-            width: 40, height: 40, borderRadius: 12, background: 'linear-gradient(135deg, #00E5FF22, #00E5FF11)',
-            border: '1px solid #00E5FF33', display: 'flex', alignItems: 'center', justifyContent: 'center',
+            width: 40, height: 40, borderRadius: 12, background: 'var(--accent-glow-sm)',
+            border: '1px solid var(--surface-border-md)', display: 'flex', alignItems: 'center', justifyContent: 'center',
             fontWeight: 900, fontSize: 16, color: 'var(--accent-primary)', flexShrink: 0,
         }}>{n}</div>
     );
@@ -39,8 +40,8 @@ function StatusBadge({ status }: { status: string }) {
     const c = colors[status] || 'var(--text-muted)';
     return (
         <span style={{
-            fontSize: 10, fontWeight: 700, color: c, background: `${c}15`,
-            padding: '3px 10px', borderRadius: 20, border: `1px solid ${c}30`,
+            fontSize: 10, fontWeight: 700, color: c, background: `${tint(c, '15')}`,
+            padding: '3px 10px', borderRadius: 20, border: `1px solid ${tint(c, '30')}`,
         }}>
             {status.replace(/_/g, ' ')}
         </span>
@@ -136,7 +137,7 @@ export default function DoctorDashboardPage() {
                     { label: 'Pending Appts', val: appointments.length, color: 'var(--accent-magenta)', icon: <FileText size={18} /> },
                 ].map(s => (
                     <div key={s.label} style={{
-                        background: 'var(--surface-1)', border: `1px solid ${s.color}22`,
+                        background: 'var(--surface-1)', border: `1px solid ${tint(s.color, '22')}`,
                         borderRadius: 16, padding: '20px 22px', position: 'relative', overflow: 'hidden',
                     }}>
                         <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 2, background: s.color, opacity: 0.6 }} />
@@ -261,7 +262,7 @@ export default function DoctorDashboardPage() {
                                                 </span>
                                                 <span style={{ fontSize: 11, color: 'var(--text-muted)' }}>{c.patient?.patientCode}</span>
                                                 {c.patient?.currentRiskLevel && (
-                                                    <span style={{ fontSize: 10, fontWeight: 700, color: riskColor, background: `${riskColor}15`, padding: '2px 8px', borderRadius: 6, border: `1px solid ${riskColor}30` }}>
+                                                    <span style={{ fontSize: 10, fontWeight: 700, color: riskColor, background: `${tint(riskColor, '15')}`, padding: '2px 8px', borderRadius: 6, border: `1px solid ${tint(riskColor, '30')}` }}>
                                                         {c.patient?.currentRiskLevel}
                                                     </span>
                                                 )}
@@ -273,7 +274,7 @@ export default function DoctorDashboardPage() {
                                             </div>
                                         </div>
                                         <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-                                            <span style={{ fontSize: 11, fontWeight: 700, color: statusColor, background: `${statusColor}15`, padding: '4px 10px', borderRadius: 20, border: `1px solid ${statusColor}30` }}>
+                                            <span style={{ fontSize: 11, fontWeight: 700, color: statusColor, background: `${tint(statusColor, '15')}`, padding: '4px 10px', borderRadius: 20, border: `1px solid ${tint(statusColor, '30')}` }}>
                                                 {c.status.replace('_', ' ')}
                                             </span>
                                             <ChevronRight size={16} style={{ color: 'var(--text-muted)' }} />

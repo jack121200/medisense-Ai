@@ -9,6 +9,7 @@ import {
 import toast from 'react-hot-toast';
 import { reportApi } from '../api/index';
 import { downloadBlob } from '../utils/downloadBlob';
+import { tint } from '../utils/tint';
 import {
     aiDoctorApi,
     AiDoctorCallSummary,
@@ -24,8 +25,8 @@ type ActiveTab = 'talk' | 'history';
 
 // ── Urgency config ────────────────────────────────────────────────────────────
 const URGENCY_CFG: Record<string, { color: string; bg: string; label: string }> = {
-    URGENT:  { color: 'var(--accent-primary)', bg: 'rgba(35, 83, 71, 0.12)',  label: '🚨 URGENT'  },
-    SOON:    { color: 'var(--vitals-temp)', bg: 'rgba(217, 122, 58, 0.12)', label: '⚠️ SOON'    },
+    URGENT:  { color: 'var(--risk-critical-text)', bg: 'var(--risk-critical-bg)', label: '🚨 URGENT'  },
+    SOON:    { color: 'var(--risk-high-text)', bg: 'var(--risk-high-bg)', label: '⚠️ SOON'    },
     ROUTINE: { color: 'var(--risk-low-text)', bg: 'rgba(63, 138, 102, 0.12)',  label: '✅ ROUTINE'  },
 };
 
@@ -142,7 +143,7 @@ function DoctorReportCard({ suggestions, callId, onDismiss }: { suggestions: Doc
                     <span style={{
                         padding: '4px 12px', borderRadius: 9999, fontSize: 11, fontWeight: 700,
                         background: urgency.bg, color: urgency.color,
-                        border: `1px solid ${urgency.color}40`,
+                        border: `1px solid ${tint(urgency.color, '40')}`,
                     }}>{urgency.label}</span>
                     {onDismiss && (
                         <button onClick={onDismiss} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-muted)', padding: 4 }}>

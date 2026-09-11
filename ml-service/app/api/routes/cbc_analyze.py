@@ -271,11 +271,11 @@ def analyze_cbc(req: CBCRequest):
     interpretations = _auto_interpret(findings, values)
 
     if abnormal_count == 0:
-        overall_status, overall_color = "NORMAL",         "#00C851"
+        overall_status, overall_color = "NORMAL",         "#2B6A4F"
     elif abnormal_count <= 2:
-        overall_status, overall_color = "MILD CONCERN",   "#FFD166"
+        overall_status, overall_color = "MILD CONCERN",   "#7A5C14"
     else:
-        overall_status, overall_color = "REVIEW REQUIRED","#E63946"
+        overall_status, overall_color = "REVIEW REQUIRED","#B0363F"
 
     cardiac_note = ""
     hgb = values.get("HGB")

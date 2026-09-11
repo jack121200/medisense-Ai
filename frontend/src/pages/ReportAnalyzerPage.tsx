@@ -9,6 +9,7 @@ import { Droplets, CheckCircle, AlertTriangle, Info } from 'lucide-react';
 import { mlApi } from '../api/ml.api';
 import toast from 'react-hot-toast';
 
+import { tint } from '../utils/tint';
 const C = {
     crimson:  'var(--accent-primary)',
     rose:     'var(--accent-primary-hover)',
@@ -36,9 +37,9 @@ const CBC_PARAMS = [
 ];
 
 const STATUS_CONFIG: Record<string, { color: string; bg: string; label: string }> = {
-    HIGH:   { color: C.crimson, bg: `${C.crimson}15`, label: 'HIGH ↑' },
+    HIGH:   { color: 'var(--risk-critical-text)', bg: 'var(--risk-critical-bg)', label: 'HIGH ↑' },
     LOW:    { color: '#256876', bg: 'rgba(46, 122, 138, 0.10)',       label: 'LOW ↓' },
-    NORMAL: { color: C.teal,    bg: `${C.teal}10`,     label: 'NORMAL' },
+    NORMAL: { color: 'var(--risk-low-text)', bg: 'var(--risk-low-bg)', label: 'NORMAL' },
 };
 
 export default function ReportAnalyzerPage() {
@@ -138,13 +139,13 @@ export default function ReportAnalyzerPage() {
                                                 placeholder={p.placeholder}
                                                 style={{
                                                     width: 120, padding: '8px 12px',
-                                                    background: filled ? `${C.teal}10` : 'var(--surface-2)',
-                                                    border: filled ? `1px solid ${C.teal}35` : '1px solid var(--surface-border)',
+                                                    background: filled ? `${tint(C.teal, '10')}` : 'var(--surface-2)',
+                                                    border: filled ? `1px solid ${tint(C.teal, '35')}` : '1px solid var(--surface-border)',
                                                     borderRadius: 9, color: 'var(--text-primary)', fontSize: 13.5,
                                                     outline: 'none', fontFamily: 'var(--font-mono)',
                                                 }}
-                                                onFocus={e => (e.currentTarget.style.border = `1px solid ${C.rose}50`)}
-                                                onBlur={e => (e.currentTarget.style.border = filled ? `1px solid ${C.teal}35` : '1px solid var(--surface-border)')}
+                                                onFocus={e => (e.currentTarget.style.border = `1px solid ${tint(C.rose, '50')}`)}
+                                                onBlur={e => (e.currentTarget.style.border = filled ? `1px solid ${tint(C.teal, '35')}` : '1px solid var(--surface-border)')}
                                             />
                                         </td>
                                         <td style={{ padding: '10px 20px' }}>
@@ -163,7 +164,7 @@ export default function ReportAnalyzerPage() {
                         background: loading || filledCount < 3 ? 'var(--surface-2)' : `linear-gradient(135deg, ${C.crimson}, var(--accent-primary-dim))`,
                         color: loading || filledCount < 3 ? 'var(--text-muted)' : 'var(--text-primary)',
                         fontWeight: 800, fontSize: 14.5, cursor: loading || filledCount < 3 ? 'not-allowed' : 'pointer',
-                        boxShadow: !loading && filledCount >= 3 ? `0 6px 28px ${C.crimson}30` : 'none',
+                        boxShadow: !loading && filledCount >= 3 ? `0 6px 28px ${tint(C.crimson, '30')}` : 'none',
                         transition: 'all 0.2s',
                     }}>
                         {loading ? '🔄 Analyzing CBC...' : '🩸 Analyze Blood Report'}
@@ -184,7 +185,7 @@ export default function ReportAnalyzerPage() {
                             <div style={{ fontWeight: 800, fontSize: 15, color: 'var(--text-primary)', display: 'flex', alignItems: 'center', gap: 8 }}>
                                 <CheckCircle size={16} color={C.teal} /> Analysis Results
                             </div>
-                            <div style={{ padding: '5px 16px', borderRadius: 9999, background: `${result.overall_color}18`, border: `1px solid ${result.overall_color}30`, color: result.overall_color, fontSize: 12, fontWeight: 800 }}>
+                            <div style={{ padding: '5px 16px', borderRadius: 9999, background: `${tint(result.overall_color, '18')}`, border: `1px solid ${tint(result.overall_color, '30')}`, color: result.overall_color, fontSize: 12, fontWeight: 800 }}>
                                 {result.overall_status}
                             </div>
                         </div>
@@ -228,7 +229,7 @@ export default function ReportAnalyzerPage() {
                     <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
 
                         {/* Overall status */}
-                        <div style={{ background: `${result.overall_color}10`, border: `1px solid ${result.overall_color}30`, borderRadius: 18, padding: '22px', textAlign: 'center' }}>
+                        <div style={{ background: `${tint(result.overall_color, '10')}`, border: `1px solid ${tint(result.overall_color, '30')}`, borderRadius: 18, padding: '22px', textAlign: 'center' }}>
                             <div style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 10 }}>Overall CBC Status</div>
                             <div style={{ fontSize: 24, fontWeight: 900, color: result.overall_color, marginBottom: 6 }}>{result.overall_status}</div>
                             <div style={{ display: 'flex', gap: 16, justifyContent: 'center', marginTop: 10 }}>
@@ -262,7 +263,7 @@ export default function ReportAnalyzerPage() {
 
                         {/* Cardiac note */}
                         {result.cardiac_note && (
-                            <div style={{ background: `${C.crimson}10`, border: `1px solid ${C.crimson}25`, borderRadius: 14, padding: '14px 18px', display: 'flex', gap: 10, alignItems: 'flex-start' }}>
+                            <div style={{ background: `${tint(C.crimson, '10')}`, border: `1px solid ${tint(C.crimson, '25')}`, borderRadius: 14, padding: '14px 18px', display: 'flex', gap: 10, alignItems: 'flex-start' }}>
                                 <AlertTriangle size={15} color={C.crimson} style={{ flexShrink: 0, marginTop: 2 }} />
                                 <div style={{ fontSize: 12.5, color: 'var(--text-primary)', lineHeight: 1.65 }}>{result.cardiac_note}</div>
                             </div>
@@ -279,7 +280,7 @@ export default function ReportAnalyzerPage() {
 
                         {/* Cluster */}
                         {result.cluster?.available && (
-                            <div style={{ background: `${C.lavender}08`, border: `1px solid ${C.lavender}20`, borderRadius: 14, padding: '14px 18px' }}>
+                            <div style={{ background: `${tint(C.lavender, '08')}`, border: `1px solid ${tint(C.lavender, '20')}`, borderRadius: 14, padding: '14px 18px' }}>
                                 <div style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', marginBottom: 6 }}>Patient Cluster</div>
                                 <div style={{ fontSize: 13.5, fontWeight: 700, color: C.lavender }}>{result.cluster.cluster_name}</div>
                                 <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 3 }}>Based on KMeans CBC pattern clustering</div>

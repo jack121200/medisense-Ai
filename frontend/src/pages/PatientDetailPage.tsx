@@ -67,6 +67,7 @@ interface SavedReport { id: string; date: string; text: string; findings: LabFin
 
 import { useAuthStore } from '../store/authStore';
 
+import { tint } from '../utils/tint';
 // ... (inside PatientDetailPage)
 export default function PatientDetailPage() {
     const { user } = useAuthStore();
@@ -396,7 +397,7 @@ export default function PatientDetailPage() {
                                             const colors: Record<string, string> = { CRITICAL: 'var(--risk-critical)', HIGH: 'var(--risk-high)', MEDIUM: 'var(--risk-medium)', LOW: 'var(--risk-low)' };
                                             const c = colors[level];
                                             return (
-                                                <div key={level} style={{ background: `${c}08`, border: `1px solid ${c}20`, borderRadius: 10, padding: '10px 12px', textAlign: 'center' }}>
+                                                <div key={level} style={{ background: `${tint(c, '08')}`, border: `1px solid ${tint(c, '20')}`, borderRadius: 10, padding: '10px 12px', textAlign: 'center' }}>
                                                     <div style={{ fontSize: 10, color: 'var(--text-muted)', fontWeight: 700, marginBottom: 5 }}>{level}</div>
                                                     <div style={{ height: 3, background: 'var(--surface-2)', borderRadius: 2, marginBottom: 6 }}>
                                                         <div style={{ height: '100%', borderRadius: 2, width: `${prob * 100}%`, background: c, transition: 'width 0.5s ease' }} />
@@ -507,7 +508,7 @@ export default function PatientDetailPage() {
                                         <div key={rec.id} style={{ background: 'var(--surface-2)', borderRadius: 12, padding: '14px 16px', borderLeft: `3px solid ${color}` }}>
                                             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 6 }}>
                                                 <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-primary)', lineHeight: 1.3 }}>{rec.title}</div>
-                                                <span style={{ fontSize: 10, padding: '2px 8px', borderRadius: 9999, fontWeight: 700, background: `${color}18`, color, marginLeft: 8, flexShrink: 0 }}>{rec.priority}</span>
+                                                <span style={{ fontSize: 10, padding: '2px 8px', borderRadius: 9999, fontWeight: 700, background: `${tint(color, '18')}`, color, marginLeft: 8, flexShrink: 0 }}>{rec.priority}</span>
                                             </div>
                                             <div style={{ fontSize: 12, color: 'var(--text-secondary)', marginBottom: 6 }}>{rec.description}</div>
                                             {rec.specialistType && <div style={{ fontSize: 11, color: 'var(--accent-primary)', fontWeight: 600 }}>👨‍⚕️ {rec.specialistType}</div>}
@@ -570,7 +571,7 @@ export default function PatientDetailPage() {
                                 <div style={{ fontSize: 12, color: 'var(--text-muted)', marginBottom: 12 }}>Confidence: <strong style={{ color: 'var(--accent-primary)' }}>{((pred.riskConfidence || 0) * 100).toFixed(1)}%</strong> · Based on: age, BMI, comorbidities, blood sugar, blood pressure, creatinine, smoking status</div>
                                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: 12 }}>
                                     {[['CRITICAL', pred.riskProbabilityCritical || 0, 'var(--risk-critical)'], ['HIGH', pred.riskProbabilityHigh || 0, 'var(--risk-high)'], ['MEDIUM', pred.riskProbabilityMedium || 0, 'var(--risk-medium)'], ['LOW', pred.riskProbabilityLow || 0, 'var(--risk-low)']].map(([level, prob, c]: any) => (
-                                        <div key={level} style={{ background: `${c}08`, border: `1px solid ${c}20`, borderRadius: 12, padding: '14px 16px', textAlign: 'center' }}>
+                                        <div key={level} style={{ background: `${tint(c, '08')}`, border: `1px solid ${tint(c, '20')}`, borderRadius: 12, padding: '14px 16px', textAlign: 'center' }}>
                                             <div style={{ fontSize: 11, color: 'var(--text-muted)', fontWeight: 700, marginBottom: 8 }}>{level}</div>
                                             <div style={{ height: 4, background: 'var(--surface-2)', borderRadius: 3, marginBottom: 10 }}>
                                                 <div style={{ height: '100%', borderRadius: 3, width: `${prob * 100}%`, background: c, transition: 'width 0.6s ease' }} />
@@ -748,7 +749,7 @@ export default function PatientDetailPage() {
                     {reportAnalyzed && reportFindings.length > 0 && (
                         <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
                             {/* Risk card */}
-                            <div style={{ background: `${riskColor}10`, border: `1px solid ${riskColor}25`, borderRadius: 16, padding: '18px 20px', position: 'relative', overflow: 'hidden' }}>
+                            <div style={{ background: `${tint(riskColor, '10')}`, border: `1px solid ${tint(riskColor, '25')}`, borderRadius: 16, padding: '18px 20px', position: 'relative', overflow: 'hidden' }}>
                                 <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 3, background: riskColor }} />
                                 <div style={{ fontSize: 11, fontWeight: 700, color: riskColor, textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 6 }}>🤖 AI Risk Assessment</div>
                                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -772,7 +773,7 @@ export default function PatientDetailPage() {
                                                 ? { color: 'var(--risk-high-text)', bg: 'rgba(217, 122, 58, 0.10)', label: '↑ HIGH' }
                                                 : { color: 'var(--accent-primary)', bg: 'rgba(35, 83, 71, 0.08)', label: '↓ LOW' };
                                             return (
-                                                <div key={f.name} style={{ background: c.bg, border: `1px solid ${c.color}30`, borderRadius: 10, padding: '10px 14px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                                <div key={f.name} style={{ background: c.bg, border: `1px solid ${tint(c.color, '30')}`, borderRadius: 10, padding: '10px 14px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                                                     <div>
                                                         <div style={{ fontWeight: 700, fontSize: 13, color: 'var(--text-primary)' }}>{f.name}</div>
                                                         <div style={{ fontSize: 11, color: 'var(--text-muted)' }}>Normal: {f.min}–{f.max} {f.unit}</div>

@@ -4,6 +4,7 @@ import { mlApi } from '../../api/ml.api';
 import toast from 'react-hot-toast';
 import api from '../../api/axiosInstance';
 
+import { tint } from '../../utils/tint';
 // ── Colour tokens ──────────────────────────────────────────────────────────────
 const C = {
     lipid:    'var(--accent-primary)',
@@ -28,29 +29,29 @@ const STATUS_COLOR: Record<string, string> = {
     'LOW':          C.crimson,
 };
 const STATUS_BG: Record<string, string> = {
-    'OPTIMAL':      `${C.teal}18`,
+    'OPTIMAL':      `${tint(C.teal, '18')}`,
     'NEAR OPTIMAL': 'rgba(43, 106, 79, 0.10)',
-    'PROTECTIVE':   `${C.teal}18`,
-    'NORMAL':       `${C.teal}12`,
-    'BORDERLINE':   `${C.gold}18`,
-    'HIGH':         `${C.crimson}18`,
-    'VERY HIGH':    '#FF006E18',
-    'LOW':          `${C.crimson}18`,
+    'PROTECTIVE':   `${tint(C.teal, '18')}`,
+    'NORMAL':       `${tint(C.teal, '12')}`,
+    'BORDERLINE':   `${tint(C.gold, '18')}`,
+    'HIGH':         `${tint(C.crimson, '18')}`,
+    'VERY HIGH':    'var(--risk-critical-bg)',
+    'LOW':          `${tint(C.crimson, '18')}`,
 };
 
 // ── Risk config ───────────────────────────────────────────────────────────────
 const RISK_CFG: Record<string, { color: string; bg: string; label: string; emoji: string }> = {
-    HIGH:   { color: C.crimson, bg: `${C.crimson}18`, label: 'HIGH',   emoji: '🔴' },
-    MEDIUM: { color: C.gold,    bg: `${C.gold}18`,    label: 'MEDIUM', emoji: '🟡' },
-    LOW:    { color: C.teal,    bg: `${C.teal}18`,    label: 'LOW',    emoji: '🟢' },
+    HIGH:   { color: C.crimson, bg: `${tint(C.crimson, '18')}`, label: 'HIGH',   emoji: '🔴' },
+    MEDIUM: { color: C.gold,    bg: `${tint(C.gold, '18')}`,    label: 'MEDIUM', emoji: '🟡' },
+    LOW:    { color: C.teal,    bg: `${tint(C.teal, '18')}`,    label: 'LOW',    emoji: '🟢' },
 };
 
 // ── Statin intensity badge ─────────────────────────────────────────────────────
 const STATIN_CFG: Record<string, { color: string; bg: string }> = {
-    NONE:     { color: C.teal,    bg: `${C.teal}18` },
+    NONE:     { color: C.teal,    bg: `${tint(C.teal, '18')}` },
     LOW:      { color: '#256876', bg: 'rgba(46, 122, 138, 0.10)' },
-    MODERATE: { color: C.gold,    bg: `${C.gold}18` },
-    HIGH:     { color: C.crimson, bg: `${C.crimson}18` },
+    MODERATE: { color: C.gold,    bg: `${tint(C.gold, '18')}` },
+    HIGH:     { color: C.crimson, bg: `${tint(C.crimson, '18')}` },
 };
 
 // ── Ratio thresholds for color coding ─────────────────────────────────────────
@@ -81,7 +82,7 @@ function Field({ label, value, onChange, placeholder = '', unit = '' }: {
                 style={{
                     padding: '9px 12px',
                     background: focused ? 'rgba(35, 83, 71, 0.06)' : 'var(--surface-2)',
-                    border: `1px solid ${focused ? `${C.lipid}60` : 'var(--surface-border)'}`,
+                    border: `1px solid ${focused ? `${tint(C.lipid, '60')}` : 'var(--surface-border)'}`,
                     borderRadius: 9, color: 'var(--text-primary)', fontSize: 13.5,
                     outline: 'none', fontFamily: 'inherit',
                     transition: 'all 0.2s',
@@ -98,8 +99,8 @@ function Toggle({ label, active, onClick }: { label: string; active: boolean; on
         <button onClick={onClick} style={{
             display: 'flex', alignItems: 'center', gap: 8,
             padding: '8px 14px', borderRadius: 8,
-            background: active ? `${C.lipid}18` : 'var(--surface-2)',
-            border: `1px solid ${active ? `${C.lipid}50` : 'var(--surface-border)'}`,
+            background: active ? `${tint(C.lipid, '18')}` : 'var(--surface-2)',
+            border: `1px solid ${active ? `${tint(C.lipid, '50')}` : 'var(--surface-border)'}`,
             color: active ? C.lipid : 'var(--text-secondary)',
             cursor: 'pointer', fontSize: 13, fontWeight: active ? 700 : 500,
             transition: 'all 0.2s',
@@ -240,7 +241,7 @@ export default function LipidProfileTab() {
                 {/* ── Risk + Statin row ── */}
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
                     {/* Risk Badge */}
-                    <div style={{ background: risk.bg, border: `2px solid ${risk.color}35`, borderRadius: 18, padding: '24px 20px', textAlign: 'center' }}>
+                    <div style={{ background: risk.bg, border: `2px solid ${tint(risk.color, '35')}`, borderRadius: 18, padding: '24px 20px', textAlign: 'center' }}>
                         <div style={{ fontSize: 42, marginBottom: 6 }}>{risk.emoji}</div>
                         <div style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 4 }}>Cardiovascular Risk</div>
                         <div style={{ fontSize: 26, fontWeight: 900, color: risk.color }}>{risk.label} RISK</div>
@@ -249,13 +250,13 @@ export default function LipidProfileTab() {
                     </div>
 
                     {/* Statin Card */}
-                    <div style={{ background: statin.bg, border: `2px solid ${statin.color}35`, borderRadius: 18, padding: '24px 20px', textAlign: 'center' }}>
+                    <div style={{ background: statin.bg, border: `2px solid ${tint(statin.color, '35')}`, borderRadius: 18, padding: '24px 20px', textAlign: 'center' }}>
                         <div style={{ fontSize: 36, marginBottom: 6 }}>💊</div>
                         <div style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 8 }}>Statin Therapy</div>
                         <div style={{ fontSize: 15, fontWeight: 800, color: d.statin_recommendation?.needs_statin ? C.crimson : C.teal, marginBottom: 8 }}>
                             {d.statin_recommendation?.needs_statin ? 'Recommended' : 'Not Required'}
                         </div>
-                        <span style={{ padding: '6px 18px', borderRadius: 9999, background: statin.bg, color: statin.color, fontSize: 13, fontWeight: 800, border: `1px solid ${statin.color}50` }}>
+                        <span style={{ padding: '6px 18px', borderRadius: 9999, background: statin.bg, color: statin.color, fontSize: 13, fontWeight: 800, border: `1px solid ${tint(statin.color, '50')}` }}>
                             {d.statin_recommendation?.intensity} INTENSITY
                         </span>
                     </div>
@@ -272,16 +273,16 @@ export default function LipidProfileTab() {
 
                 {/* ── Detected Conditions ── */}
                 {(d.has_dyslipidemia || d.has_metabolic_syndrome) && (
-                    <div style={{ background: `${C.amber}08`, border: `1px solid ${C.amber}30`, borderRadius: 14, padding: 16 }}>
+                    <div style={{ background: `${tint(C.amber, '08')}`, border: `1px solid ${tint(C.amber, '30')}`, borderRadius: 14, padding: 16 }}>
                         <div style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 10 }}>Detected Conditions</div>
                         <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
                             {d.has_dyslipidemia && (
-                                <span style={{ padding: '5px 14px', borderRadius: 9999, background: `${C.amber}20`, color: C.amber, fontSize: 12, fontWeight: 700, border: `1px solid ${C.amber}40` }}>
+                                <span style={{ padding: '5px 14px', borderRadius: 9999, background: `${tint(C.amber, '20')}`, color: C.amber, fontSize: 12, fontWeight: 700, border: `1px solid ${tint(C.amber, '40')}` }}>
                                     ⚠️ Dyslipidemia
                                 </span>
                             )}
                             {d.has_metabolic_syndrome && (
-                                <span style={{ padding: '5px 14px', borderRadius: 9999, background: `${C.crimson}20`, color: C.crimson, fontSize: 12, fontWeight: 700, border: `1px solid ${C.crimson}40` }}>
+                                <span style={{ padding: '5px 14px', borderRadius: 9999, background: `${tint(C.crimson, '20')}`, color: C.crimson, fontSize: 12, fontWeight: 700, border: `1px solid ${tint(C.crimson, '40')}` }}>
                                     ⚠️ Metabolic Syndrome
                                 </span>
                             )}
@@ -296,7 +297,7 @@ export default function LipidProfileTab() {
                         {Object.entries(d.ratios || {}).map(([k, v]: [string, any]) => {
                             const col = ratioColor(k, v);
                             return (
-                                <div key={k} style={{ background: `${col}10`, border: `1px solid ${col}25`, borderRadius: 10, padding: '10px 14px' }}>
+                                <div key={k} style={{ background: `${tint(col, '10')}`, border: `1px solid ${tint(col, '25')}`, borderRadius: 10, padding: '10px 14px' }}>
                                     <div style={{ fontSize: 10, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.07em', marginBottom: 4 }}>{ratioLabels[k] || k}</div>
                                     <div style={{ fontSize: 20, fontWeight: 900, color: col, fontFamily: 'var(--font-mono)' }}>{Number(v).toFixed(2)}</div>
                                 </div>
@@ -307,7 +308,7 @@ export default function LipidProfileTab() {
 
                 {/* ── Red Flags ── */}
                 {d.red_flags?.length > 0 && (
-                    <div style={{ background: `${C.crimson}10`, border: `1px solid ${C.crimson}30`, borderRadius: 14, padding: 16 }}>
+                    <div style={{ background: `${tint(C.crimson, '10')}`, border: `1px solid ${tint(C.crimson, '30')}`, borderRadius: 14, padding: 16 }}>
                         <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10 }}>
                             <AlertTriangle size={15} color={C.crimson} />
                             <div style={{ fontSize: 12, fontWeight: 700, color: C.crimson, textTransform: 'uppercase', letterSpacing: '0.08em' }}>Critical Flags</div>
@@ -326,7 +327,7 @@ export default function LipidProfileTab() {
 
                 {/* ── Recommendations ── */}
                 {d.recommendations?.length > 0 && (
-                    <div style={{ background: `${C.lipid}08`, border: `1px solid ${C.lipid}25`, borderRadius: 16, padding: 18 }}>
+                    <div style={{ background: `${tint(C.lipid, '08')}`, border: `1px solid ${tint(C.lipid, '25')}`, borderRadius: 16, padding: 18 }}>
                         <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
                             <Zap size={14} color={C.lipid} />
                             <div style={{ fontSize: 12, fontWeight: 700, color: C.lipid, textTransform: 'uppercase', letterSpacing: '0.08em' }}>Recommendations</div>
@@ -394,7 +395,7 @@ export default function LipidProfileTab() {
                         {(['manual', 'pdf'] as const).map(m => (
                             <button key={m} onClick={() => setInputMode(m)} style={{
                                 padding: '6px 16px', borderRadius: 8, border: 'none', cursor: 'pointer',
-                                background: inputMode === m ? `${C.lipid}18` : 'transparent',
+                                background: inputMode === m ? `${tint(C.lipid, '18')}` : 'transparent',
                                 color: inputMode === m ? C.lipid : 'var(--text-muted)',
                                 fontWeight: 700, fontSize: 12.5, display: 'flex', alignItems: 'center', gap: 6,
                                 transition: 'all 0.2s',
@@ -407,7 +408,7 @@ export default function LipidProfileTab() {
 
                 {/* ── PDF upload zone ── */}
                 {inputMode === 'pdf' ? (
-                    <div style={{ border: `2px dashed ${C.lipid}30`, borderRadius: 14, padding: 44, textAlign: 'center', background: `${C.lipid}04` }}>
+                    <div style={{ border: `2px dashed ${tint(C.lipid, '30')}`, borderRadius: 14, padding: 44, textAlign: 'center', background: `${tint(C.lipid, '04')}` }}>
                         <input ref={fileRef} type="file" accept=".pdf,.docx" style={{ display: 'none' }}
                             onChange={e => e.target.files?.[0] && handlePdfUpload(e.target.files[0])} />
                         <div style={{ fontSize: 40, marginBottom: 12 }}>🧪</div>
@@ -420,7 +421,7 @@ export default function LipidProfileTab() {
                         <button onClick={() => fileRef.current?.click()} disabled={pdfLoading} style={{
                             padding: '12px 30px', borderRadius: 10, border: 'none', cursor: 'pointer',
                             background: `linear-gradient(135deg, ${C.lipid}, var(--accent-magenta))`, color: '#fff', fontWeight: 800, fontSize: 14,
-                            boxShadow: `0 4px 20px ${C.lipid}30`, opacity: pdfLoading ? 0.7 : 1,
+                            boxShadow: `0 4px 20px ${tint(C.lipid, '30')}`, opacity: pdfLoading ? 0.7 : 1,
                         }}>
                             {pdfLoading ? '⏳ Extracting...' : '📂 Choose File (PDF / DOCX)'}
                         </button>
@@ -467,7 +468,7 @@ export default function LipidProfileTab() {
                             padding: '13px 36px', borderRadius: 12, border: 'none',
                             background: loading ? 'var(--surface-2)' : `linear-gradient(135deg, ${C.lipid}, var(--accent-magenta))`,
                             color: 'var(--text-primary)', fontWeight: 800, fontSize: 14.5, cursor: loading ? 'not-allowed' : 'pointer',
-                            boxShadow: loading ? 'none' : `0 6px 28px ${C.lipid}35`,
+                            boxShadow: loading ? 'none' : `0 6px 28px ${tint(C.lipid, '35')}`,
                             transition: 'all 0.2s',
                         }}>
                             {loading ? '⏳ Analyzing Lipid Profile...' : '🫀 Analyze Lipid Profile'}
@@ -496,7 +497,7 @@ export default function LipidProfileTab() {
                                             <span style={{ fontSize: 12, fontFamily: 'var(--font-mono)', color: cfg.color, fontWeight: 700 }}>{pct}%</span>
                                         </div>
                                         <div style={{ height: 6, borderRadius: 99, background: 'var(--surface-2)', overflow: 'hidden' }}>
-                                            <div style={{ height: '100%', width: `${pct}%`, background: `linear-gradient(90deg, ${cfg.color}, ${cfg.color}aa)`, borderRadius: 99, transition: 'width 0.6s ease' }} />
+                                            <div style={{ height: '100%', width: `${pct}%`, background: `linear-gradient(90deg, ${cfg.color}, ${tint(cfg.color, 'aa')})`, borderRadius: 99, transition: 'width 0.6s ease' }} />
                                         </div>
                                     </div>
                                 );

@@ -3,6 +3,7 @@ import { mlApi } from '../api/ml.api';
 import { Sliders, ShieldAlert, Cpu, Sparkles, CheckCircle2, AlertTriangle, Activity } from 'lucide-react';
 import toast from 'react-hot-toast';
 
+import { tint } from '../utils/tint';
 const DRUGS = ["Ramipril", "Metoprolol", "Amlodipine", "Atorvastatin"];
 
 export default function FuzzyDosingCard() {
@@ -113,7 +114,7 @@ export default function FuzzyDosingCard() {
 
                     {/* Triage Priority Score */}
                     <div style={{
-                        background: 'var(--surface-1)', border: `1px solid ${result.triage_color}40`,
+                        background: 'var(--surface-1)', border: `1px solid ${tint(result.triage_color, '40')}`,
                         borderRadius: 14, padding: 18
                     }}>
                         <div style={{ fontSize: 11, color: 'var(--text-muted)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em' }}>

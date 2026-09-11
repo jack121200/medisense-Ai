@@ -226,11 +226,11 @@ def run_bayesian_inference(req: BayesianInferenceRequest):
     # Verdict
     prob_pct = round(posterior_prob * 100, 1)
     if prob_pct >= 65:
-        risk_level, color = "HIGH", "#E63946"
+        risk_level, color = "HIGH", "#B0363F"
     elif prob_pct >= 38:
-        risk_level, color = "MEDIUM", "#FFD166"
+        risk_level, color = "MEDIUM", "#7A5C14"
     else:
-        risk_level, color = "LOW", "#06D6A0"
+        risk_level, color = "LOW", "#2B6A4F"
 
     return {
         "success": True,

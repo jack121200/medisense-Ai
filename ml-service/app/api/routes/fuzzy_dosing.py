@@ -197,7 +197,7 @@ def run_fuzzy_dosing(req: FuzzyDosingRequest):
     triage_score = round(triage_num / triage_den, 1)
 
     triage_label = "CRITICAL EMERGENCY" if triage_score >= 85 else "HIGH PRIORITY" if triage_score >= 70 else "MODERATE" if triage_score >= 40 else "ROUTINE"
-    triage_color = "#E63946" if triage_score >= 85 else "#FF6B35" if triage_score >= 70 else "#FFD166" if triage_score >= 40 else "#00FF87"
+    triage_color = "#B0363F" if triage_score >= 85 else "#924E21" if triage_score >= 70 else "#7A5C14" if triage_score >= 40 else "#2B6A4F"
 
     # 4. Generate 2D/3D Fuzzy Control Surface Mesh Data for Visual Plot
     # Grid of BP vs Creatinine -> Dosage Factor Output

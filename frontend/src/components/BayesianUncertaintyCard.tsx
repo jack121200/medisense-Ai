@@ -3,6 +3,7 @@ import { mlApi } from '../api/ml.api';
 import { Brain, Network, HelpCircle, Activity, Sparkles, CheckCircle2, ChevronRight, AlertTriangle } from 'lucide-react';
 import toast from 'react-hot-toast';
 
+import { tint } from '../utils/tint';
 interface Props {
     patientData?: {
         age?: number;
@@ -108,7 +109,7 @@ export default function BayesianUncertaintyCard({ patientData }: Props) {
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 16, marginBottom: 20 }}>
                     {/* Stat 1: Posterior Probability */}
                     <div style={{
-                        background: 'var(--surface-1)', border: `1px solid ${result.color}35`,
+                        background: 'var(--surface-1)', border: `1px solid ${tint(result.color, '35')}`,
                         borderRadius: 14, padding: 18, position: 'relative', overflow: 'hidden'
                     }}>
                         <div style={{ fontSize: 11, color: 'var(--text-muted)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em' }}>

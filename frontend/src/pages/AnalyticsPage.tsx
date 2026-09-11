@@ -7,6 +7,7 @@ import {
 import { BarChart3, FlaskConical, TrendingUp, Database } from 'lucide-react';
 import toast from 'react-hot-toast';
 
+import { tint } from '../utils/tint';
 type TabId = 'stats' | 'hypothesis' | 'eda' | 'bigdata';
 
 const TABS: { id: TabId; icon: any; label: string }[] = [
@@ -178,8 +179,8 @@ export default function AnalyticsPage() {
                                             </div>
                                             <span style={{
                                                 padding: '5px 14px', borderRadius: 9999, fontSize: 12, fontWeight: 800,
-                                                background: `${color}18`, color,
-                                                border: `1px solid ${color}30`,
+                                                background: `${tint(color, '18')}`, color,
+                                                border: `1px solid ${tint(color, '30')}`,
                                             }}>
                                                 {test.reject_h0 ? '✓ Reject H₀' : '✗ Fail to Reject H₀'}
                                             </span>

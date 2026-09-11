@@ -218,11 +218,11 @@ def predict_heart_risk(req: HeartRiskRequest):
     probability = raw_probability  # percentage display uses raw prob * 100
 
     if raw_probability >= high_threshold:
-        level, color, message = "HIGH",   "#E63946", "Immediate cardiology evaluation strongly recommended. High probability of cardiac disease detected."
+        level, color, message = "HIGH",   "#B0363F", "Immediate cardiology evaluation strongly recommended. High probability of cardiac disease detected."
     elif raw_probability >= medium_threshold:
-        level, color, message = "MEDIUM", "#FFD166", "Elevated cardiac risk — further diagnostic tests advised (ECG, stress test, echocardiography)."
+        level, color, message = "MEDIUM", "#7A5C14", "Elevated cardiac risk — further diagnostic tests advised (ECG, stress test, echocardiography)."
     else:
-        level, color, message = "LOW",    "#06D6A0", "Low cardiac risk profile. Maintain heart-healthy lifestyle and regular check-ups."
+        level, color, message = "LOW",    "#2B6A4F", "Low cardiac risk profile. Maintain heart-healthy lifestyle and regular check-ups."
 
     # Personalized cardiac recommendations
     recommendations: List[str] = []

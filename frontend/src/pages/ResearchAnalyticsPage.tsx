@@ -6,6 +6,7 @@ import {
 import { FlaskConical, BarChart3, ChevronRight, AlertCircle, CheckCircle, Info } from 'lucide-react';
 import api from '../api/axiosInstance';
 
+import { tint } from '../utils/tint';
 const C = {
     crimson: 'var(--accent-primary)', rose: 'var(--accent-primary-hover)', gold: 'var(--risk-medium)',
     teal: 'var(--risk-low)', lavender: 'var(--vitals-bp)', blue: '#256876',
@@ -91,8 +92,8 @@ function HypothesisTab() {
                 <div style={{ fontSize: 12, fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.09em', marginBottom: 4 }}>Select a Question</div>
                 {QUESTIONS.map(q => (
                     <button key={q.id} onClick={() => run(q.id)} style={{
-                        padding: '14px 16px', borderRadius: 12, border: `1px solid ${selected === q.id ? `${C.lavender}50` : C.border}`,
-                        background: selected === q.id ? `${C.lavender}10` : C.bg,
+                        padding: '14px 16px', borderRadius: 12, border: `1px solid ${selected === q.id ? `${tint(C.lavender, '50')}` : C.border}`,
+                        background: selected === q.id ? `${tint(C.lavender, '10')}` : C.bg,
                         color: selected === q.id ? C.lavender : 'var(--text-secondary)',
                         cursor: 'pointer', textAlign: 'left', transition: 'all 0.15s',
                     }}>
@@ -120,7 +121,7 @@ function HypothesisTab() {
                     </div>
                 )}
                 {error && (
-                    <div style={{ padding: 20, background: 'rgba(35, 83, 71, 0.08)', border: `1px solid ${C.crimson}30`, borderRadius: 14, display: 'flex', gap: 12, alignItems: 'flex-start' }}>
+                    <div style={{ padding: 20, background: 'rgba(35, 83, 71, 0.08)', border: `1px solid ${tint(C.crimson, '30')}`, borderRadius: 14, display: 'flex', gap: 12, alignItems: 'flex-start' }}>
                         <AlertCircle size={18} color={C.crimson} style={{ flexShrink: 0, marginTop: 2 }} />
                         <div style={{ fontSize: 13, color: 'var(--text-secondary)', lineHeight: 1.6 }}>{error}</div>
                     </div>
@@ -130,8 +131,8 @@ function HypothesisTab() {
                         {/* Verdict banner */}
                         <div style={{
                             padding: '20px 24px', borderRadius: 16,
-                            background: result.significant ? `${C.crimson}12` : `${C.teal}10`,
-                            border: `1px solid ${result.significant ? `${C.crimson}35` : `${C.teal}30`}`,
+                            background: result.significant ? `${tint(C.crimson, '12')}` : `${tint(C.teal, '10')}`,
+                            border: `1px solid ${result.significant ? `${tint(C.crimson, '35')}` : `${tint(C.teal, '30')}`}`,
                             display: 'flex', alignItems: 'flex-start', gap: 14,
                         }}>
                             {result.significant
@@ -192,7 +193,7 @@ function HypothesisTab() {
 }
 
 // ── BIG DATA ANALYTICS TAB ───────────────────────────────────────────────────
-const RISK_COLORS: Record<string, string> = { HIGH: C.crimson, MEDIUM: C.gold, LOW: C.teal, CRITICAL: 'var(--risk-critical)' };
+const RISK_COLORS: Record<string, string> = { HIGH: 'var(--risk-high)', MEDIUM: C.gold, LOW: C.teal, CRITICAL: 'var(--risk-critical)' };
 const AGE_COLORS = [C.teal, C.gold, C.rose, C.crimson];
 
 function BigDataTab() {
@@ -215,7 +216,7 @@ function BigDataTab() {
     );
 
     if (error) return (
-        <div style={{ padding: 20, background: 'rgba(35, 83, 71, 0.08)', border: `1px solid ${C.crimson}30`, borderRadius: 14, fontSize: 13, color: 'var(--text-secondary)' }}>
+        <div style={{ padding: 20, background: 'rgba(35, 83, 71, 0.08)', border: `1px solid ${tint(C.crimson, '30')}`, borderRadius: 14, fontSize: 13, color: 'var(--text-secondary)' }}>
             ⚠️ {error}
         </div>
     );
@@ -238,7 +239,7 @@ function BigDataTab() {
                     { label: '% Medium Risk', value: `${stats.pct_medium?.toFixed(1) || 0}%`, color: C.gold },
                     { label: '% Low Risk', value: `${stats.pct_low?.toFixed(1) || 0}%`, color: C.teal },
                 ].map(kpi => (
-                    <div key={kpi.label} style={{ background: C.bg, border: `1px solid ${kpi.color}20`, borderRadius: 14, padding: '18px 20px', textAlign: 'center' }}>
+                    <div key={kpi.label} style={{ background: C.bg, border: `1px solid ${tint(kpi.color, '20')}`, borderRadius: 14, padding: '18px 20px', textAlign: 'center' }}>
                         <div style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 10 }}>{kpi.label}</div>
                         <div style={{ fontSize: 28, fontWeight: 900, color: kpi.color, fontFamily: 'var(--font-mono)' }}>{kpi.value}</div>
                     </div>
@@ -350,7 +351,7 @@ export default function ResearchAnalyticsPage() {
             {/* Header */}
             <div style={{ marginBottom: 28 }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 8 }}>
-                    <div style={{ width: 40, height: 40, borderRadius: 12, background: `linear-gradient(135deg, ${C.lavender}, #7B2FF7)`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 20 }}>🔬</div>
+                    <div style={{ width: 40, height: 40, borderRadius: 12, background: `linear-gradient(135deg, ${C.lavender}, var(--accent-primary-dim))`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 20 }}>🔬</div>
                     <div>
                         <h1 style={{ fontSize: 22, fontWeight: 900, color: 'var(--text-primary)', letterSpacing: '-0.02em' }}>Research & Analytics</h1>
                         <p style={{ fontSize: 13, color: 'var(--text-muted)', marginTop: 2 }}>Population-level statistical analysis — aggregated, anonymized clinic-wide data</p>
@@ -366,10 +367,10 @@ export default function ResearchAnalyticsPage() {
                 {TABS.map(t => (
                     <button key={t.id} onClick={() => setTab(t.id)} style={{
                         padding: '10px 22px', borderRadius: 10, border: 'none', cursor: 'pointer',
-                        background: tab === t.id ? `${C.lavender}18` : 'transparent',
+                        background: tab === t.id ? `${tint(C.lavender, '18')}` : 'transparent',
                         color: tab === t.id ? C.lavender : 'var(--text-secondary)',
                         fontWeight: tab === t.id ? 800 : 600, fontSize: 13.5,
-                        boxShadow: tab === t.id ? `0 0 0 1px ${C.lavender}35` : 'none',
+                        boxShadow: tab === t.id ? `0 0 0 1px ${tint(C.lavender, '35')}` : 'none',
                         transition: 'all 0.15s',
                     }}>
                         {t.label}

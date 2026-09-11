@@ -15,8 +15,9 @@ import { Link } from 'react-router-dom';
 import { useAuthStore } from '../store/authStore';
 import { doctorName } from '../utils/doctorName';
 
+import { tint } from '../utils/tint';
 const RISK_COLORS: Record<string, string> = {
-    CRITICAL: 'var(--accent-primary)', HIGH: 'var(--accent-primary-hover)', MEDIUM: 'var(--risk-medium)', LOW: 'var(--risk-low)',
+    CRITICAL: 'var(--risk-critical-text)', HIGH: 'var(--risk-high-text)', MEDIUM: 'var(--risk-medium-text)', LOW: 'var(--risk-low-text)',
 };
 
 function KpiCard({ kpi, delay }: { kpi: any; delay: number }) {
@@ -25,7 +26,7 @@ function KpiCard({ kpi, delay }: { kpi: any; delay: number }) {
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 14 }}>
                 <div style={{
                     width: 40, height: 40, borderRadius: 12,
-                    background: `${kpi.color}15`, border: `1px solid ${kpi.color}25`,
+                    background: `${tint(kpi.color, '15')}`, border: `1px solid ${tint(kpi.color, '25')}`,
                     display: 'flex', alignItems: 'center', justifyContent: 'center',
                 }}>
                     <kpi.icon size={18} style={{ color: kpi.color }} strokeWidth={1.75} />
@@ -167,12 +168,12 @@ export default function DashboardPage() {
                     { label: '🚨 View Alerts', sub: 'Review open alerts', to: '/alerts', color: 'var(--risk-low-text)' },
                 ].map(a => (
                     <Link key={a.to} to={a.to} style={{
-                        display: 'flex', flexDirection: 'column', gap: 4, background: `${a.color}08`,
-                        border: `1px solid ${a.color}20`, borderRadius: 14, padding: '14px 18px',
+                        display: 'flex', flexDirection: 'column', gap: 4, background: `${tint(a.color, '08')}`,
+                        border: `1px solid ${tint(a.color, '20')}`, borderRadius: 14, padding: '14px 18px',
                         textDecoration: 'none', transition: 'all 0.15s ease',
                     }}
-                        onMouseOver={e => (e.currentTarget as HTMLAnchorElement).style.background = `${a.color}14`}
-                        onMouseOut={e => (e.currentTarget as HTMLAnchorElement).style.background = `${a.color}08`}
+                        onMouseOver={e => (e.currentTarget as HTMLAnchorElement).style.background = `${tint(a.color, '14')}`}
+                        onMouseOut={e => (e.currentTarget as HTMLAnchorElement).style.background = `${tint(a.color, '08')}`}
                     >
                         <span style={{ fontSize: 13, fontWeight: 800, color: a.color }}>{a.label}</span>
                         <span style={{ fontSize: 11, color: 'var(--text-muted)' }}>{a.sub}</span>
@@ -198,7 +199,7 @@ export default function DashboardPage() {
                             <div style={{ display: 'flex', flexWrap: 'wrap', gap: '5px 12px', justifyContent: 'center', marginTop: 6 }}>
                                 {riskPieData.map((r: any) => (
                                     <div key={r.name} style={{ display: 'flex', alignItems: 'center', gap: 5, fontSize: 11 }}>
-                                        <div style={{ width: 7, height: 7, borderRadius: '50%', background: r.color, boxShadow: `0 0 5px ${r.color}80` }} />
+                                        <div style={{ width: 7, height: 7, borderRadius: '50%', background: r.color, boxShadow: `0 0 5px ${tint(r.color, '80')}` }} />
                                         <span style={{ color: 'var(--text-secondary)' }}>{r.name}: <strong style={{ color: 'var(--text-primary)' }}>{r.value}</strong></span>
                                     </div>
                                 ))}
@@ -239,7 +240,7 @@ export default function DashboardPage() {
                                     <span style={{ fontFamily: 'var(--font-mono)', fontSize: 13, fontWeight: 700, color: RISK_COLORS[p.currentRiskLevel] || 'var(--text-muted)' }}>
                                         {p.riskScore?.toFixed(1)}
                                     </span>
-                                    <span style={{ fontSize: 10, fontWeight: 700, padding: '2px 7px', borderRadius: 20, color: RISK_COLORS[p.currentRiskLevel] || 'var(--text-muted)', background: `${RISK_COLORS[p.currentRiskLevel] || 'var(--surface-2)'}15`, border: `1px solid ${RISK_COLORS[p.currentRiskLevel] || 'var(--surface-border)'}25` }}>
+                                    <span style={{ fontSize: 10, fontWeight: 700, padding: '2px 7px', borderRadius: 20, color: RISK_COLORS[p.currentRiskLevel] || 'var(--text-muted)', background: `${tint(RISK_COLORS[p.currentRiskLevel] || 'var(--surface-2)', '15')}`, border: `1px solid ${tint(RISK_COLORS[p.currentRiskLevel] || 'var(--surface-border)', '25')}` }}>
                                         {p.currentRiskLevel}
                                     </span>
                                 </div>

@@ -146,7 +146,7 @@ export default function DoctorPatientsPage() {
                                 <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginBottom: 14 }}>
                                     <div style={{
                                         width: 50, height: 50, borderRadius: 14, flexShrink: 0,
-                                        background: 'linear-gradient(135deg, #00E5FF22, #6366f122)',
+                                        background: 'var(--surface-3)',
                                         border: '1px solid rgba(35, 83, 71, 0.2)',
                                         display: 'flex', alignItems: 'center', justifyContent: 'center',
                                         fontSize: 18, fontWeight: 800, color: 'var(--accent-primary)',

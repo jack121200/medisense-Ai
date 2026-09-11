@@ -5,6 +5,7 @@ import { patientApi } from '../api/patient.api';
 import { reportApi } from '../api/index';
 import toast from 'react-hot-toast';
 
+import { tint } from '../utils/tint';
 const RISK_LEVELS = ['', 'LOW', 'MEDIUM', 'HIGH', 'CRITICAL'];
 const RISK_COLORS: Record<string, string> = {
     CRITICAL: 'var(--risk-critical)', HIGH: 'var(--risk-high)', MEDIUM: 'var(--risk-medium)', LOW: 'var(--risk-low)',
@@ -108,7 +109,7 @@ export default function PatientsPage() {
                                 style={{
                                     padding: '5px 12px', borderRadius: 9999,
                                     border: `1px solid ${isActive ? color + '50' : 'var(--surface-border)'}`,
-                                    background: isActive ? `${color}15` : 'var(--surface-2)',
+                                    background: isActive ? `${tint(color, '15')}` : 'var(--surface-2)',
                                     color: isActive ? color : 'var(--text-muted)',
                                     fontSize: 11, fontWeight: 700, cursor: 'pointer',
                                     transition: 'all 0.15s',
