@@ -51,6 +51,11 @@ venv/
 ml-service/**/*.pkl
 ml-service/**/*.joblib
 ml-service/**/*.pt
+# ...except the trained artifacts the service actually serves. Render builds
+# the image from the repo, so without these the deployed ML service boots
+# with no models at all. ~17 MB total.
+!ml-service/app/models/*.pkl
+!ml-service/app/models/*.pt
 # Reproducible training-data cache built by prepare_ecg_dataset.py from
 # PhysioNet — regenerate rather than commit (~7MB, derived, not source).
 ml-service/data/mitbih_beats.npz
@@ -70,3 +75,24 @@ Thumbs.db
 # ============================================================
 *.tsbuildinfo
 coverage/
+
+# ============================================================
+# Local tooling / scratch — not part of the project
+# ============================================================
+# MCP server config: machine-specific absolute paths, not portable.
+.mcp.json
+.qodo/
+# Playwright MCP scratch output (snapshots, console logs).
+.playwright-mcp/
+
+# One-off scratch SQL run by hand against a dev database. The real,
+# reviewable seed path is backend/prisma/seed.ts — these diverge from it
+# silently, so they are kept local rather than shipped.
+/check_seeded.sql
+/mark_seeded.sql
+/update.sql
+/update_pass.sql
+
+# Source material for the original project brief — not source code.
+/AntiGravity_Final_Prompt*.docx
+/docx_content.txt

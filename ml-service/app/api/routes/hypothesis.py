@@ -21,7 +21,7 @@ router = APIRouter(prefix="/api/hypothesis", tags=["hypothesis"])
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 CSV_PATH = os.environ.get(
     "HEART_CSV",
-    os.path.join(BASE_DIR, "..", "..", "..", "..", "HeartDiseaseTrain-Test.csv")
+    os.path.join(BASE_DIR, "..", "..", "..", "data", "HeartDiseaseTrain-Test.csv")
 )
 META_PATH = os.path.join(BASE_DIR, "..", "models", "heart_risk_meta.json")
 

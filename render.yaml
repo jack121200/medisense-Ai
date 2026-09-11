@@ -1,0 +1,111 @@
+# ─────────────────────────────────────────────────────────────────────────────
+# Render Blueprint — MediSense AI
+#
+# Creates the backend, the ML service, Postgres and Key Value (Redis) in one
+# go: Render dashboard → New → Blueprint → pick this repo. The frontend is a
+# static Vite build and goes to Vercel instead (see frontend/vercel.json).
+#
+# Click-by-click walkthrough, including every value you are asked for:
+# DEPLOYMENT.md
+#
+# Paths are relative to the repo root and no rootDir is set on purpose —
+# buildFilter is what keeps a frontend-only commit from rebuilding these.
+# ─────────────────────────────────────────────────────────────────────────────
+
+services:
+  # ── ML service — Python / FastAPI ─────────────────────────────────────────
+  # Measured at ~300 MB resident with all seven models loaded, which fits the
+  # free instance's 512 MB. The Dockerfile pins it to one worker: a second
+  # copy of PyTorch, XGBoost and pgmpy would not fit.
+  - type: web
+    name: medisense-ml
+    runtime: docker
+    plan: free
+    region: singapore
+    dockerContext: ./ml-service
+    dockerfilePath: ./ml-service/Dockerfile
+    healthCheckPath: /api/health
+    buildFilter:
+      paths:
+        - ml-service/**
+    envVars:
+      # The backend must send this on every call; it is copied across below.
+      - key: INTERNAL_API_KEY
+        generateValue: true
+
+  # ── Backend — Node / Express / Prisma ────────────────────────────────────
+  - type: web
+    name: medisense-backend
+    runtime: docker
+    plan: free
+    region: singapore
+    dockerContext: ./backend
+    dockerfilePath: ./backend/Dockerfile
+    healthCheckPath: /health
+    buildFilter:
+      paths:
+        - backend/**
+    envVars:
+      - key: NODE_ENV
+        value: production
+      # Free tier has no pre-deploy command, so the container applies pending
+      # Prisma migrations on boot. A no-op when nothing is pending.
+      - key: RUN_MIGRATIONS
+        value: "true"
+      - key: DATABASE_URL
+        fromDatabase:
+          name: medisense-db
+          property: connectionString
+      - key: REDIS_URL
+        fromService:
+          type: keyvalue
+          name: medisense-redis
+          property: connectionString
+      - key: JWT_ACCESS_SECRET
+        generateValue: true
+      - key: JWT_REFRESH_SECRET
+        generateValue: true
+      - key: ML_SERVICE_INTERNAL_KEY
+        fromService:
+          type: web
+          name: medisense-ml
+          envVarKey: INTERNAL_API_KEY
+      # The PUBLIC https URL of medisense-ml. Free services can't receive
+      # private-network traffic, so its internal hostname would not work.
+      - key: ML_SERVICE_URL
+        sync: false
+      # Your Vercel URL exactly — https://, no trailing slash. CORS and the
+      # Socket.IO origin check both compare against it.
+      - key: FRONTEND_URL
+        sync: false
+      # Required at boot. No Vapi account yet? Enter any placeholder — every
+      # feature except the AI Doctor voice call still works.
+      - key: VAPI_API_KEY
+        sync: false
+      - key: VAPI_PUBLIC_KEY
+        sync: false
+      # Paste this same value into Vapi as the Server URL Secret.
+      - key: VAPI_WEBHOOK_SECRET
+        generateValue: true
+      - key: GROQ_API_KEY
+        sync: false
+      # Global cap on AI Doctor calls per day — every call is billed by Vapi.
+      - key: AI_DOCTOR_DAILY_CALL_CAP
+        value: "20"
+
+  # ── Key Value (Redis-compatible) ──────────────────────────────────────────
+  # Rate limits, login lockout, the report lock and the AI Doctor spend cap.
+  - type: keyvalue
+    name: medisense-redis
+    plan: free
+    region: singapore
+    ipAllowList: []   # private network only — nothing outside Render connects
+
+databases:
+  # Free Render Postgres expires 30 days after creation (then 14 days to
+  # upgrade). For a demo that must outlive that, use Neon — DEPLOYMENT.md.
+  - name: medisense-db
+    plan: free
+    region: singapore
+    databaseName: medisense_db
+    user: medisense

@@ -95,7 +95,9 @@ async function main() {
     console.log(`📋 Seeding ${TOTAL} patients in batches of ${BATCH}...`);
 
     for (let batch = 0; batch < TOTAL / BATCH; batch++) {
-        const ops = [];
+        // Typed explicitly: with strictNullChecks on and noImplicitAny off, a bare
+        // `[]` is inferred as never[] and ts-node refuses to run the seed at all.
+        const ops: Promise<unknown>[] = [];
 
         for (let i = 0; i < BATCH; i++) {
             const idx = batch * BATCH + i + 1;
@@ -232,7 +234,7 @@ async function main() {
     // ── Seed vitals for recent patients ──
     console.log('📊 Seeding vitals readings...');
     const recentPatients = await prisma.patient.findMany({ take: 100, select: { id: true, currentRiskLevel: true } });
-    const vitalsOps = [];
+    const vitalsOps: Promise<unknown>[] = [];
     for (const p of recentPatients) {
         const isHighRisk = ['HIGH', 'CRITICAL'].includes(p.currentRiskLevel);
         for (let h = 24 * 7; h >= 0; h -= 0.5) {

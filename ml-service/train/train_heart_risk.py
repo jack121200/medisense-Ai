@@ -35,7 +35,7 @@ BASE_DIR   = os.path.dirname(os.path.abspath(__file__))
 MODELS_DIR = os.path.join(BASE_DIR, "..", "app", "models")
 CSV_PATH   = os.environ.get(
     "HEART_CSV",
-    os.path.join(BASE_DIR, "..", "..", "HeartDiseaseTrain-Test.csv")
+    os.path.join(BASE_DIR, "..", "data", "HeartDiseaseTrain-Test.csv")
 )
 os.makedirs(MODELS_DIR, exist_ok=True)
 

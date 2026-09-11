@@ -134,7 +134,6 @@ services:
       - ALLOWED_ORIGIN=http://backend:5000
     volumes:
       - ./ml-service/app/models:/app/models
-      - ./HeartDiseaseTrain-Test.csv:/app/data/HeartDiseaseTrain-Test.csv:ro
     depends_on:
       postgres:
         condition: service_healthy

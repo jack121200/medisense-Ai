@@ -23,7 +23,7 @@ function checkAnomaly(vitals: {
     ];
 
     let severity = 'NORMAL';
-    let anomalyTypes: string[] = [];
+    const anomalyTypes: string[] = [];
 
     for (const { val, th, name } of checks) {
         if (val <= th.criticalLow || val >= th.criticalHigh) {

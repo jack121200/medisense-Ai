@@ -11,7 +11,9 @@ const options: swaggerJsdoc.Options = {
         },
         servers: [
             {
-                url: process.env.PUBLIC_API_URL || `http://localhost:${process.env.PORT || 5000}`,
+                // Render injects RENDER_EXTERNAL_URL into every web service, so the
+                // docs' "Try it out" targets the live URL there with no extra config.
+                url: process.env.PUBLIC_API_URL || process.env.RENDER_EXTERNAL_URL || `http://localhost:${process.env.PORT || 5000}`,
                 description: process.env.NODE_ENV === 'production' ? 'Production' : 'Development',
             },
         ],

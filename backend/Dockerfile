@@ -20,6 +20,9 @@ RUN apk add --no-cache openssl openssl-dev
 COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/dist ./dist
 COPY prisma ./prisma
+# `npx prisma db seed` in here reads the seed command from package.json and
+# runs it with ts-node, which needs tsconfig.json (for esModuleInterop).
+COPY package.json tsconfig.json ./
 
 # Runs as root by default otherwise. node:20-alpine already ships an
 # unprivileged "node" user (uid 1000) — reuse it rather than defining a new
@@ -29,4 +32,8 @@ RUN mkdir -p logs uploads/lab-reports && chown -R node:node /app
 USER node
 
 EXPOSE 5000
-CMD ["node", "dist/app.js"]
+
+# Render's free tier has no pre-deploy hook and no shell, so the container
+# applies pending migrations itself when RUN_MIGRATIONS=true (render.yaml
+# sets it). Off by default so local compose leaves its database alone.
+CMD ["sh", "-c", "if [ \"$RUN_MIGRATIONS\" = \"true\" ]; then npx prisma migrate deploy || exit 1; fi; exec node dist/app.js"]

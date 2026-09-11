@@ -13,7 +13,10 @@
     "prisma:studio": "prisma studio",
     "test": "jest --coverage",
     "test:watch": "jest --watch",
-    "lint": "eslint src/**/*.ts"
+    "lint": "eslint \"src/**/*.ts\""
+  },
+  "prisma": {
+    "seed": "ts-node prisma/seed.ts"
   },
   "dependencies": {
     "dotenv": "^16.4.1",
