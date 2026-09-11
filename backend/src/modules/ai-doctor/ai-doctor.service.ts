@@ -489,31 +489,53 @@ export const aiDoctorService = {
                     messages: [{ role: 'system', content: systemPrompt }],
                 },
                 voice: {
-                    // Configurable via AI_DOCTOR_TTS_PROVIDER / AI_DOCTOR_TTS_VOICE_ID —
-                    // defaults to the Azure Hindi Neural voice already in use, but a
-                    // capstone budget should try Vapi's own bundled voices or Deepgram
-                    // Aura first (both cheaper/free vs. Azure's per-character billing)
-                    // before spending real money here.
+                    // Azure's Hindi neural voice by default (AI_DOCTOR_TTS_PROVIDER /
+                    // AI_DOCTOR_TTS_VOICE_ID). Deepgram Aura has no Hindi voice and
+                    // Vapi's bundled voices are mostly English, so Azure is the
+                    // practical Hindi option through Vapi.
                     provider: env.AI_DOCTOR_TTS_PROVIDER,
                     voiceId: env.AI_DOCTOR_TTS_VOICE_ID,
+                    // Replies are streamed to the voice in chunks cut at these marks.
+                    // The Hindi danda (।) is listed explicitly rather than left to
+                    // the provider default: a reply written in Devanagari has no "."
+                    // to cut on, and with no boundary the whole reply is synthesised
+                    // before any of it plays.
+                    chunkPlan: {
+                        enabled: true,
+                        punctuationBoundaries: ['.', '!', '?', ',', ';', ':', '।', '॥'],
+                    },
                 },
                 transcriber: {
-                    // nova-3 + "multi", NOT nova-2 + "hi".
+                    // Deepgram Flux Multilingual.
                     //
-                    // This is why the assistant could not hear the patient. Locking
-                    // the transcriber to pure Hindi means an utterance like "pet mein
-                    // BURNING ho raha hai, two weeks se" — which is how people
-                    // actually speak — transcribes to noise or to nothing at all.
-                    // With no transcript the model never receives a turn, so the
-                    // assistant delivers its opening line and then sits silent
-                    // regardless of what is said to it.
+                    // Pure-Hindi nova-2 could not transcribe Hinglish at all, so the
+                    // assistant never heard the patient. nova-3 "multi" fixed hearing
+                    // but has no end-of-turn model: Vapi judged a finished turn from
+                    // the text alone — after punctuation, or, for unpunctuated speech
+                    // (most spoken Hindi), after a fixed 1.8s of silence plus the
+                    // 0.4s wait. Every reply began from a ~2.2s dead gap, and a
+                    // thinking pause could still be taken as the end of a turn. That
+                    // is the stalling, out-of-sync feel.
                     //
-                    // nova-3 with language "multi" is Deepgram's code-switching
-                    // model and handles Hindi/English within a single sentence,
-                    // which is the actual target language here.
+                    // Flux detects end-of-turn inside the speech model, from the
+                    // audio as well as the words, and handles Hindi with mid-sentence
+                    // Hindi/English switching in one stream. The hints bias it toward
+                    // exactly that mix.
                     provider: 'deepgram',
-                    model: 'nova-3',
-                    language: 'multi',
+                    model: 'flux-general-multi',
+                    languages: ['hi', 'en'],
+                    // Turn-end confidence required before replying. Vapi's range is
+                    // 0.5–0.9; 0.7 is the default — lower cuts people off
+                    // mid-thought, higher adds lag.
+                    eotThreshold: 0.7,
+                    // Ceiling on the wait when Flux is unsure a turn is over
+                    // (default 5000ms): the longest silence before a reply is 3s.
+                    eotTimeoutMs: 3000,
+                    // If Flux is unavailable, drop back to nova-3 multilingual
+                    // rather than failing the call.
+                    fallbackPlan: {
+                        transcribers: [{ provider: 'deepgram', model: 'nova-3', language: 'multi' }],
+                    },
                 },
                 firstMessageMode: 'assistant-speaks-first',
                 // Must stay in sync with the OPENING line in buildSystemPrompt()
@@ -523,23 +545,20 @@ export const aiDoctorService = {
                 firstMessage: 'Namaste! Main Priya hoon, aapki AI health assistant — ek real doctor nahi, lekin main aapki baat dhyan se sunungi aur kuch natural suggestions doongi. Bilkul ghabrao mat — aaram se batao apni problem. Toh aaj kya takleef hai?',
                 endCallPhrases: ['goodbye', 'bye', 'alvida', 'shukriya doctor', 'thank you doctor', 'bas itna hi tha'],
 
-                // Turn-taking. Two corrections from the previous configuration:
+                // Turn-taking.
                 //
-                // 1) smartEndpointingPlan is removed. It takes precedence over
-                //    transcriptionEndpointingPlan, so the endpointing values tuned
-                //    below were being silently discarded. Vapi's own docs recommend
-                //    text-based transcription endpointing for non-English work
-                //    because it is language-agnostic, where the smart models are
-                //    tuned per language.
+                // No smartEndpointingPlan: it would override Flux's built-in
+                // end-of-turn detection, and Vapi's text-based smart models are
+                // tuned per language. Vapi ignores transcriptionEndpointingPlan
+                // for a transcriber with built-in endpointing, so the values
+                // below apply only while the nova-3 fallback is in use.
                 //
-                // 2) numWords is no longer 0. Zero means pure voice-activity
-                //    interruption: any sound cuts the assistant off, including its
-                //    own voice echoing back from laptop speakers when the patient
-                //    is not wearing headphones — which reads as the assistant
-                //    talking over itself and stalling. Requiring two real words
-                //    means only actual speech interrupts. It was set to 0 to work
-                //    around interruption never firing, but that was the broken
-                //    transcriber above, not this setting.
+                // numWords is 2, not 0. Zero means any sound interrupts —
+                // including the assistant's own voice echoing back from laptop
+                // speakers — which reads as the assistant cutting itself off.
+                // Two real words means only actual speech interrupts; words like
+                // "stop" and "no" still interrupt at once, and "haan"/"okay"
+                // backchannels never do.
                 startSpeakingPlan: {
                     waitSeconds: 0.4,
                     transcriptionEndpointingPlan: {
