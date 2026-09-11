@@ -84,15 +84,3 @@ coverage/
 .qodo/
 # Playwright MCP scratch output (snapshots, console logs).
 .playwright-mcp/
-
-# One-off scratch SQL run by hand against a dev database. The real,
-# reviewable seed path is backend/prisma/seed.ts — these diverge from it
-# silently, so they are kept local rather than shipped.
-/check_seeded.sql
-/mark_seeded.sql
-/update.sql
-/update_pass.sql
-
-# Source material for the original project brief — not source code.
-/AntiGravity_Final_Prompt*.docx
-/docx_content.txt
