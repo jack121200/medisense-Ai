@@ -219,8 +219,9 @@ cd medisense-Ai
 cp .env.example .env                                     # fill in every CHANGE_ME
 
 docker compose up --build -d
-docker compose exec backend npx prisma migrate deploy    # create the tables
-docker compose exec backend npx prisma db seed           # demo data
+docker compose exec backend npx prisma migrate deploy           # create the tables
+docker compose exec backend npx prisma db seed                  # demo accounts + training data
+docker compose exec backend node prisma/seed-real-patients.js   # the patients the dashboards show
 ```
 
 Open **http://localhost**. The backend validates every required variable at boot and exits naming whichever one is missing.

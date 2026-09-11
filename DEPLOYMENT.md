@@ -93,8 +93,10 @@ JWT secrets. You type in five values.
 
 ## Step 2 — Load the demo data (once, from your PC)
 
-The tables exist but they're empty — nobody can log in yet. The seed creates
-the demo accounts and a set of sample patients.
+The tables exist but they're empty — nobody can log in yet. Two scripts fill
+them: `prisma db seed` creates the demo accounts plus 5,000 generated patients
+that only feed training and analytics (the app deliberately hides them), and
+`seed-real-patients.js` adds the named patients every dashboard shows.
 
 1. Render dashboard → **medisense-db** → **Connect** (top right) → **External**
    tab → copy the **External Database URL**.
@@ -105,13 +107,16 @@ the demo accounts and a set of sample patients.
    npm install                                        # skip if you've run the project before
    $env:DATABASE_URL = "PASTE-EXTERNAL-DATABASE-URL-HERE"
    npx prisma db seed
+   node prisma/seed-real-patients.js                  # the patients the dashboards show
    Remove-Item Env:DATABASE_URL                       # so later local runs use your .env again
    ```
 
    If it fails with an SSL/TLS error, add `?sslmode=require` to the end of the URL and run it again.
 
-   It inserts 5,000 sample patients and a week of vitals for 100 of them, so
-   over the internet it takes a few minutes — let it finish, and run it once.
+   The first command inserts 5,000 background patients and a week of vitals for
+   100 of them, so over the internet it takes a few minutes — let it finish.
+   Run each command once. Skip the second and every dashboard opens at zero
+   patients.
 3. It finishes by printing the demo logins. All of them use the password
    `MediSense@2024`: `admin@medisense.ai` · `doctor@medisense.ai` · `patient@medisense.ai`
 
@@ -281,6 +286,7 @@ judge will.
 | ML routes return 401 | `ML_SERVICE_INTERNAL_KEY` ≠ `INTERNAL_API_KEY`. The Blueprint links them — don't edit either by hand. |
 | ML routes time out or return 502 | `ML_SERVICE_URL` is wrong, or the ML service is still waking up. |
 | Demo login says "Invalid email or password" | [Step 2](#step-2--load-the-demo-data-once-from-your-pc) hasn't been run against this database. |
+| Dashboards show 0 patients | Only `prisma db seed` ran, and its patients are hidden training data. Run `node prisma/seed-real-patients.js` — [Step 2](#step-2--load-the-demo-data-once-from-your-pc). |
 | A call connects but no report arrives | The Vapi Server URL or `X-Vapi-Secret` doesn't match — [Step 5](#step-5-optional--voice-ai-doctor-the-vapi-webhook). |
 | `/start-call` returns 503 | The daily cap was reached — `AI_DOCTOR_DAILY_CALL_CAP`. |
 | The first request takes about a minute | Free-tier cold start. Warm both services before demoing. |
