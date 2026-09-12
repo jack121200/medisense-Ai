@@ -11,7 +11,7 @@
     },
     "dependencies": {
         "@tanstack/react-table": "^8.11.6",
-        "@vapi-ai/web": "^2.3.0",
+        "@vapi-ai/web": "^2.7.0",
         "axios": "^1.6.5",
         "date-fns": "^3.3.1",
         "framer-motion": "^11.0.3",
@@ -23,8 +23,8 @@
         "react-router-dom": "^6.21.3",
         "recharts": "^2.10.4",
         "socket.io-client": "^4.6.1",
-        "zustand": "^4.5.0",
-        "zod": "^3.22.4"
+        "zod": "^3.22.4",
+        "zustand": "^4.5.0"
     },
     "devDependencies": {
         "@types/node": "^20.11.5",
