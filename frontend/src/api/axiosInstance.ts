@@ -21,12 +21,20 @@ api.interceptors.request.use(
     (error) => Promise.reject(error)
 );
 
+// Auth endpoints that return a 401 on their own failure (wrong password, an
+// already-used refresh token, …) rather than because a session expired —
+// the refresh-and-retry dance below must never run for these, or a plain
+// "wrong password" turns into a hard redirect that wipes the form and any
+// error on it before the user ever sees it.
+const SKIP_REFRESH = ['/auth/login', '/auth/register', '/auth/patient-register', '/auth/refresh'];
+
 // Response interceptor — handle 401 refresh
 api.interceptors.response.use(
     (response) => response,
     async (error) => {
         const original = error.config;
-        if (error.response?.status === 401 && !original._retry) {
+        const isAuthEndpoint = SKIP_REFRESH.some((p) => original?.url?.includes(p));
+        if (error.response?.status === 401 && !original._retry && !isAuthEndpoint) {
             original._retry = true;
             try {
                 const refreshToken = useAuthStore.getState().refreshToken;
@@ -41,7 +49,12 @@ api.interceptors.response.use(
             }
         }
         const message = error.response?.data?.message || 'Something went wrong';
-        if (error.response?.status !== 401) toast.error(message);
+        // A non-auth-endpoint 401 already means the refresh attempt above
+        // failed and the page is redirecting — a toast would just flash
+        // and vanish. Auth-endpoint 401s (bad login/register credentials)
+        // are real errors the caller displays inline, but they're worth a
+        // toast too, same as any other failure.
+        if (error.response?.status !== 401 || isAuthEndpoint) toast.error(message);
         return Promise.reject(error);
     }
 );
