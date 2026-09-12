@@ -50,8 +50,8 @@ This is a live call, not an essay. Ask ONE question, then STOP and wait for the 
 
 BEDSIDE MANNER: Calm, empathetic, unhurried. Always let the patient finish before you speak.
 
-OPENING — start with EXACTLY this (or the natural English equivalent if the patient opens in English). The AI-assistant disclosure is part of the opening line itself, not something the patient has to ask for:
-"Namaste! Main Dr. Arjun hoon, aapka AI health assistant — ek real doctor nahi, lekin main aapki baat dhyan se sununga aur kuch natural suggestions doonga. Bilkul ghabrao mat — aaram se batao apni problem. Toh aaj kya takleef hai?"
+OPENING — start with EXACTLY this (or the natural English equivalent if the patient opens in English). Kept to one short breath, same as every other turn — the AI-assistant disclosure is part of the line itself, not something the patient has to ask for:
+"Namaste! Main Dr. Arjun — ek AI health assistant, real doctor nahi. Batao, aaj kya takleef hai?"
 
 CONSULTATION FLOW — before giving any advice, cover these one question at a time, in order (skip areas clearly irrelevant to the complaint):
 1. Chief complaint — what's wrong, since when, sudden or gradual, severity 1-10
@@ -529,8 +529,13 @@ export const aiDoctorService = {
                     // mid-thought, higher adds lag.
                     eotThreshold: 0.7,
                     // Ceiling on the wait when Flux is unsure a turn is over
-                    // (default 5000ms): the longest silence before a reply is 3s.
-                    eotTimeoutMs: 3000,
+                    // (default 5000ms). This is a cap, not the typical wait —
+                    // most turns end well before it on eotThreshold alone — but
+                    // every uncertain turn was eating the full 3s here, which is
+                    // exactly the "reply feels padded/lagging" complaint. 1.5s
+                    // still leaves room for a thinking pause in Hindi speech
+                    // without holding up every hesitant turn for three seconds.
+                    eotTimeoutMs: 1500,
                     // If Flux is unavailable, drop back to nova-3 multilingual
                     // rather than failing the call.
                     fallbackPlan: {
@@ -541,8 +546,10 @@ export const aiDoctorService = {
                 // Must stay in sync with the OPENING line in buildSystemPrompt()
                 // above — both carry the same AI-assistant disclosure, since
                 // Vapi speaks this literal string first before the LLM turn loop
-                // even starts.
-                firstMessage: 'Namaste! Main Dr. Arjun hoon, aapka AI health assistant — ek real doctor nahi, lekin main aapki baat dhyan se sununga aur kuch natural suggestions doonga. Bilkul ghabrao mat — aaram se batao apni problem. Toh aaj kya takleef hai?',
+                // even starts. Kept to one breath on purpose: the original ran
+                // ~40 words / 15+ seconds of TTS before the patient could speak
+                // at all, which read as a wall of talking, not a greeting.
+                firstMessage: 'Namaste! Main Dr. Arjun — ek AI health assistant, real doctor nahi. Batao, aaj kya takleef hai?',
                 endCallPhrases: ['goodbye', 'bye', 'alvida', 'shukriya doctor', 'thank you doctor', 'bas itna hi tha'],
 
                 // Turn-taking.
